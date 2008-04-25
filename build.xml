@@ -1,0 +1,365 @@
+<!-- Copyright 2008 BEA Systems Inc.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+-->
+<project name="sdo" default="usage" basedir=".">
+
+    <!-- properties -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="lib.dir" value="${build.dir}/lib"/>
+    <property name="ar.dir" value="${build.dir}/ar"/>
+    <property name="external.lib.dir" value="external/lib"/>
+
+    <property name="debug" value="true"/>
+
+    <property name="testbuild.file" value="test/build.xml"/>
+
+    <!-- manifest properties -->
+    <property name="manifest.name" value="davos/sdo/"/>
+    <property name="manifest.title" value="davos.sdo"/>
+    <property name="manifest.vendor" value="BEA Systems, Inc."/>
+
+
+    <!-- SDO version -->
+    <property name="version.base" value="2.1.1"/>
+
+    <!-- paths -->
+    <path id="xbean.classpath">
+        <pathelement location="${lib.dir}/xbean.jar"/>
+        <pathelement location="${lib.dir}/jsr173_1.0_api.jar"/>
+    </path>
+
+
+    <!-- targets -->
+
+    <!-- default target -->
+    <target name="usage">
+        <echo message="The following ant targets are defined:"/>
+        <echo/>
+        <echo message="clean       - cleans everything"/>
+        <echo message="build       - compiles the code"/>
+        <echo message="deploy      - deploys the code"/>
+        <echo message="drt         - runs drts"/>
+    </target>
+
+    <!-- clean targets -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="clean.classes">
+        <delete dir="${classes.dir}"/>
+    </target>
+
+    <target name="clean.ar">
+        <delete dir="${ar.dir}"/>
+    </target>
+
+    <!-- initial setup and utility targets -->
+    <target name="java_version">
+        <echo message="${ant.java.version}"/>
+    </target>
+
+    <target name="dirs">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${lib.dir}"/>
+    </target>
+
+    <target name="extract.xbean.jars.check">
+        <uptodate property="extract.xbean.jars.notneeded"
+            srcfile="${external.lib.dir}/xbean.jar"
+            targetfile="${lib.dir}/xbean.jar"/>
+    </target>
+
+    <target name="extract.xbean.jars" depends="extract.xbean.jars.check" unless="extract.xbean.jars.notneeded">
+        <echo message="Extracting xbean.jar and jsr173_1.0_api.jar into ${lib.dir}"/>
+        <copy file="${external.lib.dir}/xbean.jar" todir="${lib.dir}"/>
+        <copy file="${external.lib.dir}/jsr173_1.0_api.jar" todir="${lib.dir}"/>
+    </target>
+
+    <target name="compile" depends="build">
+        <echo message="Compiling code in dir ${src.dir} to dir ${classes.dir}"/>
+    </target>
+
+    <target name="ant.classes" depends="dirs, binding.classes, publicapi.classes">
+        <mkdir dir="${classes.dir}/ant"/>
+        <javac srcdir="${src.dir}/ant" destdir="${classes.dir}/ant" debug="${debug}">
+            <classpath id="ant.compile.path">
+                <pathelement location="${classes.dir}/binding"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="api.classes" depends="dirs">
+        <mkdir dir="${classes.dir}/api"/>
+        <javac srcdir="${src.dir}/api" destdir="${classes.dir}/api" debug="${debug}">
+        </javac>
+    </target>
+
+    <target name="publicapi.classes" depends="dirs, api.classes">
+        <mkdir dir="${classes.dir}/publicapi"/>
+        <javac srcdir="${src.dir}/publicapi" destdir="${classes.dir}/publicapi" debug="${debug}">
+            <classpath id="publicapi.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+        <copy todir="${classes.dir}/publicapi">
+            <fileset dir="${src.dir}/publicapi">
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="helpers.classes" depends="dirs, api.classes, publicapi.classes, common.classes,
+        type.classes">
+        <mkdir dir="${classes.dir}/helpers"/>
+        <javac srcdir="${src.dir}/helpers" destdir="${classes.dir}/helpers" debug="${debug}">
+            <classpath id="helpers.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/common"/>
+                <pathelement location="${classes.dir}/type"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="path.classes" depends="dirs, api.classes, publicapi.classes, type.classes, helpers.classes">
+        <mkdir dir="${classes.dir}/path"/>
+        <javac srcdir="${src.dir}/path" destdir="${classes.dir}/path" debug="${debug}">
+            <classpath id="path.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/helpers"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="xpath.classes" depends="dirs, api.classes, publicapi.classes, type.classes, common.classes">
+        <mkdir dir="${classes.dir}/xpath"/>
+        <javac srcdir="${src.dir}/xpath" destdir="${classes.dir}/xpath" debug="${debug}">
+            <classpath id="path.compile.xpath">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/common"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="common.classes" depends="dirs, api.classes, publicapi.classes">
+        <mkdir dir="${classes.dir}/common"/>
+        <javac srcdir="${src.dir}/common" destdir="${classes.dir}/common" debug="${debug}">
+            <classpath id="common.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="type.classes" depends="dirs, api.classes, publicapi.classes, common.classes">
+        <mkdir dir="${classes.dir}/type"/>
+        <javac srcdir="${src.dir}/type" destdir="${classes.dir}/type" debug="${debug}">
+            <classpath id="type.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/common"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="data.classes" depends="dirs, api.classes, publicapi.classes, path.classes,
+        common.classes, type.classes, helpers.classes">
+        <mkdir dir="${classes.dir}/data"/>
+        <javac srcdir="${src.dir}/data" destdir="${classes.dir}/data" debug="${debug}">
+            <classpath id="data.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/path"/>
+                <pathelement location="${classes.dir}/common"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/helpers"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+        <copy todir="${classes.dir}/data">
+            <fileset dir="${src.dir}/data">
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="marshal.classes" depends="dirs, api.classes, publicapi.classes, common.classes,
+        helpers.classes, type.classes, data.classes, xpath.classes">
+        <mkdir dir="${classes.dir}/marshal"/>
+        <javac srcdir="${src.dir}/marshal" destdir="${classes.dir}/marshal" debug="${debug}">
+            <classpath id="marshal.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/common"/>
+                <pathelement location="${classes.dir}/helpers"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/data"/>
+                <pathelement location="${classes.dir}/xpath"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="binding.classes" depends="dirs, api.classes, publicapi.classes, common.classes, type.classes,
+        data.classes">
+        <mkdir dir="${classes.dir}/binding"/>
+        <javac srcdir="${src.dir}/binding" destdir="${classes.dir}/binding" debug="${debug}">
+            <classpath id="binding.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/common"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/data"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+        <copy file="${src.dir}/binding/davos/sdo/impl/binding/wsdl/soap-encoding-11.xsd"
+            toDir="${classes.dir}/binding/davos/sdo/impl/binding/wsdl"/>
+    </target>
+
+    <target name="provider.classes" depends="dirs, api.classes, helpers.classes, type.classes, data.classes,
+        marshal.classes, publicapi.classes, binding.classes, type.classes">
+        <mkdir dir="${classes.dir}/provider"/>
+        <javac srcdir="${src.dir}/provider" destdir="${classes.dir}/provider" debug="${debug}">
+            <classpath id="provider.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/helpers"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/data"/>
+                <pathelement location="${classes.dir}/marshal"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/binding"/>
+                <pathelement location="${classes.dir}/type"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="schemas.compile.check">
+        <uptodate property="schemas.compile.notneeded"
+            targetfile="${classes.dir}/schemas">
+            <srcfiles dir="${src.dir}/schemas" includes="*.xsd"/>
+        </uptodate>
+    </target>
+
+    <target name="schemas.compile" depends="dirs, schemas.compile.check" unless="schemas.compile.notneeded">
+        <taskdef name="xmlbeans" classname="org.apache.xmlbeans.impl.tool.XMLBean" classpathref="xbean.classpath"/>
+        <mkdir dir="${classes.dir}/schemas"/>
+        <!-- We need to use the "schema" attribute rather than a nested fileset, because if we use a
+        nested fileset, then the source .xsds in the generated jar get put in a directory that
+        depends on the current directory ant was invoked from; that is not good
+        -->
+        <xmlbeans srconly="true"
+                  srcgendir="${classes.dir}/private/xmlbeans" classgendir="${classes.dir}/schemas"
+                  schema="${src.dir}/schemas" typesystemname="sSDOSCHEMAS">
+        </xmlbeans>
+    </target>
+
+    <target name="version" unless="version.notrequired">
+        <!-- p4 must be on the path -->
+        <echo message="Trying to get revision number..."/>
+        <exec executable="p4" output="build/p4info.properties" failifexecutionfails="false" dir="${basedir}">
+            <arg line="changes -m1 ...#have"/>
+        </exec>
+        <replaceregexp file="build/p4info.properties"
+            match="Change (.*) on .*"
+            replace="p4.change=\1"/>
+        <property file="build/p4info.properties"/>
+
+        <property name="manifest.comment" value="SDO version ${version.base}-${p4.change}"/>
+
+        <echo message="${manifest.comment}"/>
+    </target>
+
+    <target name="sdo_jar" depends="extract.xbean.jars, api.classes, publicapi.classes,
+        path.classes, xpath.classes, common.classes, helpers.classes, marshal.classes,
+        provider.classes, type.classes, binding.classes, schemas.compile, version" >
+
+        <mkdir dir="${ar.dir}"/>
+
+        <condition property="p4.change" value="">
+            <not><isset property="p4.change"/></not>
+        </condition>
+        <property name="version.full" value="${version.base}-${p4.change}"/>
+
+        <jar destfile="${ar.dir}/sdo.jar" index="true" >
+            <fileset dir="${classes.dir}/api" />
+            <fileset dir="${classes.dir}/publicapi" />
+            <fileset dir="${classes.dir}/path" />
+            <fileset dir="${classes.dir}/xpath" />
+            <fileset dir="${classes.dir}/common" />
+            <fileset dir="${classes.dir}/helpers" />
+            <fileset dir="${classes.dir}/type" />
+            <fileset dir="${classes.dir}/data" />
+            <fileset dir="${classes.dir}/provider" />
+            <fileset dir="${classes.dir}/binding" />
+            <fileset dir="${classes.dir}/marshal" />
+            <fileset dir="${classes.dir}/ant" />
+            <fileset dir="${classes.dir}/schemas"/>
+            <manifest>
+                <section name="${manifest.name}">
+                    <attribute name="Comment" value="${manifest.vendor} Version ${version.full}"/>
+                    <attribute name="Implementation-Title" value="${manifest.title}"/>
+                    <attribute name="Implementation-Version" value="${version.full}"/>
+                    <attribute name="Implementation-Vendor" value="${manifest.vendor}"/>
+                </section>
+            </manifest>
+        </jar>
+
+    </target>
+
+    <!-- high level targets -->
+    <target name="build" depends="extract.xbean.jars, api.classes, publicapi.classes, common.classes,
+        helpers.classes, marshal.classes, provider.classes, type.classes, data.classes, binding.classes, ant.classes"/>
+
+    <target name="deploy" depends="build, sdo_jar"/>
+    <target name="deploy-dev">
+        <antcall target="deploy">
+            <param name="version.notrequired" value="true"/>
+        </antcall>
+    </target>
+
+    <target name="redeploy" depends="clean, deploy"/>
+    <target name="redeploy-dev">
+        <antcall target="redeploy">
+            <param name="version.notrequired" value="true"/>
+        </antcall>
+    </target>
+
+    <target name="drt" depends="deploy-dev">
+      <ant antfile="${testbuild.file}" target="checkin" inheritall="false"/>
+    </target>
+
+    <target name="run.drt" depends="deploy-dev">
+      <ant antfile="${testbuild.file}" target="clean.cor" inheritall="false"/>
+      <ant antfile="${testbuild.file}" target="run.checkin" inheritall="false"/>
+    </target>
+
+</project>
