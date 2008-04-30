@@ -14,15 +14,15 @@
  *-->
 <xb:config xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config">
 
-  <xb:namespace uri="javax.sdo">
+  <xb:namespace uri="commonj.sdo">
     <xb:package>davos.sdo.impl.schemas.v2_1</xb:package>
   </xb:namespace>
 
-  <xb:namespace uri="javax.sdo/xml">
+  <xb:namespace uri="commonj.sdo/xml">
     <xb:package>davos.sdo.impl.schemas.v2_1.xml</xb:package>
   </xb:namespace>
 
-  <xb:namespace uri="javax.sdo/java">
+  <xb:namespace uri="commonj.sdo/java">
     <xb:package>davos.sdo.impl.schemas.v2_1.java</xb:package>
   </xb:namespace>
 
