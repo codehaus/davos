@@ -22,7 +22,7 @@ package davos.sdo.impl.common;
 public class Names
 {
     public static final String URI_DOM_XMLNS = "http://www.w3.org/2000/xmlns/";
-    public static final String URI_SDO = "javax.sdo";
+    public static final String URI_SDO = "commonj" + "." + "sdo"; // using + to avoid changes when repackaging
     public static final String URI_SDOXML = URI_SDO + "/xml";
     public static final String URI_SDOJAVA = URI_SDO + "/java";
     public static final String URI_XSD = "http://www.w3.org/2001/XMLSchema";
