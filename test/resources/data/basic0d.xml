@@ -1,0 +1,7 @@
+<tns:a xmlns:tns="http://sdo/test/basic0">
+    <b b0="true">
+        <b1>12</b1>
+        <b2>bb</b2>
+    </b>
+    <c>aaa</c>
+</tns:a>

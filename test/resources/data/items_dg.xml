@@ -1,0 +1,26 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary logging="false" create="I105" xmlns:cho="http://www.example.com/choice">
+        <cho:items sdo:ref="#/sdo:datagraph/cho:items[1]"><cho:shirt sdo:ref="I117"/><cho:pants sdo:ref="I321"/><cho:shirt sdo:ref="I115"/></cho:items>
+        <cho:shirt sdo:ref="I115">
+            <cho:color>white</cho:color>
+        </cho:shirt>
+    </changeSummary>
+    <cho:items xmlns:cho="http://www.example.com/choice">
+        <cho:shirt cho:id="I117">
+            <cho:color>blue</cho:color>
+            <cho:size cho:collar="15" cho:sleeve="33"/>
+        </cho:shirt>
+        <cho:pants cho:id="I321">
+            <cho:color>navy blue</cho:color>
+            <cho:size cho:waist="32" cho:inseam="33"/>
+        </cho:pants>
+        <cho:shirt cho:id="I115">
+            <cho:color>french blue</cho:color>
+            <cho:size cho:collar="16" cho:sleeve="34"/>
+        </cho:shirt>
+        <cho:shirt cho:id="I105">
+            <cho:color>pink</cho:color>
+            <cho:size cho:collar="16" cho:sleeve="34"/>
+        </cho:shirt>
+    </cho:items>
+</sdo:datagraph>

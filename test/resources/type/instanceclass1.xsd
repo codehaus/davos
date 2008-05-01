@@ -1,0 +1,137 @@
+<schema targetNamespace="http://sdo/test/instanceclass1"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/instanceclass1"
+  xmlns:sdo="commonj.sdo"
+  xmlns:sdox="commonj.sdo/xml"
+  xmlns:sdoj="commonj.sdo/java">
+
+  <simpleType name="a1">
+    <restriction base="int">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="a2">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="a3">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxInclusive value="2147483648"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="a4" sdoj:instanceClass="java.lang.Short">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <!-- integer types within and not within range of int -->
+  <simpleType name="i1a">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i1b">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxInclusive value="2147483648"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i2a">
+    <restriction base="nonPositiveInteger">
+      <minInclusive value="-999"/>
+      <maxInclusive value="0"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i2b">
+    <restriction base="nonPositiveInteger">
+      <minInclusive value="-2147483649"/>
+      <maxInclusive value="0"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i3a">
+    <restriction base="negativeInteger">
+      <minExclusive value="-1000"/>
+      <maxExclusive value="-1"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i3b">
+    <restriction base="negativeInteger">
+      <minInclusive value="-2147483649"/>
+      <maxExclusive value="-1"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i4a">
+    <restriction base="nonNegativeInteger">
+      <minInclusive value="0"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i4b">
+    <restriction base="nonNegativeInteger">
+      <minInclusive value="0"/>
+      <maxInclusive value="2147483648"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i5a">
+    <restriction base="positiveInteger">
+      <minExclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i5b">
+    <restriction base="positiveInteger">
+      <minExclusive value="1"/>
+      <maxInclusive value="2147483648"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i6a">
+    <restriction base="long">
+      <enumeration value="123"/>
+      <enumeration value="456"/>
+      <enumeration value="789"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i6b">
+    <restriction base="long">
+      <enumeration value="123456789"/>
+      <enumeration value="1234567890"/>
+      <enumeration value="2147483648"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i7a">
+    <restriction base="unsignedLong">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="i7b">
+    <restriction base="unsignedLong">
+      <minInclusive value="2147483648"/>
+      <maxExclusive value="18446744073709551615"/>
+    </restriction>
+  </simpleType>
+
+</schema>

@@ -1,0 +1,37 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="checkin/substitution"
+    elementFormDefault="qualified" xmlns:tns="checkin/substitution">
+
+    <xs:complexType name="base">
+        <xs:sequence>
+            <xs:element name="e" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="derived">
+        <xs:complexContent>
+            <xs:extension base="tns:base">
+                <xs:attribute name="a" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="derived2">
+        <xs:complexContent>
+            <xs:extension base="tns:derived">
+                <xs:attribute name="b" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="a" type="tns:base"/>
+    <xs:element name="b" type="tns:derived" substitutionGroup="tns:a"/>
+
+    <xs:element name="root">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="tns:a" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

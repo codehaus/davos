@@ -1,0 +1,8 @@
+<copy:quote xmlns:copy="http://sdo/test/copy2">
+    <symbol>XYZ</symbol>
+    <quantity>300</quantity>
+    <price><currency>USD</currency><amount>14.25</amount></price>
+    <price><currency>USD</currency><amount>14.75</amount></price>
+    <price><currency>USD</currency><amount>14.5</amount></price>
+    <reserve><currency>USD</currency><amount>14.0</amount></reserve>
+</copy:quote>

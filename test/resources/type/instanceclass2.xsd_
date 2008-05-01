@@ -1,0 +1,36 @@
+<schema targetNamespace="http://sdo/test/instanceclass2"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/instanceclass2"
+  xmlns:sdo="commonj.sdo"
+  xmlns:sdox="commonj.sdo/xml"
+  xmlns:sdoj="commonj.sdo/java">
+
+  <simpleType name="a1">
+    <restriction base="int">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="a2">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="a3">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxInclusive value="2147483648"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="a4" sdoj:instanceClass="java.lang.Short">
+    <restriction base="integer">
+      <minInclusive value="1"/>
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+</schema>

@@ -1,0 +1,30 @@
+<xs:schema targetNamespace="http://www.example.com/choice" elementFormDefault="qualified" sdojava:package="com.example.choice" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sdo="commonj.sdo" xmlns:sdoxml="commonj.sdo/xml" xmlns:sdojava="commonj.sdo/java" xmlns:tns="http://www.example.com/choice">
+  <xs:complexType name="ItemsType" mixed="true">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element type="tns:ShirtType" name="shirt" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="tns:PantsType" name="pants" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ShirtType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="color" minOccurs="0"/>
+      <xs:element type="tns:ShirtSize" name="size" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:ID" name="id" form="qualified"/>
+  </xs:complexType>
+  <xs:complexType name="PantsType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="color" minOccurs="0"/>
+      <xs:element type="tns:PantsSize" name="size" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:ID" name="id" form="qualified"/>
+  </xs:complexType>
+  <xs:complexType name="ShirtSize">
+    <xs:attribute type="xs:int" name="collar" form="qualified"/>
+    <xs:attribute type="xs:int" name="sleeve" form="qualified"/>
+  </xs:complexType>
+  <xs:complexType name="PantsSize">
+    <xs:attribute type="xs:int" name="waist" form="qualified"/>
+    <xs:attribute type="xs:int" name="inseam" form="qualified"/>
+  </xs:complexType>
+</xs:schema>

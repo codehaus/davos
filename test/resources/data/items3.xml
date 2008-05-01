@@ -1,0 +1,18 @@
+<cho:items xmlns:cho="http://www.example.com/choice">
+    <cho:pants cho:id="RL-799">
+        <cho:color>black</cho:color>
+        <cho:size cho:waist="32" cho:inseam="32"/>
+    </cho:pants>
+    <cho:shirt cho:id="RL-005">
+        <cho:color>white</cho:color>
+        <cho:size cho:collar="15" cho:sleeve="33"/>
+    </cho:shirt>
+    <cho:shirt cho:id="RL-006">
+        <cho:color>blue</cho:color>
+        <cho:size cho:collar="16" cho:sleeve="34"/>
+    </cho:shirt>
+    <cho:shirt cho:id="TH-134">
+        <cho:color>french blue</cho:color>
+        <cho:size cho:collar="15" cho:sleeve="33"/>
+    </cho:shirt>
+</cho:items>

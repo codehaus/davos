@@ -1,0 +1,8 @@
+<com:company xmlns:com="company4a.xsd" 
+    name="ACME" employeeOfTheMonth="#departments[1]/employees[2]">
+    <departments name="AdvancedTechnologies" location="NY" number="123">
+        <employees name="John Jones" SN="E0001"/>
+        <employees name="Mary Smith" SN="E0002" manager="true"/>
+        <employees name="Jane Doe" SN="E0003"/>
+    </departments>
+</com:company>

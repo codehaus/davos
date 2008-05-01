@@ -1,0 +1,26 @@
+<xs:schema targetNamespace="http://sdo/test/anil" elementFormDefault="qualified" sdojava:package="sdo.test.anil" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sdo="commonj.sdo" xmlns:sdoxml="commonj.sdo/xml" xmlns:sdojava="commonj.sdo/java" xmlns:tns="http://sdo/test/anil">
+  <xs:complexType name="NormalizedCustomer1">
+    <xs:sequence>
+      <xs:element type="xs:string" name="cid" minOccurs="0"/>
+      <xs:element type="xs:string" name="fname" minOccurs="0"/>
+      <xs:element type="xs:string" name="lname" minOccurs="0"/>
+      <xs:element type="xs:dateTime" name="since" minOccurs="0"/>
+      <xs:element type="xs:string" name="email" minOccurs="0"/>
+      <xs:element type="xs:string" name="tel" minOccurs="0"/>
+      <xs:element type="xs:string" name="ssn" minOccurs="0"/>
+      <xs:element type="xs:decimal" name="credit" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NormalizedCustomer2Type">
+    <xs:sequence>
+      <xs:element type="xs:string" name="cid" minOccurs="0"/>
+      <xs:element type="xs:string" name="fname" minOccurs="0"/>
+      <xs:element type="xs:string" name="lname" minOccurs="0"/>
+      <xs:element type="xs:dateTime" name="since" minOccurs="0"/>
+      <xs:element type="xs:string" name="email" minOccurs="0"/>
+      <xs:element type="xs:string" name="tel" minOccurs="0"/>
+      <xs:element type="xs:string" name="ssn" minOccurs="0"/>
+      <xs:element type="xs:decimal" name="credit" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,50 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://aldsp.bea.com/test/sdocs1"
+  targetNamespace="http://aldsp.bea.com/test/sdocs1"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+  <xs:element name="ORDER" type="tns:OrderType"/>
+  <xs:element name="LINE_ITEM" type="tns:LineItemType"/>
+  <xs:complexType name="LineItemType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="LINE_ID"/>
+      <xs:element type="xs:string" name="ORDER_ID"/>
+      <xs:element type="xs:integer" name="STORE_ID"/>
+      <xs:element type="xs:string" name="PRODUCT_NAME"/>
+      <xs:element type="xs:string" name="STATUS"/>
+      <xs:element type="xs:dateTime" name="EXPECTED_SHIP_DATE"/>
+      <xs:element type="xs:integer" name="QUANTITY"/>
+      <xs:element type="xs:decimal" name="PRICE"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element type="xs:dateTime" name="ORDER_DATE"/>
+      <xs:element type="xs:string" name="ORDER_ID"/>
+      <xs:element type="xs:integer" name="STORE_ID"/>
+      <xs:element type="xs:integer" name="CUSTOMER_ID"/>
+      <xs:element type="xs:string" name="SHIP_METHOD"/>
+      <xs:element type="xs:decimal" name="TOTAL_ORDER_AMOUNT"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="tns:LINE_ITEM"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CustomerOrder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:string" name="FIRST_NAME"/>
+        <xs:element type="xs:string" name="LAST_NAME"/>
+        <xs:element type="xs:integer" name="CUSTOMER_ID"/>
+        <xs:element type="xs:string" name="STATE"/>
+        <xs:element type="xs:integer" name="ZIPCODE"/>
+        <xs:element type="xs:string" name="CITY"/>
+        <xs:element type="xs:string" name="STREET_ADDRESS2"/>
+        <xs:element type="xs:string" name="STREET_ADDRESS1"/>
+        <xs:element type="xs:dateTime" name="CUSTOMER_SINCE"/>
+        <xs:element type="xs:string" name="EMAIL_ADDRESS"/>
+        <xs:element type="xs:integer" name="TELEPHONE_NUMBER"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="tns:ORDER"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

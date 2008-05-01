@@ -1,0 +1,34 @@
+<items xmlns="http://sdo/test/substitution">
+  <product>
+    <name>special</name>
+    <number>X999</number>
+  </product>
+  <shirt>
+    <name>classic T</name>
+    <number>I213</number>
+    <size>M</size>
+    <color>navy</color>
+  </shirt>
+  <shirt>
+    <name>classic T</name>
+    <number>I213</number>
+    <size>L</size>
+    <color>white</color>
+  </shirt>
+  <hat>
+    <name>black fedora</name>
+    <number>H455</number>
+    <size>9</size>
+  </hat>
+  <!--
+  <hat>
+    <name>brown fedora</name>
+    <number>H456</number>
+    <size>10</size>
+  </hat>
+  -->
+  <umbrella>
+    <name>golf deluxe</name>
+    <number>T011</number>
+  </umbrella>
+</items>

@@ -1,0 +1,251 @@
+<definitions targetNamespace="ld:LogicalDSs/Customer_view.ws" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="ld:LogicalDSs/Customer_view.ws" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <documentation>AquaLogic Data Services Web Service</documentation>
+  <types>
+    <xsd:schema targetNamespace="ld:LogicalDSs/Customer_view.ws" xmlns:dsns0="ld:logicalDS/CUSTOMER_VIEW" xmlns:sdo="commonj.sdo">
+      <xsd:import namespace="ld:logicalDS/CUSTOMER_VIEW"/>
+      <xsd:import namespace="commonj.sdo"/>
+      <xsd:element name="createCUSTOMER_VIEW">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="p">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element ref="dsns0:CUSTOMER_VIEW" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="createCUSTOMER_VIEWResponse">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateCUSTOMER_VIEW">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="p">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="value" type="dsns0:CUSTOMER_VIEW" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateCUSTOMER_VIEWResponse">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="deleteCUSTOMER_VIEW">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="p">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element ref="dsns0:CUSTOMER_VIEW" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="deleteCUSTOMER_VIEWResponse">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getAll">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getAllResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="dsns0:CUSTOMER_VIEW" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+    <xs:schema targetNamespace="ld:PhysicalDSs/CUSTOMER_ORDER" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="CUSTOMER_ORDER">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ORDER_ID" type="xs:string"/>
+            <xs:element name="C_ID" type="xs:string"/>
+            <xs:element name="ORDER_DT" type="xs:date"/>
+            <xs:element name="SHIP_METHOD_DSC" type="xs:string"/>
+            <xs:element name="HANDLING_CHRG_AMT" type="xs:decimal"/>
+            <xs:element name="SUBTOTAL_AMT" type="xs:decimal"/>
+            <xs:element name="TOTAL_ORDER_AMT" type="xs:decimal"/>
+            <xs:element name="SALE_TAX_AMT" type="xs:decimal"/>
+            <xs:element name="SHIP_TO_ID" type="xs:string"/>
+            <xs:element name="SHIP_TO_NM" type="xs:string"/>
+            <xs:element name="BILL_TO_ID" type="xs:string"/>
+            <xs:element name="ESTIMATED_SHIP_DT" type="xs:date"/>
+            <xs:element name="STATUS" type="xs:string"/>
+            <xs:element name="TRACKING_NO" type="xs:string" minOccurs="0"/>
+            <xs:element name="DATE_INT" type="xs:long" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+    <xs:schema targetNamespace="ld:PhysicalDSs/CUSTOMER" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="CUSTOMER">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CUSTOMER_ID" type="xs:string"/>
+            <xs:element name="FIRST_NAME" type="xs:string"/>
+            <xs:element name="LAST_NAME" type="xs:string"/>
+            <xs:element name="CUSTOMER_SINCE" type="xs:date"/>
+            <xs:element name="EMAIL_ADDRESS" type="xs:string"/>
+            <xs:element name="TELEPHONE_NUMBER" type="xs:string"/>
+            <xs:element name="SSN" type="xs:string" minOccurs="0"/>
+            <xs:element name="BIRTH_DAY" type="xs:date" minOccurs="0"/>
+            <xs:element name="DEFAULT_SHIP_METHOD" type="xs:string" minOccurs="0"/>
+            <xs:element name="EMAIL_NOTIFICATION" type="xs:short" minOccurs="0"/>
+            <xs:element name="NEWS_LETTTER" type="xs:short" minOccurs="0"/>
+            <xs:element name="ONLINE_STATEMENT" type="xs:short" minOccurs="0"/>
+            <xs:element name="LOGIN_ID" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+    <xs:schema targetNamespace="ld:logicalDS/CUSTOMER_VIEW" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="ld:logicalDS/CUSTOMER_VIEW">
+      <xs:element name="CUSTOMER_VIEW" type="tns:CUSTOMER_VIEW"/>
+      <xs:complexType name="CUSTOMER_VIEW">
+          <xs:sequence>
+            <xs:element name="CUSTOMER_ID" type="xs:string"/>
+            <xs:element name="FIRST_NAME" type="xs:string"/>
+            <xs:element name="LAST_NAME" type="xs:string"/>
+            <xs:element name="CUSTOMER_SINCE" type="xs:date"/>
+            <xs:element name="EMAIL_ADDRESS" type="xs:string"/>
+            <xs:element name="TELEPHONE_NUMBER" type="xs:string"/>
+            <xs:element name="SSN" type="xs:string" minOccurs="0"/>
+            <xs:element name="BIRTH_DAY" type="xs:date" minOccurs="0"/>
+            <xs:element name="DEFAULT_SHIP_METHOD" type="xs:string" minOccurs="0"/>
+            <xs:element name="EMAIL_NOTIFICATION" type="xs:integer" minOccurs="0"/>
+            <xs:element name="NEWS_LETTTER" type="xs:integer" minOccurs="0"/>
+            <xs:element name="ONLINE_STATEMENT" type="xs:integer" minOccurs="0"/>
+            <xs:element name="CREDIT_LIMIT" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="ORDERS">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="ORDER" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="CUSTOMER_ID" type="xs:string"/>
+                        <xs:element name="ORDER_ID" type="xs:string"/>
+                        <xs:element name="ORDER_DATE" type="xs:date"/>
+                        <xs:element name="SHIP_METHOD" type="xs:string"/>
+                        <xs:element name="HANDLING_CHARGE" type="xs:decimal"/>
+                        <xs:element name="SUBTOTAL" type="xs:decimal"/>
+                        <xs:element name="TOTAL_ORDER_AMOUNT" type="xs:decimal"/>
+                        <xs:element name="SALE_TAX" type="xs:decimal"/>
+                        <xs:element name="SHIP_TO" type="xs:string"/>
+                        <xs:element name="SHIP_TO_NAME" type="xs:string"/>
+                        <xs:element name="BILL_TO" type="xs:string"/>
+                        <xs:element name="ESTIMATED_SHIP_DATE" type="xs:date"/>
+                        <xs:element name="STATUS" type="xs:string"/>
+                        <xs:element name="TRACKING_NUMBER" type="xs:string" minOccurs="0"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </types>
+  <message name="getAllIn">
+    <part name="parameters" element="tns:getAll"/>
+  </message>
+  <message name="getAllOut">
+    <part name="return" element="tns:getAllResponse"/>
+  </message>
+  <message name="createCUSTOMER_VIEWIn">
+    <part name="parameters" element="tns:createCUSTOMER_VIEW"/>
+  </message>
+  <message name="createCUSTOMER_VIEWOut">
+    <part name="return" element="tns:createCUSTOMER_VIEWResponse"/>
+  </message>
+  <message name="updateCUSTOMER_VIEWIn">
+    <part name="parameters" element="tns:updateCUSTOMER_VIEW"/>
+  </message>
+  <message name="updateCUSTOMER_VIEWOut">
+    <part name="return" element="tns:updateCUSTOMER_VIEWResponse"/>
+  </message>
+  <message name="deleteCUSTOMER_VIEWIn">
+    <part name="parameters" element="tns:deleteCUSTOMER_VIEW"/>
+  </message>
+  <message name="deleteCUSTOMER_VIEWOut">
+    <part name="return" element="tns:deleteCUSTOMER_VIEWResponse"/>
+  </message>
+  <portType name="Customer_viewPortType">
+    <operation name="getAll">
+      <input message="tns:getAllIn"/>
+      <output message="tns:getAllOut"/>
+    </operation>
+    <operation name="createCUSTOMER_VIEW">
+      <input message="tns:createCUSTOMER_VIEWIn"/>
+      <output message="tns:createCUSTOMER_VIEWOut"/>
+    </operation>
+    <operation name="updateCUSTOMER_VIEW">
+      <input message="tns:updateCUSTOMER_VIEWIn"/>
+      <output message="tns:updateCUSTOMER_VIEWOut"/>
+    </operation>
+    <operation name="deleteCUSTOMER_VIEW">
+      <input message="tns:deleteCUSTOMER_VIEWIn"/>
+      <output message="tns:deleteCUSTOMER_VIEWOut"/>
+    </operation>
+  </portType>
+  <binding name="Customer_viewSoapBinding" type="tns:Customer_viewPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="getAll">
+      <soap:operation soapAction="ld:LogicalDSs/Customer_view.ws/getAll" style="document"/>
+      <input>
+        <soap:body message="getAllIn" parts="parameters" use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="createCUSTOMER_VIEW">
+      <soap:operation soapAction="ld:LogicalDSs/Customer_view.ws/createCUSTOMER_VIEW" style="document"/>
+      <input>
+        <soap:body message="createCUSTOMER_VIEWIn" parts="parameters" use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="updateCUSTOMER_VIEW">
+      <soap:operation soapAction="ld:LogicalDSs/Customer_view.ws/updateCUSTOMER_VIEW" style="document"/>
+      <input>
+        <soap:body message="updateCUSTOMER_VIEWIn" parts="parameters" use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="deleteCUSTOMER_VIEW">
+      <soap:operation soapAction="ld:LogicalDSs/Customer_view.ws/deleteCUSTOMER_VIEW" style="document"/>
+      <input>
+        <soap:body message="deleteCUSTOMER_VIEWIn" parts="parameters" use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="Customer_viewSoapService">
+    <port binding="tns:Customer_viewSoapBinding" name="Customer_viewSoapPort">
+      <soap:address location="http://localhost:7001/RTLApp/ALDSPWebService/LogicalDSs/Customer_view.ws"/>
+    </port>
+  </service>
+</definitions>

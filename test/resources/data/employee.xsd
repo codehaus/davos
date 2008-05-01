@@ -1,0 +1,30 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/employee"
+  xmlns="http://sdo/test/employee"
+  xmlns:sdoxml="commonj.sdo/xml"
+  elementFormDefault="qualified">
+  <xs:element name="employee" type="employeeType" sdoxml:many="false"/>
+  <xs:complexType name="employeeType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="address" type="addressType"/>
+      <xs:element name="phone" type="phoneType" maxOccurs="3"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="addressType">
+    <xs:sequence>
+      <xs:element name="street" type="xs:string"/>
+      <xs:element name="city" type="xs:NCName"/>
+      <xs:element name="state" type="xs:NCName"/>
+      <xs:element name="zip" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="phoneType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="location" type="xs:NCName" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

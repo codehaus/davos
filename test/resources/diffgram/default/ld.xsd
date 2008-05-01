@@ -1,0 +1,169 @@
+<xsd:schema 
+    targetNamespace="ld-default-type-test" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:ns1="ld-default-type-test">
+    <!-- .NET has issues with the commented out default values -->
+    <xsd:element name="default_all_types">
+        <xsd:annotation>
+            <xsd:documentation>{ID, IDREF, IDREFS, ENTITY, ENTITIES, NMTOKEN, NMTOKENS} are not in element</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="ns1:ElementTypes" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="ns1:AttributeTypes" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="ElementTypes">
+        <xsd:complexType>
+            <xsd:sequence>
+                <!-- <xsd:element name="anyURI" type="xsd:anyURI" default="http://www.yahoo.com" minOccurs="0"/> -->
+                <xsd:element name="anyURI" type="xsd:anyURI" minOccurs="0"/>
+                <!-- <xsd:element name="base64Binary" type="xsd:base64Binary" default="GpM7"/> -->
+                <xsd:element name="base64Binary" type="xsd:base64Binary" minOccurs="0"/>
+                <xsd:element name="boolean" type="xsd:boolean" default="1" minOccurs="0"/>
+                <!-- <xsd:element name="byte" type="xsd:byte" default="1"/> -->
+                <xsd:element name="byte" type="xsd:byte" minOccurs="0"/>
+                <!-- <xsd:element name="datetype" type="xsd:date" default="1999-03-01"/>
+                <xsd:element name="dateTime" type="xsd:dateTime" default="2005-04-04T12:12:12" minOccurs="0"/> -->
+                <xsd:element name="datetype" type="xsd:date" minOccurs="0"/> 
+                <xsd:element name="dateTime" type="xsd:dateTime" minOccurs="0"/>
+                <xsd:element name="decimal" type="xsd:decimal" default="12.76" minOccurs="0"/>
+                <xsd:element name="double" type="xsd:double" default="234.678" minOccurs="0"/>
+                <xsd:element name="duration" type="xsd:duration" default="P20DT15H" minOccurs="0"/>
+                <xsd:element name="float" type="xsd:float" default="1.0E34" minOccurs="0"/>
+                <!-- <xsd:element name="gDay" type="xsd:gDay" default="+++31" minOccurs="0"/>
+                <xsd:element name="gMonth" type="xsd:gMonth" default="++05" minOccurs="0"/>
+                <xsd:element name="gMonthDay" type="xsd:gMonthDay" default="++05-31" minOccurs="0"/>
+                <xsd:element name="gYear" type="xsd:gYear" default="1999" minOccurs="0"/>
+                <xsd:element name="gYearMonth" type="xsd:gYearMonth" default="1999-02" minOccurs="0"/> -->
+                <xsd:element name="gDay" type="xsd:gDay" minOccurs="0"/>
+                <xsd:element name="gMonth" type="xsd:gMonth" minOccurs="0"/>
+                <xsd:element name="gMonthDay" type="xsd:gMonthDay" minOccurs="0"/>
+                <xsd:element name="gYear" type="xsd:gYear" minOccurs="0"/>
+                <xsd:element name="gYearMonth" type="xsd:gYearMonth" minOccurs="0"/> 
+                <!-- <xsd:element name="hexBinary" type="xsd:hexBinary"  minOccurs="0"/> -->
+                <xsd:element name="hexBinary" type="xsd:hexBinary" default="0FB7" minOccurs="0"/>
+                <xsd:element name="int" type="xsd:int" default="123" minOccurs="0"/>
+                <xsd:element name="integer" type="xsd:integer" default="121" minOccurs="0"/>
+                <xsd:element name="language" type="xsd:language" default="en-US" minOccurs="0"/>
+                <xsd:element name="long" type="xsd:long" default="125698" minOccurs="0"/>
+                <xsd:element name="Name" type="xsd:Name" default="ElementTypes" minOccurs="0"/>
+                <xsd:element name="NCName" type="xsd:NCName" default="USAddress" minOccurs="0"/>
+                <xsd:element name="negativeInteger" type="xsd:negativeInteger" default="-123" minOccurs="0"/>
+                <!-- <xsd:element name="nonNegativeInteger" type="xsd:nonNegativeInteger" default="23" minOccurs="0"/> -->
+                <xsd:element name="nonNegativeInteger" type="xsd:nonNegativeInteger" minOccurs="0"/>
+                <xsd:element name="nonPositiveInteger" type="xsd:nonPositiveInteger" default="-98" minOccurs="0"/>
+                <xsd:element name="normalizedString" type="xsd:normalizedString" minOccurs="0"/>
+                <!-- <xsd:element name="positiveInteger" type="xsd:positiveInteger" default="1254" minOccurs="0"/> -->
+                <!-- <xsd:element name="QName" type="xsd:QName" default="ns1:ElementTypes" minOccurs="0"/> -->
+                <xsd:element name="positiveInteger" type="xsd:positiveInteger" minOccurs="0"/>
+                <xsd:element name="QName" type="xsd:QName" minOccurs="0"/> 
+                <xsd:element name="short" type="xsd:short" default="3456" minOccurs="0"/>
+                <xsd:element name="string" type="xsd:string" default="hellothere" minOccurs="0"/>
+                <!-- <xsd:element name="time" type="xsd:time" default="13:00:20.000" minOccurs="0"/> -->
+                <xsd:element name="time" type="xsd:time" minOccurs="0"/>
+                <!-- <xsd:element name="token" type="xsd:token" minOccurs="0"/> -->
+                <!-- <xsd:element name="unsignedByte" type="xsd:unsignedByte" default="44" minOccurs="0"/> -->
+                <xsd:element name="unsignedByte" type="xsd:unsignedByte" minOccurs="0"/>
+                <!-- <xsd:element name="unsignedInt" type="xsd:unsignedInt" default="5555" minOccurs="0"/>
+                <xsd:element name="unsignedLong" type="xsd:unsignedLong" default="777" minOccurs="0"/>
+                <xsd:element name="unsignedShort" type="xsd:unsignedShort" default="78" minOccurs="0"/> -->
+                <xsd:element name="unsignedLong" type="xsd:unsignedLong" minOccurs="0"/>
+                <xsd:element name="unsignedInt" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element name="unsignedShort" type="xsd:unsignedShort" minOccurs="0"/>
+                <!-- <xsd:element name="yearMonthDuration" type="ns1:yearMonthDuration" default="P1Y2M" minOccurs="0"/>
+                <xsd:element name="dayTimeDuration" type="ns1:dayTimeDuration" default="P0DT0H" minOccurs="0"/> -->
+                <xsd:element name="yearMonthDuration" type="ns1:yearMonthDuration" minOccurs="0"/>
+                <xsd:element name="dayTimeDuration" type="ns1:dayTimeDuration" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="AttributeTypes">
+        <xsd:complexType>
+            <!-- <xsd:attribute name="anyURI" type="xsd:anyURI" use="optional" default="http://www.yahoo.com"/> -->
+            <xsd:attribute name="anyURI" type="xsd:anyURI" use="optional"/>
+            <!-- <xsd:attribute name="base64Binary" type="xsd:base64Binary" use="optional" default="GpM8"/> -->
+            <xsd:attribute name="base64Binary" type="xsd:base64Binary" use="optional"/>
+            <xsd:attribute name="boolean" type="xsd:boolean" use="optional" default="false"/>
+            <!-- <xsd:attribute name="byte" type="xsd:byte" use="optional" default="1"/> -->
+            <xsd:attribute name="byte" type="xsd:byte" use="optional"/>
+            <!-- <xsd:attribute name="date" type="xsd:date" use="optional" default="1998-06-06"/>
+            <xsd:attribute name="dateTime" type="xsd:dateTime" use="optional" default="1998-08-08T12:23:23"/> -->
+            <xsd:attribute name="date" type="xsd:date" use="optional"/>
+            <xsd:attribute name="dateTime" type="xsd:dateTime" use="optional"/>
+            <xsd:attribute name="decimal" type="xsd:decimal" use="optional" default="123.32"/>
+            <xsd:attribute name="double" type="xsd:double" use="optional" default="4567.43"/>
+            <!-- <xsd:attribute name="duration" type="xsd:duration" use="optional" default="P1Y2M3DT10H30M12.3S"/> -->
+            <!-- <xsd:attribute name="ENTITIES" type="xsd:ENTITIES" use="optional" default="AttributeTypes"/> -->
+            <!-- <xsd:attribute name="ENTITY" type="xsd:ENTITY" use="optional" default="ElementTypes"/> -->
+            <xsd:attribute name="duration" type="xsd:duration" use="optional"/>
+            <xsd:attribute name="ENTITIES" type="xsd:ENTITIES" use="optional"/>
+            <xsd:attribute name="ENTITY" type="xsd:ENTITY" use="optional"/>
+            <xsd:attribute name="float" type="xsd:float" use="optional" default="12.43"/> 
+            <!-- <xsd:attribute name="gDay" type="xsd:gDay" use="optional" default="+++21"/>
+            <xsd:attribute name="gMonth" type="xsd:gMonth" use="optional" default="++09"/>
+            <xsd:attribute name="gMonthDay" type="xsd:gMonthDay" use="optional" default="++09-21"/>
+            <xsd:attribute name="gYear" type="xsd:gYear" use="optional" default="2003"/>
+            <xsd:attribute name="gYearMonth" type="xsd:gYearMonth" use="optional" default="2004-03"/>-->
+            <!-- <xsd:attribute name="hexBinary" type="xsd:hexBinary" use="optional" default="0FC8"/> -->
+            <!-- <xsd:attribute name="IDREF" type="xsd:IDREF" use="optional" default="AttributeTypes"/>
+            <xsd:attribute name="IDREFS" type="xsd:IDREFS" use="optional" default="ElementTypes"/> -->
+            <xsd:attribute name="gDay" type="xsd:gDay" use="optional"/>
+            <xsd:attribute name="gMonth" type="xsd:gMonth" use="optional"/>
+            <xsd:attribute name="gMonthDay" type="xsd:gMonthDay" use="optional"/>
+            <xsd:attribute name="gYear" type="xsd:gYear" use="optional"/>
+            <xsd:attribute name="gYearMonth" type="xsd:gYearMonth" use="optional"/>
+            <xsd:attribute name="hexBinary" type="xsd:hexBinary" use="optional"/>
+            <xsd:attribute name="IDREF" type="xsd:IDREF" use="optional"/>
+            <xsd:attribute name="IDREFS" type="xsd:IDREFS" use="optional"/>
+            <xsd:attribute name="int" type="xsd:int" use="optional" default="1298"/>
+            <xsd:attribute name="integer" type="xsd:integer" use="optional" default="5555"/>
+            <xsd:attribute name="language" type="xsd:language" use="optional" default="en-US"/>
+            <xsd:attribute name="long" type="xsd:long" use="optional" default="985643"/>
+            <xsd:attribute name="Name" type="xsd:Name" use="optional" default="ElementTypes"/>
+            <xsd:attribute name="NCName" type="xsd:NCName" use="optional" default="types"/> 
+            <xsd:attribute name="negativeInteger" type="xsd:negativeInteger" use="optional" default="-9845"/>
+            <!-- <xsd:attribute name="NMTOKEN" type="xsd:NMTOKEN" use="optional" default="ElementTypes"/> -->
+            <!-- <xsd:attribute name="NMTOKENS" type="xsd:NMTOKENS" use="optional" default="TOKEN"/> -->
+            <!-- <xsd:attribute name="nonNegativeInteger" type="xsd:nonNegativeInteger" use="optional" default="2332"/> -->
+            <xsd:attribute name="NMTOKEN" type="xsd:NMTOKEN" use="optional"/> 
+            <xsd:attribute name="NMTOKENS" type="xsd:NMTOKENS" use="optional"/> 
+            <xsd:attribute name="nonNegativeInteger" type="xsd:nonNegativeInteger" use="optional"/> 
+            <xsd:attribute name="nonPositiveInteger" type="xsd:nonPositiveInteger" use="optional"/>
+            <xsd:attribute name="nomalizedString" type="xsd:normalizedString" use="optional" default="normalize this please"/>
+            <!-- XMLBean does not support NOTATION <xsd:attribute name="NOTATION" type="xsd:NOTATION" use="optional" default="ElementTypes"/> -->
+            <!-- <xsd:attribute name="positiveInteger" type="xsd:positiveInteger" use="optional" default="2222"/> -->
+            <xsd:attribute name="positiveInteger" type="xsd:positiveInteger" use="optional"/>
+            <!-- <xsd:attribute name="QName" type="xsd:QName" use="optional" default="ns1:AttributeTypes"/> -->
+            <xsd:attribute name="QName" type="xsd:QName" use="optional"/>
+            <xsd:attribute name="short" type="xsd:short" use="optional" default="34"/>
+            <xsd:attribute name="string" type="xsd:string" use="optional" default="hello there"/>
+            <!-- <xsd:attribute name="time" type="xsd:time" use="optional" default="13:20:00.000"/> -->
+             <xsd:attribute name="time" type="xsd:time" use="optional"/>
+            <!-- <xsd:attribute name="token" type="xsd:token" use="optional" default="USAddress"/> -->
+            <!-- <xsd:attribute name="unsignedByte" type="xsd:unsignedByte" use="optional" default="254"/> -->
+            <!-- <xsd:attribute name="unsignedInt" type="xsd:unsignedInt" use="optional" default="322"/>
+            <xsd:attribute name="unsignedLong" type="xsd:unsignedLong" use="optional" default="333"/>
+            <xsd:attribute name="unisgnedShort" type="xsd:unsignedShort" use="optional" default="566"/> -->
+            <xsd:attribute name="unsignedByte" type="xsd:unsignedByte" use="optional"/> 
+            <xsd:attribute name="unsignedInt" type="xsd:unsignedInt" use="optional"/>
+            <xsd:attribute name="unsignedLong" type="xsd:unsignedLong" use="optional"/>
+            <xsd:attribute name="unisgnedShort" type="xsd:unsignedShort" use="optional"/> 
+            <!-- <xsd:attribute name="yearMonthDuration" type="ns1:yearMonthDuration" use="optional" default="P1Y3M"/>
+            <xsd:attribute name="dayTimeDuration" type="ns1:dayTimeDuration" use="optional" default="P0DT0H"/> -->
+            <xsd:attribute name="yearMonthDuration" type="ns1:yearMonthDuration" use="optional"/>
+            <xsd:attribute name="dayTimeDuration" type="ns1:dayTimeDuration" use="optional"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:simpleType name="yearMonthDuration">
+        <xsd:restriction base="xsd:duration">
+            <xsd:pattern value="[-]?P(\d+Y)?(\d+M)?"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="dayTimeDuration">
+        <xsd:restriction base="xsd:duration">
+            <xsd:pattern value="[-]?P(\d+D)?(T(\d+H)?(\d+M)?(\d+(.\d+)?S)?)?"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

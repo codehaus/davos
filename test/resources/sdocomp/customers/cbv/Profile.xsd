@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema 
+    targetNamespace="urn:Retail" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:Retail="urn:Retail">
+  <xsd:import namespace="urn:Retail" schemaLocation="Address.xsd"/>
+  <xsd:complexType name="PROFILE_TYPE">
+    <xsd:sequence>
+      <xsd:element name="CustomerID" type="xsd:string"/>
+      <xsd:element name="FirstName" type="xsd:string"/>
+      <xsd:element name="LastName" type="xsd:string"/>
+      <xsd:element name="CustomerSince" type="xsd:date"/>
+      <xsd:element name="EmailAddress" type="xsd:string"/>
+      <xsd:element name="TelephoneNumber" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="DefaultShipmentMethod" type="xsd:string" default="GROUND"/>
+      <xsd:element name="EmailNotification" type="xsd:short" default="1"/>
+      <xsd:element name="OnlineStatement" type="xsd:short" default="0"/>
+      <xsd:element name="LoginID" type="xsd:string" default="0"/>
+      <xsd:element name="ADDRESS" type="Retail:ADDRESS_TYPE" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="PROFILE" type="Retail:PROFILE_TYPE"/>
+</xsd:schema>

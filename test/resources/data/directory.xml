@@ -1,0 +1,11 @@
+<dow:directory xsi:type="dow:DirectoryType" xmlns:dow="http://sdo/test/dowcs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dow:changeSummary create="#/dow:directory/dow:listing[1]/dow:phone[2]">
+        <dow:listing sdo:ref="#/dow:directory/dow:listing[1]" name="Robert Smith" xmlns:sdo="commonj.sdo">
+            <dow:phone sdo:ref="#/dow:directory/dow:listing[1]/dow:phone[1]"/>
+        </dow:listing>
+    </dow:changeSummary>
+    <dow:listing name="Roberta Smith">
+        <dow:phone location="work" number="650-234-7701"/>
+        <dow:phone location="home" number="650-927-4321"/>
+    </dow:listing>
+</dow:directory>

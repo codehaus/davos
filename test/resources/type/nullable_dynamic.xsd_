@@ -1,0 +1,23 @@
+<xs:schema 
+  targetNamespace="http://sdo/test/nullable/dynamic"
+  elementFormDefault="qualified"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:sdo="commonj.sdo"
+  xmlns:sdoxml="commonj.sdo/xml"
+  xmlns:sdojava="commonj.sdo/java"
+  xmlns:tns="http://sdo/test/nullable/dynamic">
+  <xs:complexType name="BasicType">
+    <xs:attribute type="xs:boolean" name="x"/>
+    <xs:attribute type="xs:int" name="y"/>
+    <xs:attribute type="xs:string" name="z"/>
+  </xs:complexType>
+  <xs:complexType name="TestType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="a2" minOccurs="0" nillable="true"/>
+      <xs:element type="tns:BasicType" name="b1" minOccurs="0"/>
+      <xs:element type="tns:BasicType" name="b2" minOccurs="0" nillable="true"/>
+      <xs:element type="tns:BasicType" name="c" maxOccurs="unbounded" minOccurs="0" nillable="true"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="a1"/>
+  </xs:complexType>
+</xs:schema>

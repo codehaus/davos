@@ -1,0 +1,36 @@
+<xs:schema
+  xmlns:sdo="commonj.sdo"
+  xmlns:cs="http://www.example.com/simpleCS"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="http://www.example.com/simpleCS">
+
+  <!--xs:import namespace="commonj.sdo" schemaLocation="sdoModel.xsd"/-->
+  
+  <xs:complexType name="RootQuote">
+    <xs:complexContent>
+      <xs:extension base="cs:Quote">
+        <xs:sequence>
+          <xs:element name="changes" type="sdo:ChangeSummaryType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="stockQuote" type="cs:RootQuote"/>
+
+  <xs:complexType name="Quote">
+    <xs:sequence>
+      <xs:element name="symbol" type="xs:string"/>
+      <xs:element name="companyName" type="xs:string"/>
+      <xs:element name="price" type="xs:decimal"/>
+      <xs:element name="open1" type="xs:decimal"/>
+      <xs:element name="high" type="xs:decimal"/>
+      <xs:element name="low" type="xs:decimal"/>
+      <xs:element name="volume" type="xs:double"/>
+      <xs:element name="change1" type="xs:double"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="quotes" type="cs:Quote"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

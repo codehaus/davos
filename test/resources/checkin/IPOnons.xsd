@@ -1,0 +1,78 @@
+<!-- Sample Schema file for the SDO2 spec binding
+    Based on the sample in http://www.w3.org/TR/xmlschema-0/ -->
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    >
+
+    <xs:element name="purchaseOrder" type="PurchaseOrderType"/>
+
+    <xs:element name="comment" type="xs:string"/>
+
+    <xs:complexType name="Address">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="street" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="zip" type="myIntType"/>
+            <xs:element name="state" type="USState"/>
+            <xs:element name="country" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:element name="shipTo" type="Address"/>
+	<xs:element name="billTo" type="Address"/>
+
+    <xs:complexType name="PurchaseOrderType">
+        <xs:sequence>
+            <xs:element ref="comment" minOccurs="0"/>
+            <xs:element name="productName" type="xs:string"/>
+            <xs:element ref="shipTo"/>
+            <xs:element ref="billTo"/>
+            <xs:element name="items" type="Items"/>
+        </xs:sequence>
+        <xs:attribute name="orderDate" type="xs:date"/>
+    </xs:complexType>
+
+    <xs:simpleType name="Quantity">
+        <xs:restriction base="xs:positiveInteger">
+            <xs:maxExclusive value="100"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SKU">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{3}-[A-Z]{2}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Items">
+        <xs:sequence>
+            <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="productName" type="xs:string"/>
+                        <xs:element name="quantity" type="Quantity"/>
+                        <xs:element name="USPrice" type="xs:decimal"/>
+                        <xs:element ref="comment"/>
+                        <xs:element name="shipDate" type="xs:date"/>
+                    </xs:sequence>
+                    <xs:attribute name="partNum" type="SKU" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="USState">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="AZ"/>
+            <xs:enumeration value="CA"/>
+            <xs:enumeration value="PA"/>
+            <xs:enumeration value="WA"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="myIntType">
+        <xs:restriction base="xs:int"/>
+    </xs:simpleType>
+
+</xs:schema>

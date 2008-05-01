@@ -1,0 +1,25 @@
+<schema targetNamespace="http://www.example.com/seq2"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://www.example.com/seq2"
+  xmlns:cho="http://www.example.com/choice"
+  xmlns:sdo="commonj.sdo"
+  elementFormDefault="qualified"
+  attributeFormDefault="qualified">
+
+  <import namespace="http://www.example.com/choice"
+    schemaLocation="choice.xsd"/>
+
+  <element name="items" type="tns:ItemsType"/>
+
+  <complexType name="ItemsType">
+    <sequence>
+      <!--element name="shirt" type="cho:ShirtType"/-->
+      <!--element name="pants" type="cho:PantsType"/-->
+      <!--element name="shirt" type="cho:ShirtType"/-->
+      <element ref="cho:shirt"/>
+      <element ref="cho:pants"/>
+      <element ref="cho:shirt"/>
+    </sequence>
+  </complexType>
+
+</schema>

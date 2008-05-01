@@ -25,6 +25,6 @@ public class ModelsTypeImpl
     extends davos.sdo.impl.data.DataObjectGeneral
     implements davos.sdo.ModelsType
 {
-    public static javax.sdo.Type type = javax.sdo.helper.TypeHelper.INSTANCE.getType("javax.sdo","ModelsType");
+    public static javax.sdo.Type type = javax.sdo.helper.TypeHelper.INSTANCE.getType("commonj.sdo","ModelsType");
 
 }

@@ -1,0 +1,24 @@
+<schema targetNamespace="http://www.example.com/seq1"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://www.example.com/seq1"
+  xmlns:cho="http://www.example.com/choice"
+  xmlns:sdo="commonj.sdo"
+  xmlns:sdox="commonj.sdo/xml"
+  elementFormDefault="qualified"
+  attributeFormDefault="qualified">
+
+  <import namespace="http://www.example.com/choice"
+    schemaLocation="choice.xsd"/>
+
+  <element name="items" type="tns:ItemsType"/>
+
+  <complexType name="ItemsType" sdox:sequence="true">
+    <sequence>
+      <!--element name="shirt" type="cho:ShirtType" maxOccurs="unbounded"/-->
+      <!--element name="pants" type="cho:PantsType" maxOccurs="unbounded"/-->
+      <element ref="cho:shirt" maxOccurs="unbounded"/>
+      <element ref="cho:pants" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+</schema>

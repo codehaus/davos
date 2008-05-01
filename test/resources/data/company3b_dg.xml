@@ -1,0 +1,16 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary xmlns:com="company3b.xsd">
+        <com:company sdo:ref="#/sdo:datagraph/com:company" employeesOfTheMonth="E0004 E0005"/>
+    </changeSummary>
+    <com:company name="ACME" employeesOfTheMonth="E0002 E0003" xmlns:com="company3b.xsd">
+        <departments name="AdvancedTechnologies" location="NY" number="123">
+            <employees name="John Jones" SN="E0001"/>
+            <employees name="Mary Smith" SN="E0002" manager="true"/>
+            <employees name="Jane Doe" SN="E0003"/>
+            <employees name="Al Smith" SN="E0004" manager="true"/>
+        </departments>
+        <departments name="Services" location="CT" number="456">
+            <employees name="Joshua Klein" SN="E0005" manager="true"/>
+        </departments>
+    </com:company>
+</sdo:datagraph>

@@ -47,7 +47,7 @@ import java.io.ObjectStreamException;
  * 
  * [rootXML] is the GZip of the XML serialization of the root DataObject.
  *          The XML serialization is the same as 
- *          XMLHelper.INSTANCE.save(root, "javax.sdo", "dataObject", stream);
+ *          XMLHelper.INSTANCE.save(root, "commonj.sdo", "dataObject", stream);
  *          where stream is a GZIPOutputStream, length is the number of bytes 
  *          in the stream, and bytes are the contents of the stream.
  *          Serialized using writeInt(length), write(bytes).

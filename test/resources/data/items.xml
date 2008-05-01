@@ -1,0 +1,14 @@
+<tns:items xmlns:tns="http://www.example.com/choice">
+  <tns:shirt tns:id="I117">
+    <tns:color>blue</tns:color>
+    <tns:size tns:collar="15" tns:sleeve="33"/>
+  </tns:shirt>
+  <tns:pants tns:id="I321">
+    <tns:color>navy blue</tns:color>
+    <tns:size tns:waist="32" tns:inseam="33"/>
+  </tns:pants>
+  <tns:shirt tns:id="I115">
+    <tns:color>white</tns:color>
+    <tns:size tns:collar="16" tns:sleeve="34"/>
+  </tns:shirt>
+</tns:items>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+  <changeSummary logging="false" create="#/sdo:datagraph/sim:quote[1]/quotes[3] #/sdo:datagraph/sim:quote[1]/quotes[4]" delete="#/sdo:datagraph/changeSummary/sim:quote[1]/quotes[2]" xmlns:sim="http://www.example.com/simple1">
+    <sim:quote sdo:ref="#/sdo:datagraph/sim:quote[1]" sdo:unset="volume">
+      <symbol>fbnt</symbol>
+      <price>1000.0</price>
+      <quotes sdo:ref="#/sdo:datagraph/sim:quote[1]/quotes[1]"/>
+      <quotes>
+        <price>2000.0</price>
+        <quotes>
+          <price>2000.99</price>
+        </quotes>
+      </quotes>
+      <quotes sdo:ref="#/sdo:datagraph/sim:quote[1]/quotes[2]"/>
+    </sim:quote>
+  </changeSummary>
+  <sim:quote xmlns:sim="http://www.example.com/simple1">
+    <symbol>FBNT</symbol>
+    <companyName>FlyByNightTechnology</companyName>
+    <price>999.0</price>
+    <volume>1000.0</volume>
+    <quotes>
+      <price>1500.0</price>
+    </quotes>
+    <quotes>
+      <price>2500.0</price>
+    </quotes>
+    <quotes>
+      <price>3000.0</price>
+    </quotes>
+    <quotes>
+      <price>4000.0</price>
+    </quotes>
+  </sim:quote>
+</sdo:datagraph>

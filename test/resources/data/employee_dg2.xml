@@ -1,0 +1,24 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary create="#/sdo:datagraph/emp:employee/emp:address" delete="#/sdo:datagraph/changeSummary/emp:employee[1]/emp:address" xmlns:emp="http://sdo/test/employee">
+        <emp:employee sdo:ref="#/sdo:datagraph/emp:employee">
+            <emp:address>
+                <emp:street>900 Aurora Ave.</emp:street>
+                <emp:city>Seattle</emp:city>
+                <emp:state>WA</emp:state>
+                <emp:zip>98115</emp:zip>
+            </emp:address>
+        </emp:employee>
+    </changeSummary>
+    <emp:employee xmlns:emp="http://sdo/test/employee">
+        <emp:name>Fred Jones</emp:name>
+        <emp:address>
+            <emp:street>1215 Elm St.</emp:street>
+            <emp:city>Seattle</emp:city>
+            <emp:state>WA</emp:state>
+            <emp:zip>98115</emp:zip>
+        </emp:address>
+        <emp:phone location="work">(425)555-5665</emp:phone>
+        <emp:phone location="home">(206)555-5555</emp:phone>
+        <emp:phone location="mobile">(206)555-4321</emp:phone>
+    </emp:employee>
+</sdo:datagraph>

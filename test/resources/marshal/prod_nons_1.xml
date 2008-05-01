@@ -1,0 +1,5 @@
+<product xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="prod_nons.xsd">
+  <number>557</number>
+  <size>10</size>
+</product>

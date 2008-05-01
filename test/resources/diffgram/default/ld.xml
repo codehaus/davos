@@ -1,0 +1,40 @@
+<ld:default_all_types xmlns:ld="ld-default-type-test">
+    <ld:ElementTypes>
+        <anyURI xmlns="">http://www.yahoo.com/</anyURI>
+        <base64Binary xmlns="">AQ==</base64Binary>
+        <boolean xmlns="">false</boolean>
+        <byte xmlns="">1</byte>
+        <datetype xmlns="">2006-01-12-08:00</datetype>
+        <dateTime xmlns="">2006-01-12T00:25:12.5008168-08:00</dateTime>
+        <decimal xmlns="">12.76</decimal>
+        <double xmlns="">234.678</double>
+        <duration xmlns="">PT0S</duration>
+        <float xmlns="">1E+34</float>
+        <gDay xmlns="">---12-08:00</gDay>
+        <gMonth xmlns="">--01-08:00</gMonth>
+        <gMonthDay xmlns="">--01-12-08:00</gMonthDay>
+        <gYear xmlns="">2006-08:00</gYear>
+        <gYearMonth xmlns="">2006-01-08:00</gYearMonth>
+        <hexBinary xmlns="">0FB7</hexBinary>
+        <int xmlns="">123</int>
+        <integer xmlns="">121</integer>
+        <language xmlns="">en-US</language>
+        <long xmlns="">125698</long>
+        <Name xmlns="">ElementTypes</Name>
+        <NCName xmlns="">USAddress</NCName>
+        <negativeInteger xmlns="">-123</negativeInteger>
+        <nonNegativeInteger xmlns="">1</nonNegativeInteger>
+        <nonPositiveInteger xmlns="">-98</nonPositiveInteger>
+        <normalizedString xmlns="">str</normalizedString>
+        <positiveInteger xmlns="">1</positiveInteger>
+        <QName xmlns="" xmlns:ha="http://www.haha.com">ha:name</QName>
+        <short xmlns="">3456</short>
+        <string xmlns="">hellothere</string>
+        <time xmlns="">00:25:12.5008168-08:00</time>
+        <unsignedByte xmlns="">1</unsignedByte>
+        <unsignedLong xmlns="">1</unsignedLong>
+        <unsignedInt xmlns="">1</unsignedInt>
+        <unsignedShort xmlns="">65535</unsignedShort>
+    </ld:ElementTypes>
+    <ld:AttributeTypes NCName="types" Name="ElementTypes" boolean="false" decimal="123.32" double="4567.43" float="12.43" int="1298" integer="5555" language="en-US" long="985643" negativeInteger="-9845" nomalizedString="normalize this please" short="34" string="hello there"/>
+</ld:default_all_types>

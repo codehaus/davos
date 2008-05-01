@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+  xmlns:Retail="urn:Retail" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  targetNamespace="urn:Retail" 
+  elementFormDefault="unqualified" 
+  attributeFormDefault="unqualified">
+  <xsd:complexType name="LINE_ITEM_TYPE">
+    <xsd:sequence>
+      <xsd:element name="LineItemID" type="xsd:string"/>
+      <xsd:element name="OrderID" type="xsd:string"/>
+      <xsd:element name="ProductID" type="xsd:string"/>
+      <xsd:element name="ProductDescription" type="xsd:string" minOccurs="1"/>
+      <xsd:element name="Quantity" type="xsd:int"/>
+      <xsd:element name="Price" type="xsd:decimal"/>
+      <xsd:element name="Status" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="LINE_ITEM" type="Retail:LINE_ITEM_TYPE"/>
+</xsd:schema>

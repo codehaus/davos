@@ -1,0 +1,10 @@
+<letter:letter xmlns:letter="letter.xsd">
+  <date>August 1, 2003</date>
+  Mutual of Omaha
+  Wild Kingdom, USA
+  Dear
+  <firstName>Casy</firstName>
+  <lastName>Crocodile</lastName>
+  Please buy more shark repellent.
+  Your premium is past due.
+</letter:letter>

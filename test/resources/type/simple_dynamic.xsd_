@@ -1,0 +1,8 @@
+<xs:schema targetNamespace="http://www.bea.com/test/xsd" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sdo="commonj.sdo" xmlns:sdoxml="commonj.sdo/xml" xmlns:sdojava="commonj.sdo/java" xmlns:tns="http://www.bea.com/test/xsd">
+  <xs:complexType name="SimpleType">
+    <xs:attribute type="xs:boolean" name="boolean"/>
+    <xs:attribute type="xs:int" name="int"/>
+    <xs:attribute type="xs:string" name="string"/>
+    <xs:attribute type="xs:time" name="time"/>
+  </xs:complexType>
+</xs:schema>

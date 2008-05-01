@@ -1,0 +1,18 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/copy1"
+  xmlns:copy="http://sdo/test/copy1"
+  xmlns:sdox="commonj.sdo/xml">
+
+  <xs:element name="quote" type="copy:QuoteType"/>
+
+  <xs:complexType name="QuoteType">
+    <xs:sequence>
+      <xs:element name="symbol" type="xs:string"/>
+      <xs:element name="quantity" type="xs:int" default="100"/>
+      <xs:element name="price" type="xs:double" maxOccurs="unbounded"/>
+      <xs:element name="comment" type="xs:string" minOccurs="0"
+        sdox:readOnly="true"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

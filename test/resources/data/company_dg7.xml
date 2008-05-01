@@ -1,0 +1,10 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary/>
+    <com:company name="ACME" employeeOfTheMonth="E0002" xmlns:com="company.xsd">
+        <departments name="AdvancedTechnologies" location="NY" number="123">
+            <employees name="John Jones" SN="E0001"/>
+            <employees name="Mary Smith" SN="E0002" manager="true"/>
+            <employees name="Jane Doe" SN="E0003"/>
+        </departments>
+    </com:company>
+</sdo:datagraph>

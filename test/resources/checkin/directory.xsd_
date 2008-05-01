@@ -1,0 +1,17 @@
+<xs:schema targetNamespace="http://sdo/test/dynamic" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sdo="commonj.sdo" xmlns:sdoxml="commonj.sdo/xml" xmlns:sdojava="commonj.sdo/java" xmlns:tns="http://sdo/test/dynamic">
+  <xs:complexType name="PhoneType">
+    <xs:attribute type="xs:string" name="location"/>
+    <xs:attribute type="xs:string" name="number"/>
+  </xs:complexType>
+  <xs:complexType name="PersonType">
+    <xs:sequence>
+      <xs:element type="tns:PhoneType" name="phone" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name"/>
+  </xs:complexType>
+  <xs:complexType name="DirectoryType">
+    <xs:sequence>
+      <xs:element type="tns:PersonType" name="listing" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

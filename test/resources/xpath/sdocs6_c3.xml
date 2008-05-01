@@ -1,0 +1,17 @@
+<sdoc:customer xmlns:sdoc="http://aldsp.bea.com/test/sdocs6">
+    <first_name>ALICE</first_name>
+    <last_name>CARROLL</last_name>
+    <customer_id>3</customer_id>
+    <sdoc:tel_no customer_id="3" listed="0">
+        <location>HOME</location>
+        <number>4085491515</number>
+    </sdoc:tel_no>
+    <sdoc:tel_no customer_id="3" listed="1">
+        <location>MOBILE</location>
+        <number>6509672121</number>
+    </sdoc:tel_no>
+    <sdoc:tel_no customer_id="3" listed="1">
+        <location>WORK</location>
+        <number>4158482022</number>
+    </sdoc:tel_no>
+</sdoc:customer>

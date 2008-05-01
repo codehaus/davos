@@ -1,0 +1,6 @@
+<!-- Snippet from the XLink Schema file -->
+<schema targetNamespace="http://www.w3.org/1999/xlink"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+>
+    <attribute name="href" type="anyURI"/>
+</schema>

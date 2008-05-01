@@ -1,0 +1,34 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/copy2"
+  xmlns:copy="http://sdo/test/copy2"
+  xmlns:sdox="commonj.sdo/xml">
+
+  <xs:element name="quote" type="copy:QuoteType"/>
+  <xs:element name="genquote" type="copy:GenericQuoteType"/>
+
+  <xs:complexType name="QuoteType">
+    <xs:sequence>
+      <xs:element name="symbol" type="xs:string"/>
+      <xs:element name="quantity" type="xs:int" default="100"/>
+      <xs:element name="price" type="copy:PriceType" maxOccurs="unbounded"/>
+      <xs:element name="reserve" type="copy:PriceType" minOccurs="0"
+        sdox:readOnly="true"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GenericQuoteType">
+    <xs:sequence>
+      <xs:element name="price" type="copy:PriceType" maxOccurs="unbounded"/>
+      <xs:element name="reserve" type="copy:PriceType" minOccurs="0"
+        sdox:readOnly="true"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PriceType">
+    <xs:sequence>
+      <xs:element name="currency" type="xs:string"/>
+      <xs:element name="amount" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

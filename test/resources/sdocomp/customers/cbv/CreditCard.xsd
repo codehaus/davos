@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema 
+    targetNamespace="urn:Retail" 
+    elementFormDefault="unqualified" 
+    attributeFormDefault="unqualified" 
+    xmlns:Retail="urn:Retail" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:complexType name="CREDIT_CARD_TYPE">
+    <xsd:sequence>
+      <xsd:element name="CreditCardID" type="xsd:string"/>
+      <xsd:element name="CustomerID" type="xsd:string"/>
+      <xsd:element name="CustomerName" type="xsd:string"/>
+      <xsd:element name="CreditCardType" type="xsd:string"/>
+      <xsd:element name="CreditCardNumber" type="xsd:string"/>
+      <xsd:element name="ExpirationDate" type="xsd:gYearMonth"/>
+      <xsd:element minOccurs="0" name="Status" type="xsd:string" default="ACTIVE"/>
+      <xsd:element name="AddressID" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CREDIT_CARD" type="Retail:CREDIT_CARD_TYPE"/>
+</xsd:schema>

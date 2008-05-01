@@ -1,0 +1,38 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/copy3a"
+  xmlns:copy="http://sdo/test/copy3a"
+  xmlns:sdox="commonj.sdo/xml">
+
+  <xs:element name="a" type="copy:A"/>
+
+  <xs:complexType name="A">
+    <xs:sequence>
+      <xs:element name="b" type="copy:B"/>
+      <xs:element name="c" type="copy:C"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="B">
+    <xs:sequence>
+      <xs:element name="e" type="copy:E" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="d" type="xs:IDREF" sdox:propertyType="copy:E"/>
+  </xs:complexType>
+
+  <xs:complexType name="E">
+    <xs:sequence>
+      <xs:element name="e1" type="xs:int"/>
+      <xs:element name="e2" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="e0" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:complexType name="C">
+    <xs:sequence>
+      <xs:element name="c1" type="xs:int"/>
+      <xs:element name="c2" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="c0" type="xs:ID"/>
+  </xs:complexType>
+
+</xs:schema>

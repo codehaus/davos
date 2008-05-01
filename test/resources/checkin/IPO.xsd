@@ -1,0 +1,102 @@
+<!-- Sample Schema file for the SDO2 spec binding
+    Based on the sample in http://www.w3.org/TR/xmlschema-0/ -->
+<schema targetNamespace="http://www.example.com/IPO"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:ipo="http://www.example.com/IPO"
+        xmlns:cust="http://www.example.com/IPO"
+        xmlns:sdo="commonj.sdo/xml"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+
+    <include schemaLocation="Customer.xsd"/>
+    <import namespace="http://www.w3.org/1999/xlink"
+        schemaLocation="xlink.xsd"/>
+
+    <element name="purchaseOrder" type="ipo:PurchaseOrderType"/>
+
+    <element name="comment" type="string"/>
+
+    <complexType name="Address">
+        <sequence>
+            <element name="name" type="string"/>
+            <element name="street" type="string"/>
+            <element name="city" type="string"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="PurchaseOrderType">
+        <sequence>
+            <element ref="ipo:comment" minOccurs="0"/>
+            <element name="productName" type="string"/>
+            <element name="shipTo" type="ipo:Address"/>
+            <element name="billTo" type="ipo:Address"/>
+            <element name="items" type="ipo:Items"/>
+        </sequence>
+        <attribute name="orderDate" type="date"/>
+        <attribute name="customer" type="IDREF"
+            sdo:propertyType="cust:Customer"
+            sdo:oppositeProperty="purchaseOrder"/>
+        <attribute name="customer2" type="anyURI"
+            sdo:propertyType="cust:Customer"/>
+        <attribute ref="xlink:href"
+            sdo:propertyType="cust:Customer"
+            sdo:name="Customer"/>
+    </complexType>
+
+    <simpleType name="Quantity" sdo:name="QuantityType">
+        <restriction base="positiveInteger">
+            <maxExclusive value="100"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="SKU">
+        <restriction base="string">
+            <pattern value="\d{3}-[A-Z]{2}"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="Items">
+        <sequence>
+            <element name="productName" type="string"/>
+            <element name="item" minOccurs="0" maxOccurs="unbounded">
+                <complexType sdo:name="ItemType">
+                    <sequence>
+
+                    </sequence>
+                    <attribute name="partNum" type="ipo:SKU" use="required"/>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="USAddress">
+        <complexContent>
+            <extension base="ipo:Address">
+                <attribute name="country" type="NMTOKEN" fixed="US"/>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Vehicle" abstract="true"/>
+
+    <simpleType name="zipUnion">
+        <union memberTypes="ipo:USState ipo:listOfMyIntType"/>
+    </simpleType>
+
+    <simpleType name="USState">
+        <restriction base="NMTOKEN">
+            <enumeration value="AZ"/>
+            <enumeration value="CA"/>
+            <enumeration value="WA"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="myIntType">
+        <restriction base="int"/>
+    </simpleType>
+
+    <simpleType name="listOfMyIntType">
+        <list itemType="ipo:myIntType"/>
+    </simpleType>
+
+</schema>

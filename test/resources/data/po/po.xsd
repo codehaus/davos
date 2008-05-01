@@ -1,0 +1,53 @@
+<xs:schema
+    targetNamespace="http://sdo/test/po"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:po="http://sdo/test/po"
+    xmlns:sdo="commonj.sdo"
+    >
+
+    <xs:element name="shipTo" type="po:USAddress"/>
+    <xs:element name="billTo" type="po:USAddress"/>
+    <xs:element name="comment" type="xs:string"/>
+
+    <xs:simpleType name="USState">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="CA"/>
+            <xs:enumeration value="OR"/>
+            <xs:enumeration value="WA"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="USZip">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="9[0-9]{4}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="USAddress">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="street" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="state" type="po:USState"/>
+            <xs:element name="zip" type="po:USZip"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Items">
+        <xs:sequence>
+            <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="productName" type="xs:string"/>
+                        <xs:element name="quantity" type="xs:positiveInteger"/>
+                        <xs:element name="price" type="xs:decimal"/>
+                        <xs:element ref="po:comment" minOccurs="0"/>
+                        <xs:element name="shipDate" type="xs:date"/>
+                    </xs:sequence>
+                    <xs:attribute name="itemNumber" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,24 @@
+<xs:schema
+    targetNamespace="http://sdo/test/po2"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:po="http://sdo/test/po"
+    xmlns:po2="http://sdo/test/po2"
+    xmlns:sdo="commonj.sdo"
+    >
+
+    <xs:import namespace="http://sdo/test/po" schemaLocation="po.xsd"/>
+
+    <xs:element name="purchaseOrder" type="po2:PurchaseOrder"/>
+
+    <xs:complexType name="PurchaseOrder">
+        <xs:sequence>
+            <xs:element name="changeSummary" type="sdo:ChangeSummaryType"/>
+            <xs:element ref="po:comment" minOccurs="0"/>
+            <xs:element ref="po:shipTo"/>
+            <xs:element ref="po:billTo"/>
+            <xs:element name="items" type="po:Items"/>
+        </xs:sequence>
+        <xs:attribute name="orderDate" type="xs:date"/>
+    </xs:complexType>
+
+</xs:schema>

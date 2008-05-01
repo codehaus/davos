@@ -1,0 +1,10 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary>
+        <bas:a sdo:ref="#/sdo:datagraph/bas:a" sdo:unset="int0 integer0" xmlns:bas="http://sdo/test/basic"/>
+    </changeSummary>
+    <bas:a xmlns:bas="http://sdo/test/basic">
+        <decimal>9.999999999</decimal>
+        <int0>1234567890</int0>
+        <integer0>1234567890</integer0>
+    </bas:a>
+</sdo:datagraph>

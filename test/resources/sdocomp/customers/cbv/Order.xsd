@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+  targetNamespace="urn:Retail" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns:Retail="urn:Retail">
+  <xsd:complexType name="CUSTOMER_ORDER_TYPE">
+    <xsd:sequence>
+      <xsd:element name="ORDER_ID" type="xsd:string"/>
+      <xsd:element name="CUSTOMER_ID" type="xsd:string"/>
+      <xsd:element name="ORDER_DATE" type="xsd:date"/>
+      <xsd:element name="SHIPPING_METHOD" type="xsd:string"/>
+      <xsd:element name="HANDLING_CHARGE" type="xsd:decimal"/>
+      <xsd:element name="SUB_TOTAL" type="xsd:decimal"/>
+      <xsd:element name="TOTAL_ORDER_AMOUNT" type="xsd:decimal"/>
+      <xsd:element name="SALE_TAX" type="xsd:decimal"/>
+      <xsd:element name="ESITMATED_SHIP_DATE" type="xsd:date"/>
+      <xsd:element name="STATUS" type="xsd:string" default="ACTIVE"/>
+      <xsd:element name="SHIP_TO" type="xsd:string"/>
+      <xsd:element name="SHIP_TO_NAME" type="xsd:string"/>
+      <xsd:element name="BILL_TO" type="xsd:string"/>
+      <xsd:element name="TRACKING_NUMBER" type="xsd:string" default="ACTIVE" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CUSTOMER_ORDER" type="Retail:CUSTOMER_ORDER_TYPE"/>
+</xsd:schema>

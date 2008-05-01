@@ -1,0 +1,64 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary delete="#/sdo:datagraph/changeSummary/emp:employee[1]/emp:phone[3]" xmlns:emp="http://xmlbeans.apache.org/samples/xquery/employees">
+        <emp:employee sdo:ref="#/sdo:datagraph/emp:employees/emp:employee[2]">
+            <emp:phone sdo:ref="#/sdo:datagraph/emp:employees/emp:employee[2]/emp:phone[1]"/>
+            <emp:phone sdo:ref="#/sdo:datagraph/emp:employees/emp:employee[2]/emp:phone[2]"/>
+            <emp:phone location="mobile">(503)555-5152</emp:phone>
+        </emp:employee>
+    </changeSummary>
+    <emp:employees xmlns:emp="http://xmlbeans.apache.org/samples/xquery/employees">
+        <emp:employee>
+            <emp:name>Fred Jones</emp:name>
+            <emp:address location="home">
+                <emp:street>900 Aurora Ave.</emp:street>
+                <emp:city>Seattle</emp:city>
+                <emp:state>WA</emp:state>
+                <emp:zip>98115</emp:zip>
+            </emp:address>
+            <emp:address location="work">
+                <emp:street>2011 152nd Avenue NE</emp:street>
+                <emp:city>Redmond</emp:city>
+                <emp:state>WA</emp:state>
+                <emp:zip>98052</emp:zip>
+            </emp:address>
+            <emp:phone location="work">(425)555-5665</emp:phone>
+            <emp:phone location="home">(206)555-5555</emp:phone>
+            <emp:phone location="mobile">(206)555-4321</emp:phone>
+        </emp:employee>
+        <emp:employee>
+            <emp:name>Sally Smith</emp:name>
+            <emp:address location="home">
+                <emp:street>1430 Oak Place</emp:street>
+                <emp:city>Salem</emp:city>
+                <emp:state>OR</emp:state>
+                <emp:zip>97125</emp:zip>
+            </emp:address>
+            <emp:address location="work">
+                <emp:street>765 Main St.</emp:street>
+                <emp:city>Keizer</emp:city>
+                <emp:state>OR</emp:state>
+                <emp:zip>97303</emp:zip>
+            </emp:address>
+            <emp:phone location="work">(503)555-3856</emp:phone>
+            <emp:phone location="home">(503)555-6951</emp:phone>
+        </emp:employee>
+        <emp:employee>
+            <emp:name>Gladys Kravitz</emp:name>
+            <emp:address location="home">
+                <emp:street>1313 Mockingbird Lane</emp:street>
+                <emp:city>Seattle</emp:city>
+                <emp:state>WA</emp:state>
+                <emp:zip>98115</emp:zip>
+            </emp:address>
+            <emp:address location="work">
+                <emp:street>2011 152nd Avenue NE</emp:street>
+                <emp:city>Redmond</emp:city>
+                <emp:state>WA</emp:state>
+                <emp:zip>98052</emp:zip>
+            </emp:address>
+            <emp:phone location="work">(425)555-6897</emp:phone>
+            <emp:phone location="home">(206)555-6594</emp:phone>
+            <emp:phone location="mobile">(206)555-7894</emp:phone>
+        </emp:employee>
+    </emp:employees>
+</sdo:datagraph>

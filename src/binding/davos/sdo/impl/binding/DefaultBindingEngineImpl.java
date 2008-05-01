@@ -439,9 +439,6 @@ public class DefaultBindingEngineImpl
             baseClass, j.getIntfReferenceName());
 
         // fields
-        //out.emitString("public static javax.sdo.Type type = " +
-        //    "javax.sdo.helper.TypeHelper.INSTANCE.getType(\"" +
-        //    t.getURI() + "\",\"" + t.getName() + "\");");
         out.emitString("public static String typeUri = \"" + t.getURI() + "\";");
         out.emitNewLine();
         out.emitString("public static String typeName = \"" + t.getName() + "\";");

@@ -1,0 +1,15 @@
+<tns:items xmlns:tns="http://www.example.com/seq1"
+  xmlns:cho="http://www.example.com/choice">
+  <cho:shirt cho:id="I117">
+    <cho:color>blue</cho:color>
+    <cho:size cho:collar="15" cho:sleeve="33"/>
+  </cho:shirt>
+  <cho:shirt cho:id="I115">
+    <cho:color>white</cho:color>
+    <cho:size cho:collar="16" cho:sleeve="34"/>
+  </cho:shirt>
+  <cho:pants cho:id="I321">
+    <cho:color>navy blue</cho:color>
+    <cho:size cho:waist="32" cho:inseam="33"/>
+  </cho:pants>
+</tns:items>

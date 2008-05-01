@@ -1,0 +1,14 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:sdoxml="commonj.sdo/xml">
+  <xs:element name="catalog4">
+    <xs:complexType sdoxml:sequence="true">
+      <xs:sequence>
+        <xs:element name="product4" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

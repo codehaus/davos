@@ -1,0 +1,6 @@
+<com:company name="ACME" xmlns:com="company2.xsd">
+    <departments name="AdvancedTechnologies" location="NY" number="123">
+        <employees name="John Jones" SN="E0001"/>
+        <employees name="Jane Doe" SN="E0003"/>
+    </departments>
+</com:company>

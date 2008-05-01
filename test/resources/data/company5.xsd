@@ -1,0 +1,55 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="company5.xsd" 
+  xmlns:com="company5.xsd"
+  xmlns:sdoxml="commonj.sdo/xml"
+  xmlns:sdojava="commonj.sdo/java">
+
+  <xs:element name="company" type="com:CompanyType" sdoxml:many="false"/>
+  <xs:complexType name="CompanyType">
+    <xs:sequence>
+      <xs:element name="departments" type="com:DepartmentType"
+        maxOccurs="unbounded"/>
+      <xs:element name="registry" type="com:RegistryType"
+        sdoxml:readOnly="true"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="employeeOfTheMonth" type="xs:IDREF"/>
+    <xs:attribute name="id" type="xs:int" sdoxml:readOnly="true"/>
+  </xs:complexType>
+
+  <xs:complexType name="DepartmentType">
+    <xs:sequence>
+      <xs:element name="employees" type="com:EmployeeType"
+        maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="location" type="xs:string"/>
+    <xs:attribute name="number" type="xs:int"/>
+    <xs:attribute name="id" type="xs:int" sdoxml:readOnly="true"/>
+  </xs:complexType>
+
+  <xs:complexType name="EmployeeType">
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="SN" type="xs:ID"/>
+    <xs:attribute name="manager" type="xs:boolean"
+      sdoxml:dataType="sdojava:BooleanObject"/>
+    <xs:attribute name="id" type="xs:int" sdoxml:readOnly="true"/>
+  </xs:complexType>
+
+  <xs:complexType name="RegistryType">
+    <xs:sequence>
+      <xs:element name="x" type="com:EntryType"/>
+      <xs:element name="y" type="com:EntryType"/>
+      <xs:element name="z" type="com:EntryType" sdoxml:readOnly="true"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EntryType">
+    <xs:sequence>
+      <xs:element name="key" type="xs:long"/>
+      <xs:element name="value" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

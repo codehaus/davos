@@ -1,0 +1,20 @@
+<copy:a xmlns:copy="http://sdo/test/copy3a">
+    <b d="E002">
+        <e e0="E001">
+            <e1>100</e1>
+            <e2>xxx</e2>
+        </e>
+        <e e0="E002">
+            <e1>200</e1>
+            <e2>yyy</e2>
+        </e>
+        <e e0="E003">
+            <e1>300</e1>
+            <e2>zzz</e2>
+        </e>
+    </b>
+    <c c0="C123">
+        <c1>5</c1>
+        <c2>abc</c2>
+    </c>
+</copy:a>

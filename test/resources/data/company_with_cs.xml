@@ -1,0 +1,15 @@
+<com:company name="ACME" employeeOfTheMonth="E0004" xmlns:com="company_with_cs.xsd">
+    <changeSummary create="E0004" delete="E0002">
+        <departments sdo:ref="#/com:company/departments[1]" xmlns:sdo="commonj.sdo">
+            <employees sdo:ref="E0001"/>
+            <employees name="Mary Smith" SN="E0002" manager="true"/>
+            <employees sdo:ref="E0003"/>
+        </departments>
+        <com:company sdo:ref="#/com:company" employeeOfTheMonth="E0002" xmlns:sdo="commonj.sdo"/>
+    </changeSummary>
+    <departments name="AdvancedTechnologies" location="NY" number="123">
+        <employees name="John Jones" SN="E0001"/>
+        <employees name="Jane Doe" SN="E0003"/>
+        <employees name="Al Smith" SN="E0004" manager="true"/>
+    </departments>
+</com:company>

@@ -1,0 +1,20 @@
+<tns:a xmlns:tns="http://sdo/test/basic">
+  <decimal>9.999999999</decimal>
+  <double0>1.23456789</double0>
+  <int0>42</int0>
+  <integer0>1234567890</integer0>
+  <string0>Hello, World!</string0>
+  <b b0="true">
+    <b1>12</b1>
+    <b2>bb</b2>
+  </b>
+  <c>xxx</c>
+  <c>yyy</c>
+  <c>zzz</c>
+  <d>Testing, testing, ...
+    <d1>1</d1>
+    <d2>two</d2>
+    <d3>three</d3>
+  </d>
+  <!--<e>1 2 3</e>-->
+</tns:a>

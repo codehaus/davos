@@ -26,7 +26,7 @@ import javax.sdo.impl.HelperProvider;
 /**
  * Look up a Type given the uri and typeName or interfaceClass.
  * SDO Types are available through the
- *   getType("javax.sdo", typeName) method.
+ *   getType("commonj.sdo", typeName) method.
  * Defines Types from DataObjects.
  */
 public interface TypeHelper

@@ -1,0 +1,434 @@
+<project name="sdo-test" default="deploy" basedir=".">
+
+    <!-- properties -->
+    <property name="test.src.dir" value="src"/>
+    <property name="resources.dir" value="resources"/>
+    <property name="ext.src.dir" value="extsrc"/>
+    <property name="build.dir" value="../build"/>
+    <property name="build.test.dir" value="../build/test"/>
+    <property name="build.classes.dir" value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.test.dir}/classes"/>
+    <property name="test.output.dir" value="${build.test.dir}/output"/>
+    <property name="test.reports.dir" value="${build.test.dir}/reports"/>
+    <property name="lib.dir" value="${build.dir}/lib"/>
+    <property name="external.lib.dir" value="../external/lib"/>
+    <property name="tools.lib.dir" value="tools/lib"/>
+    <property name="test.lib.dir" value="${build.test.dir}/lib"/>
+    <property name="test.lib.schemas.dir" value="${test.lib.dir}/schemas"/>
+
+    <property name="debug" value="true"/>
+
+
+    <!-- custom tasks -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${tools.lib.dir}/ant-contrib-0.6.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef resource="antexts.properties">
+        <classpath>
+            <pathelement location="${tools.lib.dir}/antexts.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef name="sdocomp" classname="davos.sdo.impl.ant.SDOCompileTask">
+        <classpath>
+            <path refid="sdo.classpath"/>
+            <path refid="xbean.classpath"/>
+        </classpath>
+    </taskdef>
+
+
+    <!-- paths -->
+    <path id="xbean.classpath">
+        <pathelement location="${lib.dir}/xbean.jar"/>
+        <pathelement location="${lib.dir}/jsr173_1.0_api.jar"/>
+    </path>
+
+    <path id="sdo.classpath">
+        <pathelement location="${build.dir}/ar/sdo.jar"/>
+    </path>
+
+    <path id="junit.classpath">
+        <pathelement location="${tools.lib.dir}/junit.jar"/>
+        <pathelement location="${tools.lib.dir}/xmlunit1.0.jar"/>
+        <pathelement location="${tools.lib.dir}/xercesImpl.jar"/>
+    	<pathelement location="${tools.lib.dir}/stax-1.2.0.jar"/>
+    </path>
+
+    <path id="sdocomp.classpath">
+        <fileset dir="${test.lib.schemas.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+
+    <!-- schema compilation related properties -->
+    <!-- use this to specify a comma-separated list of directories
+         containing schemas to be compiled (one jar per directory)-->
+    <property name="compiletime.schema.dirs"
+        value="${resources.dir}/sdocomp/customers/cbv,
+               ${resources.dir}/data/po,
+               ${resources.dir}/data/seq"/>
+    <property name="runtime.schema.dirs"
+        value=""/>
+
+    <!-- use this to specify a comma-separated list of schema files
+         to be compiled individually -->
+    <property name="compiletime.schema.files"
+        value="${resources.dir}/checkin/IPO.xsd,
+               ${resources.dir}/checkin/simple1.xsd,
+               ${resources.dir}/checkin/simple3.xsd,
+               ${resources.dir}/checkin/employees.xsd,
+               ${resources.dir}/checkin/anontype.xsd,
+               ${resources.dir}/data/basic.xsd,
+               ${resources.dir}/data/company5.xsd,
+               ${resources.dir}/type/anil.xsd,
+               ${resources.dir}/type/derivation.xsd,
+               ${resources.dir}/type/substitution.xsd"/>
+    <property name="runtime.schema.files"
+        value="${resources.dir}/checkin/company_with_cs.xsd,
+               ${resources.dir}/checkin/company.xsd,
+               ${resources.dir}/checkin/company2.xsd,
+               ${resources.dir}/checkin/QName.xsd,
+               ${resources.dir}/checkin/substGroup.xsd,
+               ${resources.dir}/data/company3a.xsd,
+               ${resources.dir}/data/company3b.xsd,
+               ${resources.dir}/data/company4a.xsd,
+               ${resources.dir}/data/company4b.xsd,
+               ${resources.dir}/data/letter.xsd,
+               ${resources.dir}/data/copy1.xsd,
+               ${resources.dir}/data/copy2.xsd,
+               ${resources.dir}/data/copy3a.xsd,
+               ${resources.dir}/data/copy3b.xsd,
+               ${resources.dir}/data/copy4.xsd,
+               ${resources.dir}/data/basic0.xsd,
+               ${resources.dir}/data/custom.xsd,
+               ${resources.dir}/data/employee.xsd,
+               ${resources.dir}/data/sdocs4.xsd,
+               ${resources.dir}/data/sdocs5.xsd,
+               ${resources.dir}/data/sdo_lds003b.xsd,
+               ${resources.dir}/marshal/chartest.xsd,
+               ${resources.dir}/type/catalognons2.xsd,
+               ${resources.dir}/type/global.xsd,
+               ${resources.dir}/type/global2.xsd,
+               ${resources.dir}/type/instanceclass1.xsd,
+               ${resources.dir}/type/nillable.xsd,
+               ${resources.dir}/type/opencontent.xsd,
+               ${resources.dir}/type/profile.xsd"/>
+
+
+    <!-- targets -->
+
+    <!-- default target -->
+    <target name="usage">
+        <echo message="The following high-level targets are defined:"/>
+        <echo/>
+        <echo message="clean       - cleans everything"/>
+        <echo message="build       - compiles the schemas and the tests"/>
+        <echo message="deploy      - deploys the tests (same as build)"/>
+        <echo message="checkin     - runs checkin tests (from clean)"/>
+        <echo/>
+        <echo message="Also:"/>
+        <echo message="run.junit   - (with no argument) runs all tests"/>
+        <echo message="  use -Dtest.class=class to run a single test"/>
+        <echo message="    e.g., -Dtest.class=checkin.MarshalTest"/>
+        <echo message="  use -Dtest.area=dir to run tests in a subdir"/>
+        <echo message="    e.g., -Dtest.area=type"/>
+        <echo message="  use -Dtest.spec=pattern to run specified tests"/>
+        <echo message="    e.g., -Dtest.spec=**/*Test*"/>
+    </target>
+
+    <!-- clean targets -->
+    <target name="clean">
+        <delete dir="${build.test.dir}"/>
+    </target>
+
+    <target name="clean.classes">
+        <delete dir="${test.classes.dir}"/>
+    </target>
+
+    <target name="clean.lib">
+        <delete dir="${test.lib.dir}"/>
+    </target>
+
+    <target name="clean.output">
+        <delete dir="${test.output.dir}"/>
+    </target>
+
+    <target name="clean.reports">
+        <delete dir="${test.reports.dir}"/>
+    </target>
+
+    <target name="clean.cor" depends="clean.classes, clean.output, clean.reports"/>
+
+    <!-- initial setup and utility targets -->
+    <target name="java_version">
+        <echo message="${ant.java.version}"/>
+    </target>
+
+    <target name="dirs">
+        <mkdir dir="${build.test.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${test.lib.dir}"/>
+        <mkdir dir="${test.lib.schemas.dir}"/>
+        <mkdir dir="${test.output.dir}"/>
+        <mkdir dir="${test.reports.dir}"/>
+    </target>
+
+    <!-- build targets -->
+    <target name="build.tests" depends="ext.classes, build.compiletime.schemas, test.classes"/>
+
+    <target name="ext.classes" depends="dirs">
+        <echo message="Compiling code in dir ${ext.src.dir} to dir ${test.classes.dir}"/>
+        <javac srcdir="${ext.src.dir}"
+               destdir="${test.classes.dir}"
+               debug="${debug}">
+            <compilerarg value="-Xlint:deprecation"/>
+        </javac>
+    </target>
+
+    <target name="test.classes" depends="dirs">
+        <echo message="Compiling code in dir ${test.src.dir} to dir ${test.classes.dir}"/>
+        <javac srcdir="${test.src.dir}"
+               excludes="**/sandbox/**"
+               destdir="${test.classes.dir}"
+               debug="${debug}">
+            <compilerarg value="-Xlint:deprecation"/>
+            <!--<compilerarg value="-Xlint:unchecked"/>-->
+            <classpath id="test.compile.path">
+                <path refid="sdo.classpath"/>
+                <path refid="xbean.classpath"/>
+                <path refid="junit.classpath"/>
+                <path refid="sdocomp.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="build.schemas" depends="build.compiletime.schemas, build.runtime.schemas"/>
+
+    <target name="build.compiletime.schemas" depends="dirs, ext.classes">
+        <foreach list="${compiletime.schema.dirs}"
+	    target="sdocomp.dir"
+            param="schemasrc" trim="true"
+            inheritall="true" inheritrefs="true"/>
+        <foreach list="${compiletime.schema.files}"
+	    target="sdocomp.single"
+            param="schemasrc" trim="true"
+            inheritall="true" inheritrefs="true"/>
+    </target>
+
+    <target name="build.runtime.schemas" depends="dirs, ext.classes">
+        <foreach list="${runtime.schema.dirs}"
+	    target="sdocomp.dir"
+            param="schemasrc" trim="true"
+            inheritall="true" inheritrefs="true"/>
+        <foreach list="${runtime.schema.files}"
+	    target="sdocomp.single"
+            param="schemasrc" trim="true"
+            inheritall="true" inheritrefs="true"/>
+    </target>
+
+    <target name="sdocomp.dir">
+        <basename path="${schemasrc}" property="jarname"/>
+        <property name="jar.file" value="${test.lib.schemas.dir}/${jarname}.jar"/>
+        <!-- Check if sdocomp is required -->
+        <if>
+            <uptodate targetfile="${jar.file}">
+                <srcfiles dir="${schemasrc}" includes="**/*.xsd"/>
+            </uptodate>
+            <then>
+                <echo message="Jar uptodate for ${schemasrc}"/>
+            </then>
+            <else>
+                <antcall target="sdocomp"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="sdocomp.single">
+        <basename path="${schemasrc}" suffix=".xsd" property="jarname"/>
+        <property name="jar.file" value="${test.lib.schemas.dir}/${jarname}.jar"/>
+        <!-- Check if sdocomp is required -->
+        <if>
+            <uptodate srcfile="${schemasrc}" targetfile="${jar.file}"/>
+            <then>
+                <echo message="Jar uptodate for ${schemasrc}"/>
+            </then>
+            <else>
+                <antcall target="sdocomp"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="sdocomp" unless="jar.uptodate">
+        <echo message="Compiling ${schemasrc}"/>
+        <sdocomp schema="${schemasrc}"
+            failonerror="true"
+            destfile="${jar.file}"
+            sdoanontypenames="namesComposite"
+            >
+            <classpath id="test.run.path">
+                <path refid="sdo.classpath"/>
+                <path refid="xbean.classpath"/>
+                <pathelement path="${test.classes.dir}"/>
+            </classpath>
+        </sdocomp>
+        <echo message="jar file: ${jar.file}"/>
+    </target>
+
+    <!-- run targets -->
+    <target name="run" depends="dirs, build.tests, build.runtime.schemas">
+        <property name="test.class" value="dynamic.Test"/>
+        <property name="sdocontext" value="global"/>
+        <java classname="${test.class}" fork="true">
+            <classpath id="test.run.path">
+                <path refid="sdo.classpath"/>
+                <path refid="xbean.classpath"/>
+                <path refid="junit.classpath"/>
+                <path refid="sdocomp.classpath"/>
+                <pathelement path="${test.classes.dir}"/>
+                <pathelement path="${resources.dir}"/>
+            </classpath>
+            <!-- for tests that use resource and/or output files -->
+            <sysproperty key="sdo.root" path=".."/>
+            <sysproperty key="build.root" path="${build.dir}"/>
+            <sysproperty key="test.output.root" path="${test.output.dir}"/>
+            <sysproperty key="sdo.context.type" value="${sdocontext}"/>
+            <assertions>
+                <enable/>
+            </assertions>
+        </java>
+    </target>
+
+    <target name="run.junit" depends="dirs, build.tests, build.runtime.schemas">
+        <if>
+            <isset property="test.spec"/>
+            <then>
+                <property name="test.files" value="${test.spec}"/>
+            </then>
+            <else>
+                <if>
+                    <isset property="test.area"/>
+                    <then>
+                        <echo message="test.area is set to ${test.area}"/>
+                        <property name="test.files" value="**/${test.area}/**"/>
+                    </then>
+                    <else>
+                        <echo message="test.area is not set"/>
+                        <property name="test.files" value="**/*Test*"/>
+                    </else>
+                </if>
+            </else>
+        </if>
+        <property name="sdocontext" value="global"/>
+        <junit printsummary="on"
+            failureproperty="junit.fail">
+            <classpath id="test.run.path">
+                <path refid="sdo.classpath"/>
+                <path refid="xbean.classpath"/>
+                <path refid="junit.classpath"/>
+                <path refid="sdocomp.classpath"/>
+                <pathelement path="${test.classes.dir}"/>
+                <pathelement path="${resources.dir}"/>
+            </classpath>
+            <!-- for tests that use resource and/or output files -->
+            <sysproperty key="sdo.root" path=".."/>
+            <sysproperty key="build.root" path="${build.dir}"/>
+            <sysproperty key="test.output.root" path="${test.output.dir}"/>
+            <sysproperty key="sdo.context.type" value="${sdocontext}"/>
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${test.reports.dir}"
+                unless="test.class">
+                <fileset dir="${test.classes.dir}">
+                    <include name="${test.files}"/>
+                    <exclude name="common/*"/>
+                    <exclude name="util/*"/>
+                    <exclude name="dynamic/Test*"/>
+                    <exclude name="type/MetaDataTest*"/>
+                    <exclude name="**/*$*"/>
+                </fileset>
+            </batchtest>
+            <test name="${test.class}"
+                fork="yes" todir="${test.reports.dir}"
+                if="test.class"/>
+            <assertions>
+                <enable/>
+            </assertions>
+        </junit>
+        <junitreport todir="${test.reports.dir}">
+            <fileset dir="${test.reports.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${test.reports.dir}/html"/>
+        </junitreport>
+        <if>
+            <and>
+                <isset property="junit.fail"/>
+                <not>
+                    <isset property="do.not.fail.build"/>
+                </not>
+            </and>
+            <then>
+                <fail message="Test run had failures"/>
+            </then>
+        </if>
+    </target>
+
+    <!-- convenience target for printing data objects in an xml file -->
+    <target name="dump" depends="dirs, test.classes">
+        <!--<property name="xml.file" value=""/>-->
+        <if>
+            <isset property="xml.file"/>
+            <then>
+                <java classname="util.DataObjectPrinter">
+                    <classpath id="test.run.path">
+                        <path refid="sdo.classpath"/>
+                        <path refid="xbean.classpath"/>
+                        <path refid="sdocomp.classpath"/>
+                        <pathelement path="${test.classes.dir}"/>
+                        <!--<pathelement path="${resources.dir}"/>-->
+                    </classpath>
+                    <arg value="${xml.file}"/>
+                </java>
+            </then>
+            <else>
+                <echo message="use -Dxml.file=path to specify a file"/>
+            </else>
+        </if>
+    </target>
+
+    <!-- a target for testing the sdo compilation ant task -->
+    <target name="sdocomp-test" depends="dirs">
+        <mkdir dir="${test.output.dir}/sdocomp"/>
+        <sdocomp
+            classpathref="sdo.classpath"
+            destfile="${test.output.dir}/checkin/anontype.jar"
+            srcgendir="${test.output.dir}/checkin/src"
+            sdoanontypenames="namesComposite"
+            >
+            <fileset dir="${resources.dir}/checkin">
+                <include name="anontype.xsd"/>
+            </fileset>
+        </sdocomp>
+    </target>
+
+    <!-- test targets -->
+    <target name="run.checkin">
+        <antcall target="run.junit">
+            <param name="test.area" value="checkin"/>
+        </antcall>
+    </target>
+
+    <!-- high level targets -->
+    <!--target name="build" depends="build.schemas, build.tests"/-->
+    <target name="build" depends="build.tests, build.runtime.schemas"/>
+
+    <target name="deploy" depends="build"/>
+
+    <target name="redeploy" depends="clean, deploy"/>
+
+    <target name="checkin" depends="clean, deploy, run.checkin"/>
+
+</project>

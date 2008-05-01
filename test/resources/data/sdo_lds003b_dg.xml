@@ -1,0 +1,64 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary create="#/sdo:datagraph/sdo1:WLCustOrdersCD[1]/sdo1:SDO_C_CD[1]/sdo1:SDO_WLCO_CD[4]" delete="#/sdo:datagraph/changeSummary/sdo1:SDO_C_CD[1]/sdo1:SDO_WLCO_CD[3]" xmlns:sdo1="sdo_lds003b.xsd">
+        <sdo1:SDO_C_CD sdo:ref="#/sdo:datagraph/sdo1:WLCustOrdersCD[1]/sdo1:SDO_C_CD[1]">
+            <sdo1:SDO_WLCO_CD sdo:ref="#/sdo:datagraph/sdo1:WLCustOrdersCD[1]/sdo1:SDO_C_CD[1]/sdo1:SDO_WLCO_CD[1]"/>
+            <sdo1:SDO_WLCO_CD sdo:ref="#/sdo:datagraph/sdo1:WLCustOrdersCD[1]/sdo1:SDO_C_CD[1]/sdo1:SDO_WLCO_CD[2]"/>
+            <sdo1:SDO_WLCO_CD>
+                <sdo1:ORDER_DATE>1997-01-31T09:26:50.240</sdo1:ORDER_DATE>
+                <sdo1:ORDER_ID>ORDER_ID_3</sdo1:ORDER_ID>
+                <sdo1:STORE_ID>2</sdo1:STORE_ID>
+                <sdo1:CUSTOMER_ID>3</sdo1:CUSTOMER_ID>
+                <sdo1:SHIP_METHOD>AIR</sdo1:SHIP_METHOD>
+                <sdo1:TOTAL_ORDER_AMOUNT>4000</sdo1:TOTAL_ORDER_AMOUNT>
+            </sdo1:SDO_WLCO_CD>
+            <sdo1:SDO_WLCO_CD sdo:ref="#/sdo:datagraph/sdo1:WLCustOrdersCD[1]/sdo1:SDO_C_CD[1]/sdo1:SDO_WLCO_CD[3]"/>
+        </sdo1:SDO_C_CD>
+    </changeSummary>
+    <sdo1:WLCustOrdersCD xmlns:sdo1="sdo_lds003b.xsd">
+        <sdo1:SDO_C_CD>
+            <sdo1:FIRST_NAME>JOHN_3</sdo1:FIRST_NAME>
+            <sdo1:LAST_NAME>KAY_3</sdo1:LAST_NAME>
+            <sdo1:CUSTOMER_ID>3</sdo1:CUSTOMER_ID>
+            <sdo1:STATE>AZ</sdo1:STATE>
+            <sdo1:ZIPCODE>93151</sdo1:ZIPCODE>
+            <sdo1:CITY>SAN JOSE</sdo1:CITY>
+            <sdo1:STREET_ADDRESS2>2315</sdo1:STREET_ADDRESS2>
+            <sdo1:STREET_ADDRESS1>NORTH FIRST STREET</sdo1:STREET_ADDRESS1>
+            <sdo1:CUSTOMER_SINCE>1997-01-31T09:26:50.240</sdo1:CUSTOMER_SINCE>
+            <sdo1:EMAIL_ADDRESS>abc@abc.com</sdo1:EMAIL_ADDRESS>
+            <sdo1:TELEPHONE_NUMBER>4081231234</sdo1:TELEPHONE_NUMBER>
+            <sdo1:SDO_WLCO_CD>
+                <sdo1:ORDER_DATE>1997-01-31T09:26:50.240</sdo1:ORDER_DATE>
+                <sdo1:ORDER_ID>ORDER_ID_3</sdo1:ORDER_ID>
+                <sdo1:STORE_ID>0</sdo1:STORE_ID>
+                <sdo1:CUSTOMER_ID>3</sdo1:CUSTOMER_ID>
+                <sdo1:SHIP_METHOD>AIR</sdo1:SHIP_METHOD>
+                <sdo1:TOTAL_ORDER_AMOUNT>1000</sdo1:TOTAL_ORDER_AMOUNT>
+            </sdo1:SDO_WLCO_CD>
+            <sdo1:SDO_WLCO_CD>
+                <sdo1:ORDER_DATE>1997-01-31T09:26:50.240</sdo1:ORDER_DATE>
+                <sdo1:ORDER_ID>ORDER_ID_3</sdo1:ORDER_ID>
+                <sdo1:STORE_ID>1</sdo1:STORE_ID>
+                <sdo1:CUSTOMER_ID>3</sdo1:CUSTOMER_ID>
+                <sdo1:SHIP_METHOD>AIR</sdo1:SHIP_METHOD>
+                <sdo1:TOTAL_ORDER_AMOUNT>2000</sdo1:TOTAL_ORDER_AMOUNT>
+            </sdo1:SDO_WLCO_CD>
+            <sdo1:SDO_WLCO_CD>
+                <sdo1:ORDER_DATE>1997-01-31T09:26:50.240</sdo1:ORDER_DATE>
+                <sdo1:ORDER_ID>ORDER_ID_3</sdo1:ORDER_ID>
+                <sdo1:STORE_ID>3</sdo1:STORE_ID>
+                <sdo1:CUSTOMER_ID>3</sdo1:CUSTOMER_ID>
+                <sdo1:SHIP_METHOD>AIR</sdo1:SHIP_METHOD>
+                <sdo1:TOTAL_ORDER_AMOUNT>5000</sdo1:TOTAL_ORDER_AMOUNT>
+            </sdo1:SDO_WLCO_CD>
+            <sdo1:SDO_WLCO_CD>
+                <sdo1:ORDER_DATE>1997-01-31T09:26:50.240</sdo1:ORDER_DATE>
+                <sdo1:ORDER_ID>ORDER_ID_31</sdo1:ORDER_ID>
+                <sdo1:STORE_ID>30</sdo1:STORE_ID>
+                <sdo1:CUSTOMER_ID>3</sdo1:CUSTOMER_ID>
+                <sdo1:SHIP_METHOD>AIR</sdo1:SHIP_METHOD>
+                <sdo1:TOTAL_ORDER_AMOUNT>5000</sdo1:TOTAL_ORDER_AMOUNT>
+            </sdo1:SDO_WLCO_CD>
+        </sdo1:SDO_C_CD>
+    </sdo1:WLCustOrdersCD>
+</sdo:datagraph>

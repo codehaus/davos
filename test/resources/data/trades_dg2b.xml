@@ -1,0 +1,17 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary create="#/sdo:datagraph/trad:trades/trad:trader[2]/trad:sell[1]" delete="#/sdo:datagraph/changeSummary/trad:trader[2]/trad:sell[1]" xmlns:trad="http://sdo/test/trade">
+        <trad:trader sdo:ref="#/sdo:datagraph/trad:trades/trad:trader[2]"/>
+        <trad:trader sdo:ref="#/sdo:datagraph/trad:trades/trad:trader[1]">
+            <trad:sell symbol="DEF" quantity="200" price="10.5"/>
+        </trad:trader>
+    </changeSummary>
+    <trad:trades xmlns:trad="http://sdo/test/trade">
+        <trad:trader id="traderX">
+            <trad:buy symbol="ABC" quantity="100" price="14.25"/>
+        </trad:trader>
+        <trad:trader id="traderY">
+            <trad:buy symbol="XYZ" quantity="500" price="5.75"/>
+            <trad:sell symbol="DEF" quantity="200" price="10.5"/>
+        </trad:trader>
+    </trad:trades>
+</sdo:datagraph>

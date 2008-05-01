@@ -1,0 +1,44 @@
+<xs:schema targetNamespace="urn:CustomerBaseView" sdojava:package="customerbaseview" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sdo="commonj.sdo" xmlns:sdoxml="commonj.sdo/xml" xmlns:sdojava="commonj.sdo/java" xmlns:tns="urn:CustomerBaseView" xmlns:ns1="urn:Retail" xmlns:ns2="urn:Product">
+  <xs:import namespace="urn:Retail" schemaLocation="Profile.xsd Address.xsd CreditCard.xsd Order.xsd Item.xsd Case.xsd"/>
+  <xs:import namespace="urn:Product" schemaLocation="Product.xsd"/>
+  <xs:complexType name="CUSTOMER_BASE_VIEW">
+    <xs:sequence>
+      <xs:element ref="ns1:PROFILE" minOccurs="0"/>
+      <xs:element name="CREDIT_CARDS" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="ns1:CREDIT_CARD" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ORDERS" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ORDER" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="ns1:CUSTOMER_ORDER" minOccurs="0"/>
+                  <xs:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element ref="ns1:LINE_ITEM" minOccurs="0"/>
+                        <xs:element ref="ns2:PRODUCT" minOccurs="0"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CASES" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="ns1:CUSTOMER_CASE" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

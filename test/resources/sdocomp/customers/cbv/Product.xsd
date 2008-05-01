@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+    xmlns:Product="urn:Product" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    targetNamespace="urn:Product" 
+    elementFormDefault="unqualified" 
+    attributeFormDefault="unqualified">
+    <xsd:complexType name="PRODUCT_TYPE">
+        <xsd:sequence>
+            <xsd:element name="ProductID" type="xsd:string"/>
+            <xsd:element name="CategoryID" type="xsd:string"/>
+            <xsd:element name="ProductName" type="xsd:string"/>
+            <xsd:element name="ProductDescription" type="xsd:string"/>
+            <xsd:element name="Manufacturer" type="xsd:string"/>
+            <xsd:element name="ListPrice" type="xsd:decimal"/>
+            <xsd:element name="AverageServiceCost" type="xsd:decimal" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="PRODUCT" type="Product:PRODUCT_TYPE"/>
+</xsd:schema>

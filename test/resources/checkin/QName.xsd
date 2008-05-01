@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="test/QName" xmlns:tns="test/QName">
+
+  <element name="QNameRoot" type="tns:typeWithQName"/>
+
+  <complexType name="typeWithQName">
+    <attribute name="date" type="gYearMonth"></attribute>
+    <attribute name="qname" type="QName"></attribute>
+  </complexType>
+</schema>

@@ -1,0 +1,134 @@
+<xs:schema
+  targetNamespace="http://sdo/test/basic"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/basic"
+  xmlns:sdoxml="commonj.sdo/xml"
+  >
+  <xs:element name="a" type="tns:A" sdoxml:many="false"/>
+  <xs:element name="b" type="tns:B"/>
+  <xs:element name="c" type="tns:C"/>
+  <xs:element name="d" type="tns:D"/>
+  <xs:element name="e" type="tns:E"/>
+  <xs:complexType name="A">
+    <xs:sequence>
+      <xs:element name="any0" minOccurs="0"/>
+      <xs:element name="any1" type="xs:anyType" minOccurs="0"/>
+      <xs:element name="any2" type="xs:anySimpleType" minOccurs="0"/>
+      <xs:element name="uri1" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="bytes1" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="boolean0" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="byte0" type="xs:byte" minOccurs="0"/>
+      <xs:element name="yearMonthDay" type="xs:date" minOccurs="0"/>
+      <xs:element name="dateTime" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="decimal" type="xs:decimal" minOccurs="0" nillable="true"/>
+      <xs:element name="double0" type="xs:double" minOccurs="0"/>
+      <xs:element name="duration" type="xs:duration" minOccurs="0"/>
+      <xs:element name="float0" type="xs:float" minOccurs="0"/>
+      <xs:element name="day" type="xs:gDay" minOccurs="0"/>
+      <xs:element name="month" type="xs:gMonth" minOccurs="0"/>
+      <xs:element name="monthDay" type="xs:gMonthDay" minOccurs="0"/>
+      <xs:element name="year" type="xs:gYear" minOccurs="0"/>
+      <xs:element name="yearMonth" type="xs:gYearMonth" minOccurs="0"/>
+      <xs:element name="bytes2" type="xs:hexBinary" minOccurs="0"/>
+      <xs:element name="int0" type="xs:int" minOccurs="0"/>
+      <xs:element name="integer0" type="xs:integer" minOccurs="0" nillable="true"/>
+      <xs:element name="string1" type="xs:language" minOccurs="0"/>
+      <xs:element name="long0" type="xs:long" minOccurs="0"/>
+      <xs:element name="string2" type="xs:Name" minOccurs="0"/>
+      <xs:element name="string3" type="xs:NCName" minOccurs="0"/>
+      <xs:element name="integer1" type="xs:negativeInteger" minOccurs="0"/>
+      <xs:element name="integer2" type="xs:nonNegativeInteger" minOccurs="0"/>
+      <xs:element name="integer3" type="xs:nonPositiveInteger" minOccurs="0"/>
+      <xs:element name="string4" type="xs:normalizedString" minOccurs="0"/>
+      <xs:element name="integer4" type="xs:positiveInteger" minOccurs="0"/>
+      <xs:element name="uri2" type="xs:QName" minOccurs="0"/>
+      <xs:element name="short0" type="xs:short" minOccurs="0"/>
+      <xs:element name="string0" type="xs:string" minOccurs="0"/>
+      <xs:element name="time" type="xs:time" minOccurs="0"/>
+      <xs:element name="string5" type="xs:token" minOccurs="0"/>
+      <xs:element name="short1" type="xs:unsignedByte" minOccurs="0"/>
+      <xs:element name="long1" type="xs:unsignedInt" minOccurs="0"/>
+      <xs:element name="integer5" type="xs:unsignedLong" minOccurs="0"/>
+      <xs:element name="int1" type="xs:unsignedShort" minOccurs="0"/>
+      
+      <xs:element name="b" type="tns:B" minOccurs="0"/>
+      <xs:element name="c" type="tns:C" minOccurs="0" maxOccurs="3"/>
+      <xs:element name="d" type="tns:D" minOccurs="0"/>
+      <xs:element name="e" type="tns:E" minOccurs="0"/>
+      <xs:element name="f" type="tns:F" minOccurs="0"/>
+      <xs:element name="f2" type="tns:F2" minOccurs="0" maxOccurs="3"/>
+      <xs:element name="g" type="tns:G" minOccurs="0"/>
+      
+    </xs:sequence>
+    <xs:attribute name="any3"/>
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="idref" type="xs:IDREF"/>
+    <xs:attribute name="idrefs" type="xs:IDREFS"/>
+    <xs:attribute name="entity" type="xs:ENTITY"/>
+    <xs:attribute name="entities" type="xs:ENTITIES"/>
+    <xs:attribute name="nmtoken" type="xs:NMTOKEN"/>
+    <xs:attribute name="nmtokens" type="xs:NMTOKENS"/>
+    <xs:attribute name="notation">
+      <xs:simpleType>
+        <xs:restriction base="xs:NOTATION">
+          <xs:enumeration value="xs:base64Binary"/>
+          <xs:enumeration value="xs:hexBinary"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="B">
+    <xs:sequence>
+      <xs:element name="b1" type="xs:int"/>
+      <xs:element name="b2" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="b0" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:simpleType name="C">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="aaa"/>
+      <xs:enumeration value="bbb"/>
+      <xs:enumeration value="ccc"/>
+      <xs:enumeration value="xxx"/>
+      <xs:enumeration value="yyy"/>
+      <xs:enumeration value="zzz"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="C2">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="A"/>
+      <xs:enumeration value="B"/>
+      <xs:enumeration value="C"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="D" mixed="true">
+    <xs:sequence>
+      <xs:element name="d1" type="xs:int"/>
+      <xs:element name="d2" type="xs:string"/>
+      <xs:element name="d3" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:simpleType name="E">
+    <xs:list itemType="xs:int"/>
+  </xs:simpleType>
+  
+  <xs:simpleType name="F">
+    <xs:union memberTypes="tns:C tns:E"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="F2">
+    <xs:union memberTypes="tns:C tns:C2"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="G">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="1"/>
+      <xs:maxExclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

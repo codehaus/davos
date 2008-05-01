@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema 
+    targetNamespace="urn:Retail" 
+    elementFormDefault="unqualified" 
+    attributeFormDefault="unqualified" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:Retail="urn:Retail">
+  <xsd:complexType name="ADDRESS_TYPE">
+    <xsd:sequence>
+      <xsd:element name="AddressID" type="xsd:string"/>
+      <xsd:element name="CustomerID" type="xsd:string"/>
+      <xsd:element name="FirstName" type="xsd:string"/>
+      <xsd:element name="LastName" type="xsd:string"/>
+      <xsd:element name="StreetAddress_1" type="xsd:string"/>
+      <xsd:element name="StreetAddress_2" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="City" type="xsd:string"/>
+      <xsd:element name="State" type="xsd:string"/>
+      <xsd:element name="ZipCode" type="xsd:string" minOccurs="1"/>
+      <xsd:element name="Country" type="xsd:string" fixed="USA"/>
+      <xsd:element name="DayPhone" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="EveningPhone" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Alias" type="xsd:string" minOccurs="0"/>
+      <xsd:element minOccurs="0" name="Status" type="xsd:string" default="ACTIVE"/>
+      <xsd:element name="IsDefault" type="xsd:short"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="ADDRESS" type="Retail:ADDRESS_TYPE"/>
+  
+</xsd:schema>

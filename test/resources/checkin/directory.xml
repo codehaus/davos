@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dyn:directory xsi:type="dyn:DirectoryType" xmlns:dyn="http://sdo/test/dynamic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dyn:listing name="Robert Smith">
+        <dyn:phone location="work" number="650-234-7701"/>
+        <dyn:phone location="home" number="650-927-4321"/>
+    </dyn:listing>
+</dyn:directory>

@@ -1,0 +1,24 @@
+<!-- Customer.xsd contains only one type, used by IPO.xsd -->
+<schema
+        targetNamespace="http://www.example.com/IPO"
+        xmlns:ipo="http://www.example.com/IPO"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+>
+    <import namespace="http://www.example.com/IPO"/>
+
+    <complexType name="Customer">
+        <sequence>
+            <element name="purchaseOrder" type="ipo:PurchaseOrderType" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="primaryKey" type="ID"/>
+    </complexType>
+
+    <element name="customerList">
+        <complexType>
+            <sequence>
+                <element name="customer" type="ipo:Customer" maxOccurs="10"/>
+            </sequence>
+        </complexType>
+    </element>
+
+</schema>

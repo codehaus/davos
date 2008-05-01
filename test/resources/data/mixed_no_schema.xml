@@ -1,0 +1,10 @@
+<root xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <st1>simple content</st1>
+  <st2 xsi:type="xs:string">more simple content</st2>
+  <st3 xsi:type="xs:int">100</st3>
+  <st3 xsi:type="xs:string">xxx</st3>
+  <st4 xsi:type="xs:int">200</st4>
+  <ct1 text="example">simple content</ct1>
+  <ct2 content="mixed">this <b>content</b> is mixed</ct2>
+</root>

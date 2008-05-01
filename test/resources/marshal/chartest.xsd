@@ -1,0 +1,23 @@
+<xs:schema
+  targetNamespace="chartest.xsd"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="chartest.xsd"
+  >
+
+  <xs:element name="testList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="test" type="tns:testType" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="testType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="esc" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+</xs:schema>

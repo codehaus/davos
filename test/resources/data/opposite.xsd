@@ -1,0 +1,48 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/opposite"
+  xmlns:opp="http://sdo/test/opposite"
+  xmlns:sdox="commonj.sdo/xml">
+
+  <xs:element name="customerRecord" type="opp:CustomerRecordType"/>
+
+  <xs:complexType name="CustomerRecordType">
+    <xs:sequence>
+      <xs:element name="customer" type="opp:CustomerType"/>
+      <xs:element name="address" type="opp:AddressType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CustomerType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="address" type="xs:IDREF"
+        sdox:propertyType="opp:AddressType"/>
+      <xs:element name="order" type="opp:OrderType"
+        maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:complexType name="AddressType">
+    <xs:sequence>
+      <xs:element name="street" type="xs:string"/>
+      <xs:element name="city" type="xs:string"/>
+      <xs:element name="state" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:ID"/>
+    <xs:attribute name="customer" type="xs:IDREF"
+      sdox:propertyType="opp:CustomerType"
+      sdox:oppositeProperty="address"/>
+  </xs:complexType>
+
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="sku" type="xs:string"/>
+      <xs:element name="quantity" type="xs:int"/>
+    </xs:sequence>
+    <xs:attribute name="customer" type="xs:IDREF"
+      sdox:propertyType="opp:CustomerType"
+      sdox:oppositeProperty="order"/>
+  </xs:complexType>
+
+</xs:schema>

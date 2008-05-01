@@ -1,0 +1,43 @@
+<ipo:customerList xmlns:ipo="http://www.example.com/IPO"
+    >
+    <customer primaryKey="C01">
+        <purchaseOrder customer="C01">
+            <productName>Gizmo</productName>
+            <shipTo>
+                <name>John Jones</name>
+                <street>10 12th St</street>
+                <city>Atlanta, GA</city>
+            </shipTo>
+            <billTo>
+                <name>John Jones</name>
+                <street>10 12th St</street>
+                <city>Atlanta, GA</city>
+            </billTo>
+            <items>
+                <productName>Gizmo</productName>
+                <item partNum="0001"></item>
+                <item partNum="0002"/>
+            </items>
+        </purchaseOrder>
+    </customer>
+    <customer primaryKey="C02">
+        <purchaseOrder customer="C02">
+            <productName>iPod</productName>
+            <shipTo>
+                <name>Martin Smith</name>
+                <street>333 North St</street>
+                <city>Nashville, TN</city>
+            </shipTo>
+            <billTo>
+                <name>Martin Smith</name>
+                <street>eeeNorth St</street>
+                <city>Nashville, TN</city>
+            </billTo>
+            <items>
+                <productName>iPod</productName>
+                <item partNum="0010"></item>
+                <item partNum="0020"/>
+            </items>
+        </purchaseOrder>
+    </customer>
+</ipo:customerList>

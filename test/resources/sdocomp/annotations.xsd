@@ -1,0 +1,72 @@
+<schema targetNamespace="http://www.example.com/test"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://www.example.com/test"
+  xmlns:sdo="commonj.sdo"
+  xmlns:sdox="commonj.sdo/xml"
+  xmlns:sdoj="commonj.sdo/java"
+  sdoj:package="davos.sdo.test.annotations">
+
+  <element name="order" type="tns:PurchaseOrder"/>
+
+  <complexType name="Address">
+    <sequence>
+      <element name="name" type="string"/>
+      <element name="street" type="string"/>
+      <element name="city" type="string"/>
+      <element name="state" type="string" sdox:aliasName="province"/>
+      <element name="country" type="string" default="US"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="PurchaseOrder" sdox:aliasName="po PO">
+    <sequence>
+      <element name="shipTo" type="tns:Address" 
+        sdox:aliasName="shipAddr shippingAddress"/>
+      <element name="billTo" type="tns:Address"
+        sdox:aliasName="billingAddress"/>
+      <element name="comment" minOccurs="0" sdox:readOnly="true"/>
+      <element name="items" sdox:name="goodies" type="tns:Items"/>
+      <element name="orderDate" type="date" sdox:string="true"/>
+    </sequence>
+    <attribute name="poNum" sdox:name="poNumber" type="ID" use="required"/>
+  </complexType>
+
+  <complexType name="Items" sdox:name="Stuff" sdox:sequence="true">
+    <sequence>
+      <element name="item" minOccurs="0" maxOccurs="unbounded">
+        <complexType sdox:name="Item">
+          <sequence>
+            <element name="productName" type="string"/>
+            <element name="quantity" type="int" sdox:dataType="tns:Qty"/>
+            <!--
+              <simpleType>
+                <restriction base="positiveInteger">
+                  <maxExclusive value="100"/>
+                </restriction>
+              </simpleType>
+            </element>
+            -->
+            <element name="price" type="decimal" sdox:dataType="sdo:Double"/>
+            <element name="shipDate" type="date" minOccurs="0" sdox:dataType="sdo:String"/>
+          </sequence>
+          <attribute name="itemNum" type="ID" use="required"/>
+          <attribute name="partNum" type="tns:SKU" use="required"/>
+        </complexType>
+      </element>
+    </sequence>
+    <attribute name="bonusItem" type="IDREF" sdox:propertyType="tns:Item"/>
+  </complexType>
+
+  <simpleType name="Qty" sdoj:instanceClass="java.lang.Short">
+    <restriction base="positiveInteger">
+      <maxExclusive value="100"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="SKU" sdox:name="StockKeepingUnit">
+    <restriction base="string">
+      <pattern value="\d{3}-[A-Z]{2}"/>
+    </restriction>
+  </simpleType>
+
+</schema>

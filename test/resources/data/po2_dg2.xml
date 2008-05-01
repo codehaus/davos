@@ -1,0 +1,27 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <po2:purchaseOrder xmlns:po="http://sdo/test/po" xmlns:po2="http://sdo/test/po2">
+        <changeSummary/>
+        <po:shipTo>
+            <name>Alex Brown</name>
+            <street>321 Easy St</street>
+            <city>Mountain View</city>
+            <state>CA</state>
+            <zip>94043</zip>
+        </po:shipTo>
+        <po:billTo>
+            <name>Alex Brown</name>
+            <street>321 Easy St</street>
+            <city>Mountain View</city>
+            <state>CA</state>
+            <zip>94043</zip>
+        </po:billTo>
+        <items>
+            <item itemNumber="11213-98706">
+                <productName>SuperGizmo</productName>
+                <quantity>1</quantity>
+                <price>19.95</price>
+                <shipDate>2006-11-10</shipDate>
+            </item>
+        </items>
+    </po2:purchaseOrder>
+</sdo:datagraph>

@@ -1,0 +1,12 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary create="#/sdo:datagraph/open:a[1]/glob:test2[1]" xmlns:open="http://sdo/test/opencontent" xmlns:glob="http://sdo/test/global2">
+        <open:a sdo:ref="#/sdo:datagraph/open:a[1]"/>
+    </changeSummary>
+    <open:a xmlns:open="http://sdo/test/opencontent">
+        <open:name>My open content object</open:name>
+        <glob:test2 x0="123" xmlns:glob="http://sdo/test/global2">
+            <glob:x1>asdfasdf</glob:x1>
+            <glob:x2>qwerty</glob:x2>
+        </glob:test2>
+    </open:a>
+</sdo:datagraph>

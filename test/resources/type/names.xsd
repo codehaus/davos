@@ -1,0 +1,17 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/names"
+  xmlns:tns="http://sdo/test/names">
+
+  <xs:element name="test" type="tns:Test"/>
+
+  <xs:complexType name="Test">
+    <xs:sequence>
+      <xs:element name="foo" type="xs:string"/>
+      <xs:element name="bar" type="xs:double"/>
+    </xs:sequence>
+    <xs:attribute name="foo" type="xs:boolean"/>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+</xs:schema>

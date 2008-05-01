@@ -1,0 +1,33 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="company2.xsd"
+  xmlns:company="company2.xsd"
+  xmlns:sdox="commonj.sdo/xml">
+
+  <xs:element name="company" type="company:CompanyType" sdox:many="false"/>
+  <xs:complexType name="CompanyType">
+    <xs:sequence>
+      <xs:element name="departments" type="company:DepartmentType"
+        maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="employeeOfTheMonth" type="xs:IDREF"
+      sdox:propertyType="company:EmployeeType"/>
+  </xs:complexType>
+
+  <xs:complexType name="DepartmentType">
+    <xs:sequence>
+      <xs:element name="employees" type="company:EmployeeType"
+        maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="location" type="xs:string"/>
+    <xs:attribute name="number" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:complexType name="EmployeeType">
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="SN" type="xs:ID"/>
+    <xs:attribute name="manager" type="xs:boolean"/>
+  </xs:complexType>
+
+</xs:schema>

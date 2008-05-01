@@ -1,0 +1,45 @@
+<schema targetNamespace="http://www.example.com/choice"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://www.example.com/choice"
+  xmlns:sdo="commonj.sdo"
+  elementFormDefault="qualified"
+  attributeFormDefault="qualified">
+
+  <element name="items" type="tns:ItemsType"/>
+  <element name="shirt" type="tns:ShirtType"/>
+  <element name="pants" type="tns:PantsType"/>
+
+  <complexType name="ItemsType">
+    <choice minOccurs="0" maxOccurs="unbounded">
+      <element name="shirt" type="tns:ShirtType"/>
+      <element name="pants" type="tns:PantsType"/>
+    </choice>
+  </complexType>
+
+  <complexType name="ShirtType">
+    <sequence>
+      <element name="color" type="string"/>
+      <element name="size" type="tns:ShirtSize"/>
+    </sequence>
+    <attribute name="id" type="ID"/>
+  </complexType>
+
+  <complexType name="PantsType">
+    <sequence>
+      <element name="color" type="string"/>
+      <element name="size" type="tns:PantsSize"/>
+    </sequence>
+    <attribute name="id" type="ID"/>
+  </complexType>
+
+  <complexType name="ShirtSize">
+    <attribute name="collar" type="int"/>
+    <attribute name="sleeve" type="int"/>
+  </complexType>
+
+  <complexType name="PantsSize">
+    <attribute name="waist" type="int"/>
+    <attribute name="inseam" type="int"/>
+  </complexType>
+
+</schema>

@@ -1,0 +1,6 @@
+<der:product xsi:type="der:ShirtType" xmlns:der="http://sdo/test/derivation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <der:name>classic T</der:name>
+    <der:number>I213</der:number>
+    <der:size>M</der:size>
+    <der:color>navy</der:color>
+</der:product>

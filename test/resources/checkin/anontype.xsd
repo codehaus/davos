@@ -1,0 +1,93 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/anontype"
+  xmlns:anon="http://sdo/test/anontype"
+  elementFormDefault="qualified">
+
+  <xs:element name="gamma" type="anon:Gamma"/>
+  <xs:element name="delta" type="anon:Delta"/>
+
+  <!-- global element with anonymous type -->
+  <xs:element name="gigli">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="alice" type="xs:string"/>
+        <xs:element name="bob" type="xs:int"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- global attribute with anonymous type -->
+  <xs:element name="fleck">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="on"/>
+        <xs:enumeration value="off"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- global element with anonymous type, containing element with anonymous type -->
+  <xs:element name="gigino">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="x" type="xs:int"/>
+        <xs:element name="charlie">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="y" type="xs:string"/>
+              <xs:element name="z" type="xs:double"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- global type containing element and attribute with anonymous type -->
+  <xs:complexType name="Gamma">
+    <xs:sequence>
+      <xs:element name="x" type="xs:int"/>
+      <xs:element name="charlie">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="y" type="xs:string"/>
+            <xs:element name="z" type="xs:double"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="ray">
+      <xs:simpleType>
+        <xs:restriction base="xs:int">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="180"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- global type containing element with anonymous type, twice nested -->
+  <xs:complexType name="Delta">
+    <xs:sequence>
+      <xs:element name="x" type="xs:int"/>
+      <xs:element name="charlie">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="y" type="xs:string"/>
+            <xs:element name="z" type="xs:double"/>
+            <xs:element name="omega">
+              <xs:complexType>
+                <xs:choice>
+                  <xs:element name="o1" type="xs:int"/>
+                  <xs:element name="o2" type="xs:string"/>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>

@@ -1,0 +1,51 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:sdoxml="commonj.sdo/xml"
+  targetNamespace="http://sdo/test/global"
+  xmlns="http://sdo/test/global"
+  elementFormDefault="qualified">
+
+  <xs:element name="size" type="SizeType"/>
+  <xs:attribute name="size" type="xs:int"/>
+  <xs:element name="product" type="ProductType"/>
+  <xs:element name="test" type="SimpleType"/>
+  <xs:element name="test2" type="SimpleType" sdoxml:many="true"/>
+  <xs:element name="test3" type="SimpleType" sdoxml:many="false"/>
+  <xs:attribute name="xxx" type="xs:boolean"/>
+
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="number" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute ref="size"/>
+  </xs:complexType>
+  
+  <xs:complexType name="SimpleType">
+    <xs:sequence>
+      <xs:element name="x" type="xs:string"/>
+      <xs:element name="y" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="SizeType">
+    <xs:union memberTypes="NumberSizeType SMLXSizeType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="NumberSizeType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="99"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SMLXSizeType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="S"/>
+      <xs:enumeration value="M"/>
+      <xs:enumeration value="L"/>
+      <xs:enumeration value="XL"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

@@ -1,0 +1,4 @@
+<prod:product xmlns:prod="http://example.com/prod">
+  <prod:number>557</prod:number>
+  <prod:size>10</prod:size>
+</prod:product>

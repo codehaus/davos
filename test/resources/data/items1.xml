@@ -1,0 +1,6 @@
+<cho:items xmlns:cho="http://www.example.com/choice">
+    <cho:shirt cho:id="RL-005">
+        <cho:color>white</cho:color>
+        <cho:size cho:collar="15" cho:sleeve="33"/>
+    </cho:shirt>
+</cho:items>

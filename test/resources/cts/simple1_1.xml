@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sim:quote xmlns:sim="http://www.example.com/simple1">
+  <symbol>FBNT</symbol>
+  <companyName>FlyByNightTechnology</companyName>
+  <price>999.0</price>
+  <volume>1000.0</volume>
+  <quotes>
+    <price>1500.0</price>
+  </quotes>
+  <quotes>
+    <price>2500.0</price>
+  </quotes>
+  <quotes>
+    <price>3000.0</price>
+  </quotes>
+  <quotes>
+    <price>4000.0</price>
+  </quotes>
+</sim:quote>

@@ -1,0 +1,22 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://example.com/prod"
+  xmlns:prod="http://example.com/prod"
+  elementFormDefault="qualified">
+
+  <xs:element name="product" type="prod:ProductType"/>
+
+  <xs:complexType name="ProductType">
+    <xs:sequence>
+      <xs:element name="number" type="xs:int"/>
+      <xs:element name="size" type="prod:SizeType"/>
+    </xs:sequence>
+  </xs:complexType>
+ 
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="2"/>
+      <xs:maxInclusive value="18"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

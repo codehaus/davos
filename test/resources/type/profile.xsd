@@ -1,0 +1,33 @@
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    targetNamespace="http://sdo/test/profile" 
+    xmlns:tns="http://sdo/test/profile">
+
+  <xs:element name="profile" type="tns:Profile"/>
+  <xs:element name="address" type="tns:Address">
+    <xs:annotation>
+      <xs:appinfo source="uri1">aaa</xs:appinfo>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="Profile">
+    <xs:annotation>
+      <xs:appinfo source="uri2">apap</xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="name" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo source="uri1">nnn</xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="tns:address"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Address">
+    <xs:sequence>
+      <xs:element name="street" type="xs:string"/>
+      <xs:element name="city" type="xs:string"/>
+      <xs:element name="state" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,17 @@
+<sdo:datagraph xmlns:sdo="commonj.sdo">
+    <changeSummary create="#/sdo:datagraph/open:a[1]/glob:test[1]" delete="#/sdo:datagraph/changeSummary/open:a[1]/glob1:test[1]" xmlns:open="http://sdo/test/opencontent" xmlns:glob="http://sdo/test/global2" xmlns:glob1="http://sdo/test/global">
+        <open:a sdo:ref="#/sdo:datagraph/open:a[1]">
+            <glob1:test>
+                <glob1:x>Extra! Extra!</glob1:x>
+                <glob1:y>1000000</glob1:y>
+            </glob1:test>
+        </open:a>
+    </changeSummary>
+    <open:a xmlns:open="http://sdo/test/opencontent">
+        <open:name>My open content object</open:name>
+        <glob:test x0="123" xmlns:glob="http://sdo/test/global2">
+            <glob:x1>asdfasdf</glob:x1>
+            <glob:x2>qwerty</glob:x2>
+        </glob:test>
+    </open:a>
+</sdo:datagraph>

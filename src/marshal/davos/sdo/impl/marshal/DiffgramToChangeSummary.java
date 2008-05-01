@@ -952,7 +952,7 @@ public class DiffgramToChangeSummary
     private String createChangeSummary(String insertList,String deleteList,String summary,String diffgramAfter) {
         StringBuilder s = new StringBuilder();
         int indent = NEWLINE.length() + 4;
-        s.append("<sdo:datagraph xmlns:sdo=\"javax.sdo\">");
+        s.append("<sdo:datagraph xmlns:sdo=\"commonj.sdo\">");
         s.append(INDENT, 0, indent);
         s.append("<changeSummary create=\"").append(insertList);
         s.append("\" delete=\"").append(deleteList).append('"');

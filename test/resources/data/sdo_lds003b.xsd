@@ -1,0 +1,42 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="sdo_lds003b.xsd"
+  targetNamespace="sdo_lds003b.xsd"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+  <xs:element name="WLCustOrdersCD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="SDO_C_CD">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="FIRST_NAME"/>
+              <xs:element type="xs:string" name="LAST_NAME"/>
+              <xs:element type="xs:int" name="CUSTOMER_ID"/>
+              <xs:element type="xs:string" name="STATE"/>
+              <xs:element type="xs:integer" name="ZIPCODE"/>
+              <xs:element type="xs:string" name="CITY"/>
+              <xs:element type="xs:string" name="STREET_ADDRESS2"/>
+              <xs:element type="xs:string" name="STREET_ADDRESS1"/>
+              <xs:element type="xs:dateTime" name="CUSTOMER_SINCE"/>
+              <xs:element type="xs:string" name="EMAIL_ADDRESS"/>
+              <xs:element type="xs:integer" name="TELEPHONE_NUMBER"/>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="SDO_WLCO_CD">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:dateTime" name="ORDER_DATE"/>
+                    <xs:element type="xs:string" name="ORDER_ID"/>
+                    <xs:element type="xs:int" name="STORE_ID"/>
+                    <xs:element type="xs:int" name="CUSTOMER_ID"/>
+                    <xs:element type="xs:string" name="SHIP_METHOD"/>
+                    <xs:element type="xs:decimal" name="TOTAL_ORDER_AMOUNT"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

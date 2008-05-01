@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="test/simple3" xmlns:tns="test/simple3"
+  elementFormDefault="qualified">
+
+<element name="document">
+  <complexType>
+    <sequence>
+      <element ref="tns:a"/>
+    </sequence>
+    <attribute name="node" type="string"/>
+  </complexType>
+</element>
+
+<element name="a">
+  <complexType>
+    <sequence>
+      <element name="b">
+        <complexType>
+          <attribute name="name" type="string"/>
+        </complexType>
+      </element>
+      <element name="c">
+        <complexType>
+          <attribute name="name" type="string"/>
+        </complexType>
+      </element>
+    </sequence>
+    <attribute name="atr" type="int"/>
+  </complexType>
+</element>
+
+</schema>

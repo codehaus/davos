@@ -1,0 +1,23 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://aldsp.bea.com/test/sdocs6"
+  targetNamespace="http://aldsp.bea.com/test/sdocs6">
+  <xs:element name="customer" type="tns:CustomerType"/>
+  <xs:element name="tel_no" type="tns:TelNoType"/>
+  <xs:complexType name="TelNoType">
+    <xs:sequence>
+      <xs:element name="location" type="xs:string"/>
+      <xs:element name="number" type="xs:integer"/>
+    </xs:sequence>
+    <xs:attribute name="customer_id" type="xs:integer" use="required"/>
+    <xs:attribute name="listed" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="CustomerType">
+    <xs:sequence>
+      <xs:element name="first_name" type="xs:string"/>
+      <xs:element name="last_name" type="xs:string"/>
+      <xs:element name="customer_id" type="xs:integer"/>
+      <xs:element ref="tns:tel_no" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,57 @@
+<xs:schema targetNamespace="ld:logicalDS/CUSTOMER_VIEW" xmlns:dsns0="ld:logicalDS/CUSTOMER_VIEW" xmlns:sdo="commonj.sdo" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="CUSTOMER_VIEWDataGraph" type="dsns0:CUSTOMER_VIEWDataGraphType"/>
+  <xs:complexType name="CUSTOMER_VIEWDataGraphType">
+    <xs:complexContent>
+      <xs:extension base="sdo:BaseDataGraphType">
+        <xs:sequence>
+          <xs:element ref="dsns0:CUSTOMER_VIEW"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="CUSTOMER_VIEW">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="CUSTOMER_ID" type="xs:string"/>
+        <xs:element name="FIRST_NAME" type="xs:string"/>
+        <xs:element name="LAST_NAME" type="xs:string"/>
+        <xs:element name="CUSTOMER_SINCE" type="xs:date"/>
+        <xs:element name="EMAIL_ADDRESS" type="xs:string"/>
+        <xs:element name="TELEPHONE_NUMBER" type="xs:string"/>
+        <xs:element name="SSN" type="xs:string" minOccurs="0"/>
+        <xs:element name="BIRTH_DAY" type="xs:date" minOccurs="0"/>
+        <xs:element name="DEFAULT_SHIP_METHOD" type="xs:string" minOccurs="0"/>
+        <xs:element name="EMAIL_NOTIFICATION" type="xs:integer" minOccurs="0"/>
+        <xs:element name="NEWS_LETTTER" type="xs:integer" minOccurs="0"/>
+        <xs:element name="ONLINE_STATEMENT" type="xs:integer" minOccurs="0"/>
+        <xs:element name="CREDIT_LIMIT" type="xs:decimal" minOccurs="0"/>
+        <xs:element name="ORDERS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ORDER" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CUSTOMER_ID" type="xs:string"/>
+                    <xs:element name="ORDER_ID" type="xs:string"/>
+                    <xs:element name="ORDER_DATE" type="xs:date"/>
+                    <xs:element name="SHIP_METHOD" type="xs:string"/>
+                    <xs:element name="HANDLING_CHARGE" type="xs:decimal"/>
+                    <xs:element name="SUBTOTAL" type="xs:decimal"/>
+                    <xs:element name="TOTAL_ORDER_AMOUNT" type="xs:decimal"/>
+                    <xs:element name="SALE_TAX" type="xs:decimal"/>
+                    <xs:element name="SHIP_TO" type="xs:string"/>
+                    <xs:element name="SHIP_TO_NAME" type="xs:string"/>
+                    <xs:element name="BILL_TO" type="xs:string"/>
+                    <xs:element name="ESTIMATED_SHIP_DATE" type="xs:date"/>
+                    <xs:element name="STATUS" type="xs:string"/>
+                    <xs:element name="TRACKING_NUMBER" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

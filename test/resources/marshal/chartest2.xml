@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE test [
+  <!ENTITY alpha "&#x3B1;">
+  <!ENTITY omega "&#x3C9;">
+]>
+<char:testList xmlns:char="chartest.xsd">
+  <test>This is a greater than sign: &gt;</test>
+  <test>This is a less than sign: &lt;</test>
+  <test esc='&apos;'>This is a single quote: &apos;</test>
+  <test esc="&quot;">This is a double quote: &quot;</test>
+  <test>&alpha;&amp;&omega;</test>
+  <test>Character data may not contain the three-character sequence ]]&gt; with the &gt; unescaped.</test>
+  <test>In particular, <![CDATA[character data in a CDATA section may not contain the three-character sequence ]]&gt;]]> with the &gt; unescaped.</test>
+</char:testList>

@@ -1,0 +1,19 @@
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://sdo/test/global2"
+  xmlns="http://sdo/test/global2"
+  elementFormDefault="qualified">
+
+  <xs:element name="test" type="SimpleType"/>
+  <xs:element name="test2" type="SimpleType"/>
+  <xs:attribute name="test3" type="xs:string"/>
+
+  <xs:complexType name="SimpleType">
+    <xs:sequence>
+      <xs:element name="x1" type="xs:string"/>
+      <xs:element name="x2" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="x0" type="xs:int"/>
+  </xs:complexType>
+
+</xs:schema>

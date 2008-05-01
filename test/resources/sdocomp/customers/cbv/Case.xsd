@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="urn:Retail" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns:Retail="urn:Retail" 
+  elementFormDefault="unqualified" 
+  attributeFormDefault="unqualified">
+  <xsd:complexType name="CASE_TYPE">
+    <xsd:sequence>
+      <xsd:element name="CaseID" type="xsd:string"/>
+      <xsd:element name="CustomerID" type="xsd:string"/>
+      <xsd:element name="ProductID" type="xsd:string"/>
+      <xsd:element name="CaseType" type="xsd:string"/>
+      <xsd:element name="CaseDescription" type="xsd:string"/>
+      <xsd:element name="CaseDate" type="xsd:date" nillable="true"/>
+      <xsd:element name="AssigneeID" type="xsd:string"/>
+      <xsd:element name="Status" type="xsd:string"/>
+      <xsd:element name="StatusDate" type="xsd:date" nillable="true"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CUSTOMER_CASE" type="Retail:CASE_TYPE"/>
+</xsd:schema>

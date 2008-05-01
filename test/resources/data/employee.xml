@@ -1,0 +1,12 @@
+<employee xmlns="http://sdo/test/employee">
+  <name>Fred Jones</name>
+  <address>
+    <street>900 Aurora Ave.</street>
+    <city>Seattle</city>
+    <state>WA</state>
+    <zip>98115</zip>
+  </address>
+  <phone location="work">(425)555-5665</phone>
+  <phone location="home">(206)555-5555</phone>
+  <phone location="mobile">(206)555-4321</phone>
+</employee>

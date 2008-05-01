@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:ns1="http://sdo/test/anil" 
+    targetNamespace="http://sdo/test/anil" 
+    elementFormDefault="qualified" 
+    attributeFormDefault="unqualified">
+
+    <xs:element name="NormalizedCustomer1">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="cid" type="xs:string"/>
+                <xs:element name="fname" type="xs:string"/>
+                <xs:element name="lname" type="xs:string"/>
+                <xs:element name="since" type="xs:dateTime"/>
+                <xs:element name="email" type="xs:string"/>
+                <xs:element name="tel" type="xs:string"/>
+                <xs:element name="ssn" type="xs:string" minOccurs="0"/>
+                <xs:element name="credit" type="xs:decimal" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="NormalizedCustomer2" type="ns1:NormalizedCustomer2Type"/>
+
+    <xs:complexType name="NormalizedCustomer2Type">
+        <xs:sequence>
+            <xs:element name="cid" type="xs:string"/>
+            <xs:element name="fname" type="xs:string"/>
+            <xs:element name="lname" type="xs:string"/>
+            <xs:element name="since" type="xs:dateTime"/>
+            <xs:element name="email" type="xs:string"/>
+            <xs:element name="tel" type="xs:string"/>
+            <xs:element name="ssn" type="xs:string" minOccurs="0"/>
+            <xs:element name="credit" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

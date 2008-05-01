@@ -1,0 +1,8 @@
+<item xmlns="http://sdo/test/substitution">
+  <product xsi:type="ShirtType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <name>classic T</name>
+    <number>I213</number>
+    <size>M</size>
+    <color>navy</color>
+  </product>
+</item>

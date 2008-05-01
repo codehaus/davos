@@ -1,0 +1,8 @@
+<mix:quote xmlns:mix="http://www.example.com/mixed">
+  <symbol>fbnt</symbol>
+  <companyName>FlyByNightTechnology</companyName>
+  some text
+  <quotes><price>2000.0</price></quotes>yet
+  more text
+  <price>1000.0</price>
+</mix:quote>

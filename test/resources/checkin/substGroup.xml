@@ -1,0 +1,11 @@
+<root xmlns="checkin/substitution">
+    <a>
+        <e>abc</e>
+    </a>
+    <b a="1">
+        <e>bcd</e>
+    </b>
+    <b xsi:type="derived2" a="2" b="3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <e>bcd</e>
+    </b>
+</root>

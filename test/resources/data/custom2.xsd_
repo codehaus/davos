@@ -1,0 +1,58 @@
+<xs:schema
+  targetNamespace="http://sdo/test/custom2"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/custom2"
+  xmlns:sdoj="commonj.sdo/java"
+  >
+
+  <xs:element name="a" type="tns:A"/>
+  <xs:element name="b" type="tns:B"/>
+  <xs:element name="c" type="tns:C"/>
+  <xs:element name="d" type="tns:D"/>
+  <xs:element name="e" type="tns:E"/>
+
+  <xs:complexType name="A">
+    <xs:sequence>
+      <xs:element name="any1" type="xs:anyType" minOccurs="0"/>
+      <xs:element name="any2" type="xs:anySimpleType" minOccurs="0"/>
+      <xs:element name="uri1" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="uri2" type="xs:QName" minOccurs="0"/>
+      <xs:element name="b" type="tns:B" minOccurs="0"/>
+      <xs:element name="c" type="tns:C" minOccurs="0" maxOccurs="3"/>
+      <xs:element name="d" type="tns:D" minOccurs="0"/>
+      <xs:element name="e" type="tns:E" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="B">
+    <xs:sequence>
+      <xs:element name="b1" type="xs:int"/>
+      <xs:element name="b2" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="b0" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:simpleType name="C">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="aaa"/>
+      <xs:enumeration value="bbb"/>
+      <xs:enumeration value="ccc"/>
+      <xs:enumeration value="xxx"/>
+      <xs:enumeration value="yyy"/>
+      <xs:enumeration value="zzz"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="D" mixed="true">
+    <xs:sequence>
+      <xs:element name="d1" type="xs:int"/>
+      <xs:element name="d2" type="xs:string"/>
+      <xs:element name="d3" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:simpleType name="E" sdoj:instanceClass="davos.sdo.test.MyIntList">
+    <xs:list itemType="xs:int"/>
+  </xs:simpleType>
+  
+</xs:schema>

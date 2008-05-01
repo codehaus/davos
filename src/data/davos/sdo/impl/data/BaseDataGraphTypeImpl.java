@@ -25,7 +25,7 @@ public abstract class BaseDataGraphTypeImpl
     extends davos.sdo.impl.data.DataObjectGeneral
     implements davos.sdo.BaseDataGraphType
 {
-    public static javax.sdo.Type type = javax.sdo.helper.TypeHelper.INSTANCE.getType("javax.sdo","BaseDataGraphType");
+    public static javax.sdo.Type type = javax.sdo.helper.TypeHelper.INSTANCE.getType("commonj.sdo","BaseDataGraphType");
 
     public davos.sdo.ModelsType getModels()
     {

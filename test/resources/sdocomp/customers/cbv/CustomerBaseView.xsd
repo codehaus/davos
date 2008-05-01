@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+  targetNamespace="urn:CustomerBaseView" 
+  xmlns:CustomerBaseView="urn:CustomerBaseView" 
+  xmlns:Retail="urn:Retail" 
+  xmlns:Product="urn:Product" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!-- import -->
+  <xsd:import namespace="urn:Retail" schemaLocation="CreditCard.xsd"/>
+  <xsd:import namespace="urn:Retail" schemaLocation="Profile.xsd"/>
+  <xsd:import namespace="urn:Retail" schemaLocation="Case.xsd"/>
+  <xsd:import namespace="urn:Retail" schemaLocation="Order.xsd"/>
+  <xsd:import namespace="urn:Retail" schemaLocation="Item.xsd"/>
+  <xsd:import namespace="urn:Product" schemaLocation="Product.xsd"/>
+
+  <xsd:complexType name="CUSTOMER_BASE_VIEW">
+    <xsd:sequence>
+      <xsd:element ref="Retail:PROFILE"/>
+      <xsd:element name="CREDIT_CARDS">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="Retail:CREDIT_CARD" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ORDERS">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ORDER" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element ref="Retail:CUSTOMER_ORDER"/>
+                  <xsd:element name="ITEM" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element ref="Retail:LINE_ITEM"/>
+                        <xsd:element ref="Product:PRODUCT"/>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>  
+            </xsd:element>      
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CASES">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="Retail:CUSTOMER_CASE" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CustomerBaseView">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="CUSTOMER_BASE_VIEW" type="CustomerBaseView:CUSTOMER_BASE_VIEW" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

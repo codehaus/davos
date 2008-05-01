@@ -1,0 +1,19 @@
+<xs:schema
+  targetNamespace="http://test/sdo/sdo2xsd"
+  elementFormDefault="qualified"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:sdo="commonj.sdo"
+  xmlns:sdoxml="commonj.sdo/xml"
+  xmlns:sdojava="commonj.sdo/java"
+  xmlns:tns="http://test/sdo/sdo2xsd">
+  <xs:complexType name="TestType2">
+    <xs:attribute type="xs:boolean" name="boolean" sdoxml:dataType="sdojava:BooleanObject"/>
+    <xs:attribute type="xs:byte" name="byte" sdoxml:dataType="sdojava:ByteObject"/>
+    <xs:attribute type="xs:string" name="character" sdoxml:dataType="sdojava:CharacterObject"/>
+    <xs:attribute type="xs:double" name="double" sdoxml:dataType="sdojava:DoubleObject"/>
+    <xs:attribute type="xs:float" name="float" sdoxml:dataType="sdojava:FloatObject"/>
+    <xs:attribute type="xs:int" name="int" sdoxml:dataType="sdojava:IntObject"/>
+    <xs:attribute type="xs:long" name="long" sdoxml:dataType="sdojava:LongObject"/>
+    <xs:attribute type="xs:short" name="short" sdoxml:dataType="sdojava:ShortObject"/>
+  </xs:complexType>
+</xs:schema>

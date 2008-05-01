@@ -1,0 +1,5 @@
+<copy:genquote xmlns:copy="http://sdo/test/copy2">
+    <price><currency>USD</currency><amount>14.25</amount></price>
+    <price><currency>USD</currency><amount>14.75</amount></price>
+    <price><currency>USD</currency><amount>14.5</amount></price>
+</copy:genquote>
