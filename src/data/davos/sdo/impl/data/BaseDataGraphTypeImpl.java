@@ -25,55 +25,56 @@ public abstract class BaseDataGraphTypeImpl
     extends davos.sdo.impl.data.DataObjectGeneral
     implements davos.sdo.BaseDataGraphType
 {
-    public static javax.sdo.Type type = javax.sdo.helper.TypeHelper.INSTANCE.getType("commonj.sdo","BaseDataGraphType");
+    public static String typeUri = "commonj.sdo";
+    public static String typeName = "BaseDataGraphType";
 
     public davos.sdo.ModelsType getModels()
     {
-        return (davos.sdo.ModelsType)get(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("models"));
+        return (davos.sdo.ModelsType)get( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("models"));
     }
 
     public void setModels(davos.sdo.ModelsType models)
     {
-        set(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("models"), models);
+        set( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("models"), models);
     }
 
     public boolean isSetModels()
     {
-        return isSet(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("models"));
+        return isSet( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("models"));
     }
 
     public void unsetModels()
     {
-        unset(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("models"));
+        unset( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("models"));
     }
 
     public davos.sdo.ModelsType createModels()
     {
-        return (davos.sdo.ModelsType)createDataObject(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("models") );
+        return (davos.sdo.ModelsType)createDataObject( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("models") );
     }
 
     public davos.sdo.XSDType getXsd()
     {
-        return (davos.sdo.XSDType)get(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("xsd"));
+        return (davos.sdo.XSDType)get( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("xsd"));
     }
 
     public void setXsd(davos.sdo.XSDType xsd)
     {
-        set(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("xsd"), xsd);
+        set( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("xsd"), xsd);
     }
 
     public boolean isSetXsd()
     {
-        return isSet(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("xsd"));
+        return isSet( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("xsd"));
     }
 
     public void unsetXsd()
     {
-        unset(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("xsd"));
+        unset( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("xsd"));
     }
 
     public davos.sdo.XSDType createXsd()
     {
-        return (davos.sdo.XSDType)createDataObject(davos.sdo.impl.data.BaseDataGraphTypeImpl.type.getProperty("xsd") );
+        return (davos.sdo.XSDType)createDataObject( super.getSDOContext().getTypeSystem().getTypeXML(typeUri, typeName).getProperty("xsd") );
     }
 }

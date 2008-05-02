@@ -25,6 +25,7 @@ public class XSDTypeImpl
     extends davos.sdo.impl.data.DataObjectGeneral
     implements davos.sdo.XSDType
 {
-    public static javax.sdo.Type type = javax.sdo.helper.TypeHelper.INSTANCE.getType("commonj.sdo","XSDType");
+    public static String typeURI = "commonj.sdo";
+    public static String typeName = "XSDType";
 
 }
