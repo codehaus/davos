@@ -53,7 +53,8 @@ import javax.xml.namespace.QName;
 public class XSDHelperImpl
     implements XSDHelperExt
 {
-    private static QName SOURCE_QNAME = new QName("", "source");
+    private static final QName SOURCE_QNAME = new QName("", "source");
+    private static final String DOWNLOADS_PROP_NAME = "SDO_DOWNLOADS_ENABLED";
 
     private SDOContext _sdoContext;
 
@@ -301,17 +302,62 @@ public class XSDHelperImpl
     private Object addDefaultOptions(Object options)
     {
         if (options == null)
-            options = new Options().setCompileSkipTypesFromContext();
-        else if (options instanceof XmlOptions)
         {
             Options opt = new Options().setCompileSkipTypesFromContext();
-            opt.setCompileSchemaOptions((XmlOptions) options);
+            if (isDownloadsEnabled())
+                opt.setCompileSchemaOptions(new XmlOptions().setCompileDownloadUrls());
+            return opt;
+        }
+        else if (options instanceof XmlOptions)
+        {
+            XmlOptions xmlOptions = (XmlOptions) options;
+            if (isDownloadsEnabled())
+                xmlOptions.setCompileDownloadUrls();
+            Options opt = new Options().setCompileSkipTypesFromContext();
+            opt.setCompileSchemaOptions(xmlOptions);
+            return opt;
         }
         else if (options instanceof Map)
-            ((Map) options).put(Options.COMPILE_SKIP_IF_KNOWN, null);
+        {
+            Map opt = (Map) options;
+            opt.put(Options.COMPILE_SKIP_IF_KNOWN, null);
+            if (isDownloadsEnabled())
+            {
+                XmlOptions xmlOptions = (XmlOptions) opt.get(Options.COMPILE_SCHEMA_OPTIONS);
+                if (xmlOptions == null)
+                    opt.put(Options.COMPILE_SCHEMA_OPTIONS, new XmlOptions().setCompileDownloadUrls());
+                else
+                    xmlOptions.setCompileDownloadUrls();
+            }
+        }
         else if (options instanceof Options)
-            ((Options) options).setCompileSkipTypesFromContext();
+        {
+            Options opt = (Options) options;
+            opt.setCompileSkipTypesFromContext();
+            if (isDownloadsEnabled())
+            {
+                XmlOptions xmlOptions = (XmlOptions) opt.getMap().get(Options.COMPILE_SCHEMA_OPTIONS);
+                if (xmlOptions == null)
+                    opt.setCompileSchemaOptions(new XmlOptions().setCompileDownloadUrls());
+                else
+                    xmlOptions.setCompileDownloadUrls();
+            }
+        }
         return options;
+    }
+
+    private boolean isDownloadsEnabled()
+    {
+        try
+        {
+            String propValue = System.getenv(DOWNLOADS_PROP_NAME);
+            if (propValue != null && (propValue.equalsIgnoreCase("true") ||
+                propValue.equals("1")))
+                return true;
+        }
+        catch (SecurityException se)
+        { }
+        return false;
     }
 
     // ======================================================

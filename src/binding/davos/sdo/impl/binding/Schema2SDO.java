@@ -850,7 +850,7 @@ public final class Schema2SDO
         {
             dataType = false;
             javaClass = null;
-            sequenced = getSDOConfiguredSequence(st);
+            int configuredSequence = getSDOConfiguredSequence(st);
             open = st.hasAttributeWildcards() || st.hasElementWildcards();
             mixed = st.getContentType() == SchemaType.MIXED_CONTENT;
 
@@ -913,9 +913,10 @@ public final class Schema2SDO
             }
 
             // determine whether order sensitive
-            sequenced |= st.getContentType() == SchemaType.MIXED_CONTENT ||
+            sequenced = configuredSequence == 0 ? st.getContentType() == SchemaType.MIXED_CONTENT ||
                 (st.getContentType() == SchemaType.ELEMENT_CONTENT &&
-                isPropertyModelOrderSensitive(st.getContentModel(), new HashSet<QName>()));
+                isPropertyModelOrderSensitive(st.getContentModel(), new HashSet<QName>())) :
+                configuredSequence < 0 ? false: true;
         }
 
         boolean instanceClassNotFound = false;
@@ -1945,7 +1946,7 @@ public final class Schema2SDO
                 return false;
             }
         case SchemaParticle.WILDCARD:
-            return p.getMaxOccurs() == null || p.getMaxOccurs().compareTo(BigInteger.ONE) > 0;
+            return p.getMaxOccurs() == null || p.getMaxOccurs().compareTo(BigInteger.ZERO) > 0;
         }
         return false;
     }
@@ -2550,12 +2551,12 @@ public final class Schema2SDO
     /**
      * Returns the sequence configuration
      */
-    public static boolean getSDOConfiguredSequence(SchemaType t)
+    public static int getSDOConfiguredSequence(SchemaType t)
     {
         String ann = getSDOAnnotation(t, SDO_SEQUENCE);
         if (ann == null)
-            return false;
-        return booleanValue(ann);
+            return 0;
+        return booleanValue(ann) ? 1 : -1;
     }
 
     private static final String SCHEMA = "schema";

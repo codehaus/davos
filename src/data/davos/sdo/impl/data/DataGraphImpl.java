@@ -53,7 +53,8 @@ public class DataGraphImpl
     {
         if (root.getType() != BuiltInTypeSystem.DATAGRAPHTYPE)
             throw new IllegalArgumentException("The root object of a DataGraph has to have " +
-                "the type 'DataGraphType@javax.sdo'");
+                "the type {" + BuiltInTypeSystem.DATAGRAPHTYPE.getURI() + '}' +
+                BuiltInTypeSystem.DATAGRAPHTYPE.getName());
         _root = root;
         _changeSummary = root.getChangeSummary();
     }

@@ -30,9 +30,7 @@ public class Type extends org.apache.xmlbeans.impl.inst2xsd.util.Type
     private int derivation;
     private List aliasNames;
     private String instanceClass;
-    private String dataTypeUri;
-    private String dataTypeName;
-    private boolean openContent;
+    private boolean sequenced;
 
     Type(String typeUri, String typeName)
     {
@@ -112,13 +110,13 @@ public class Type extends org.apache.xmlbeans.impl.inst2xsd.util.Type
         this.instanceClass = instanceClass;
     }
 
-    public boolean isOpenContent()
+    public boolean isSequenced()
     {
-        return openContent;
+        return sequenced;
     }
 
-    public void setOpenContent(boolean openContent)
+    public void setSequenced(boolean sequenced)
     {
-        this.openContent = openContent;
+        this.sequenced = sequenced;
     }
 }

@@ -229,10 +229,13 @@ public class XsdGenerator extends TypeSystemHolder
                 formDefaultQualified = buildElementOrAttribute(prop, isElem, type, uri,
                     importURIs, types, typeSet, formDefaultQualified, t);
             }
-            t.setOpenContent(type.isOpen() &&
-                !(baseType != null && baseType.isOpen()));
+            t.setOpen(type.isOpen() && !(baseType != null &&
+                    !(Names.URI_SDO.equals(baseType.getURI()) &&
+                    "DataObject".equals(baseType.getName())) &&
+                    baseType.isOpen()));
             if (type.isSequenced())
             {
+                t.setSequenced(true);
                 t.setContentType(org.apache.xmlbeans.impl.inst2xsd.util.Type.COMPLEX_TYPE_MIXED_CONTENT);
                 t.setTopParticleForComplexOrMixedContent(org.apache.xmlbeans.impl.inst2xsd.util.Type.PARTICLE_CHOICE_UNBOUNDED);
             }
@@ -580,6 +583,8 @@ public class XsdGenerator extends TypeSystemHolder
             addCustomAttribute(o, Names.URI_SDOXML, "aliasNames", t.getAliasNames());
         if (t.getInstanceClass() != null)
             addCustomAttribute(o, Names.URI_SDOJAVA, "instanceClass", t.getInstanceClass());
+        if (t.isOpen() && !t.isSequenced())
+            addCustomAttribute(o, Names.URI_SDOXML, "sequence", "false");
     }
 
     private static void addCustomAttributesProperty(XmlObject o, SdoProperty p)
@@ -733,7 +738,7 @@ public class XsdGenerator extends TypeSystemHolder
             }
             AnyDocument.Any any = g.addNewAny();
             any.setMinOccurs(BigInteger.ZERO);
-            any.setMaxOccurs(null);
+            any.setMaxOccurs("unbounded");
             any.setNamespace("##other");
             complexType.addNewAnyAttribute();
         }

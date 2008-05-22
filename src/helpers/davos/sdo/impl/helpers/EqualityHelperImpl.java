@@ -17,6 +17,8 @@ package davos.sdo.impl.helpers;
 import davos.sdo.PropertyXML;
 import davos.sdo.SequenceXML;
 import davos.sdo.SDOContext;
+import davos.sdo.impl.type.BuiltInTypeSystem;
+
 import javax.sdo.DataObject;
 import javax.sdo.helper.EqualityHelper;
 
@@ -67,24 +69,42 @@ public class EqualityHelperImpl implements EqualityHelper
             // Compare using the sequences
             SequenceXML seq1 = (SequenceXML) dataObject1.getSequence();
             SequenceXML seq2 = (SequenceXML) dataObject2.getSequence();
-            int size = seq1.size();
-            if (size != seq2.size())
-                return false;
-            for (int i = 0; i < size; i++)
+            int size1 = seq1.size();
+            int size2 = seq2.size();
+            int i, j;
+            if (deep)
+                i = j = 0;
+            else
+            {
+                i = skipDataObjects(seq1, 0);
+                j = skipDataObjects(seq2, 0);
+            }
+            while (i < size1 && j < size2)
             {
                 PropertyXML p1 = seq1.getPropertyXML(i);
-                PropertyXML p2 = seq2.getPropertyXML(i);
+                PropertyXML p2 = seq2.getPropertyXML(j);
                 if (!propertyEquals(p1, p2))
                     return false;
                 // Text is represented by null property
                 if (p1 == null)
                 {
-                    if (!seq1.getValue(i).equals(seq2.getValue(i)))
+                    if (!seq1.getValue(i).equals(seq2.getValue(j)))
                         return false;
                 }
-                else if (!objectEquals(seq1.getValue(i), seq2.getValue(i), p1, deep, ctx))
+                else if (!objectEquals(seq1.getValue(i), seq2.getValue(j), p1, deep, ctx))
                     return false;
+                if (deep)
+                {
+                    i++; j++;
+                }
+                else
+                {
+                    i = skipDataObjects(seq1, i + 1);
+                    j = skipDataObjects(seq2, j + 1);
+                }
             }
+            // One of the sequences is at the end, check that the other is too
+            return i >= size1 && j >= size2;
         }
         else
         {
@@ -142,6 +162,19 @@ public class EqualityHelperImpl implements EqualityHelper
                 return false;
         }
         return ctx == null || ctx.registerObjectEquals(dataObject1, dataObject2);
+    }
+
+    private int skipDataObjects(SequenceXML seq, int start)
+    {
+        for (int i = start; i < seq.size(); i++)
+        {
+            PropertyXML prop = seq.getPropertyXML(i);
+            if (prop == null ||
+                    (prop.getType().isDataType() &&
+                            prop.getType() != BuiltInTypeSystem.CHANGESUMMARYTYPE))
+                return i;
+        }
+        return seq.size();
     }
 
     private boolean propertyEquals(PropertyXML p1, PropertyXML p2)

@@ -129,17 +129,7 @@ public class CopyHelperImpl implements CopyHelper
                 }
                 else if (!deepCopy)
                 {
-                    if (p.isNullable())
-                    {
-                        if (!p.isReadOnly())
-                            dSeq.add(p, null);
-                        else
-                            dest.getStore().storeAddNew(p, null);
-                    }
-                    else
-                    {
-                        dest.createDataObject(p);
-                    }
+                    // Don't copy it
                 }
                 else if (p.isContainment())
                 {
