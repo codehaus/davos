@@ -241,19 +241,19 @@ public class XSDHelperImpl
     public List /*Type*/ define(String xsd)
     {
         return defineTypeSystem(Schema2SDO.createSDOTypeSystem(xsd, null,
-            _sdoContext.getBindingSystem(), new Options().setCompileSkipTypesFromContext()));
+            _sdoContext.getBindingSystem(), getDefaultOptions()));
     }
 
     public List /*Type*/ define(Reader xsdReader, String schemaLocation)
     {
         return defineTypeSystem(Schema2SDO.createSDOTypeSystem(xsdReader, schemaLocation,
-            _sdoContext.getBindingSystem(), new Options().setCompileSkipTypesFromContext()));
+            _sdoContext.getBindingSystem(), getDefaultOptions()));
     }
 
     public List /*Type*/ define(InputStream xsdInputStream, String schemaLocation)
     {
         return defineTypeSystem(Schema2SDO.createSDOTypeSystem(xsdInputStream, schemaLocation,
-            _sdoContext.getBindingSystem(), new Options().setCompileSkipTypesFromContext()));
+            _sdoContext.getBindingSystem(), getDefaultOptions()));
     }
 
     public String generate(List /*Type*/ types)
@@ -297,6 +297,14 @@ public class XSDHelperImpl
     {
         return defineTypeSystem(Schema2SDO.createSDOTypeSystem(schemaAsReader, schemaLocation,
             _sdoContext.getBindingSystem(), addDefaultOptions(options)));
+    }
+
+    private Object getDefaultOptions()
+    {
+        Options opt = new Options().setCompileSkipTypesFromContext();
+        if (isDownloadsEnabled())
+            opt.setCompileSchemaOptions(new XmlOptions().setCompileDownloadUrls());
+        return opt;
     }
 
     private Object addDefaultOptions(Object options)
