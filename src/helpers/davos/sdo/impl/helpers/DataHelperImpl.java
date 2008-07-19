@@ -301,13 +301,23 @@ public class DataHelperImpl
                 return ((Long)value).byteValue();
             if ( value instanceof Short)
                 return ((Short)value).byteValue();
+            if ( value instanceof BigDecimal)
+                return ((BigDecimal)value).byteValue();
+            if ( value instanceof BigInteger)
+                return ((BigInteger)value).byteValue();
         }
         else if (instClass.isAssignableFrom(char.class))
         {
             if ( value instanceof Character)
                 return value;
             if ( value instanceof String)
-                return ((String)value).charAt(0);
+            {
+                String stringValue = (String)value;
+                if ( stringValue.length() == 0 )
+                    return '\0';
+                else
+                    return stringValue.charAt(0);
+            }
         }
         else if (instClass.isAssignableFrom(double.class))
         {
@@ -411,6 +421,10 @@ public class DataHelperImpl
                 return ((Integer)value).shortValue();
             if ( value instanceof Long)
                 return ((Long)value).shortValue();
+            if ( value instanceof BigDecimal)
+                return ((BigDecimal)value).shortValue();
+            if ( value instanceof BigInteger)
+                return ((BigInteger)value).shortValue();
         }
         else if (instClass.isAssignableFrom(String.class))
         {
@@ -421,7 +435,12 @@ public class DataHelperImpl
             if ( value instanceof Byte)
                 return ((Byte)value).toString();
             if ( value instanceof Character)
-                return ((Character)value).toString();
+            {
+                if (((Character)value).charValue() == '\0')
+                    return "";
+                else
+                    return ((Character)value).toString();
+            }
             if ( value instanceof Double)
                 return ((Double)value).toString();
             if ( value instanceof Float)
@@ -497,6 +516,8 @@ public class DataHelperImpl
                 return value;
             if ( value instanceof String)
                 return new BigDecimal((String)value);
+            if ( value instanceof Byte)
+                return BigDecimal.valueOf((Byte)value);
             if ( value instanceof Double)
                 return BigDecimal.valueOf(((Double)value));
             if ( value instanceof Float)
@@ -505,8 +526,8 @@ public class DataHelperImpl
                 return BigDecimal.valueOf((Integer)value);
             if ( value instanceof Long)
                 return BigDecimal.valueOf(((Long)value));
-//        if ( value instanceof Short)
-//            return BigDecimal.valueOf((Short)value);
+            if ( value instanceof Short)
+                return BigDecimal.valueOf((Short)value);
             if ( value instanceof BigInteger)
                 return new BigDecimal((BigInteger)value);
         }
@@ -516,6 +537,8 @@ public class DataHelperImpl
                 return value;
             if ( value instanceof String)
                 return new BigInteger((String)value);
+            if ( value instanceof Byte)
+                return BigInteger.valueOf((Byte)value);
             if ( value instanceof Double)
                 return BigInteger.valueOf(((Double)value).longValue());
             if ( value instanceof Float)
@@ -524,8 +547,8 @@ public class DataHelperImpl
                 return BigInteger.valueOf((Integer)value);
             if ( value instanceof Long)
                 return BigInteger.valueOf((Long)value);
-    //        if ( value instanceof Short)
-    //            return BigInteger.valueOf((Short)value);
+            if ( value instanceof Short)
+                return BigInteger.valueOf((Short)value);
             if ( value instanceof BigDecimal)
                 return ((BigDecimal)value).toBigInteger();
             if ( value instanceof byte[])

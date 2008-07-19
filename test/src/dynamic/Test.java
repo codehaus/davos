@@ -3143,20 +3143,34 @@ public class Test
     }
 
     static void testXbPath()
-            throws XmlException
+        throws XmlException
     {
-        final XmlObject obj = XmlObject.Factory.parse("<a><b><c>val1</c><d><c>val2</c></d></b><c>val3</c></a>");
-        final XmlCursor c = obj.newCursor();
+//        final XmlObject obj = XmlObject.Factory.parse("<a><b><c>val1</c><d><c>val2</c></d></b><c>val3</c></a>");
+//        final XmlCursor c = obj.newCursor();
+//
+//        c.selectPath(".//b/c");
+//
+//        System.out.println(c.getSelectionCount());
+//
+//        while ( c.hasNextSelection() )
+//        {
+//            c.toNextSelection();
+//            System.out.println(" -> " + c.getObject());
+//        }
+//        c.dispose();
 
-        c.selectPath(".//b/c");
+        String schema = "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" \n" +
+            "  xmlns:tns=\"tns\"\n" + "  targetNamespace=\"tns\" elementFormDefault='qualified'>\n" + 
+            "  <xsd:element name=\"a\" >" +
+            "    <xsd:complexType>" +
+            "     <xsd:sequence>\n" +
+            "      <xsd:element name=\"int\" type=\"xsd:int\" />\n" +
+            "     </xsd:sequence>\n" +
+            "   </xsd:complexType>" +
+            "  </xsd:element>" +
+            "</xsd:schema>";
+       List l = XSDHelper.INSTANCE.define(schema);
 
-        System.out.println(c.getSelectionCount());
-
-        while ( c.hasNextSelection() )
-        {
-            c.toNextSelection();
-            System.out.println(" -> " + c.getObject());
-        }
-        c.dispose();
+       System.out.println("l: " + l);
     }
 }

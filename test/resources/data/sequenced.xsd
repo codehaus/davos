@@ -1,0 +1,20 @@
+<schema targetNamespace="http://sdo/test/sequenced"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/sequenced">
+
+  <element name="root" type="tns:Root"/>
+
+  <complexType name="Root">
+    <sequence>
+      <element name="a" type="int"/>
+      <element name="b" type="string"/>
+      <choice maxOccurs="unbounded">
+        <element name="c" type="string"/>
+        <element name="d" type="double"/>
+      </choice>
+    </sequence>
+    <attribute name="x" type="boolean"/>
+    <attribute name="y" type="string"/>
+  </complexType>
+
+</schema>

@@ -605,14 +605,16 @@ public class DataTypeConversionTest extends DataObjectTest
         fromByteToInt.convert(dobj, (byte)1, 1);
         fromByteToLong.convert(dobj, (byte)1, 1l);
         fromByteToShort.convert(dobj, (byte)1, (short)1);
+        fromByteToDecimal.convert(dobj, (byte)1, BigDecimal.valueOf(1));
+        fromByteToInteger.convert(dobj, (byte)1, BigInteger.valueOf(1));
         fromByteToString.convert(dobj, (byte)1, "1");
 
         // unsupported
         fromByteToBoolean.failToConvert(dobj, (byte)1, ClassCastException.class);
         fromByteToCharacter.failToConvert(dobj, (byte)1, ClassCastException.class);
         fromByteToBytes.failToConvert(dobj, (byte)1, ClassCastException.class);
-        fromByteToDecimal.failToConvert(dobj, (byte)1, ClassCastException.class);
-        fromByteToInteger.failToConvert(dobj, (byte)1, ClassCastException.class);
+        //fromByteToDecimal.failToConvert(dobj, (byte)1, ClassCastException.class);
+        //fromByteToInteger.failToConvert(dobj, (byte)1, ClassCastException.class);
         fromByteToDate.failToConvert(dobj, (byte)1, ClassCastException.class);
     }
 
@@ -636,6 +638,7 @@ public class DataTypeConversionTest extends DataObjectTest
         // supported
         fromCharacterToString.convert(dobj, 'a', "a");
         fromCharacterToString.convert(dobj, 'Z', "Z");
+        fromCharacterToString.convert(dobj, (char)0, "");
 
         // unsupported
         fromCharacterToBoolean.failToConvert(dobj, 'a', ClassCastException.class);
@@ -810,14 +813,16 @@ public class DataTypeConversionTest extends DataObjectTest
         fromShortToFloat.convert(dobj, (short)1, (float)1.0);
         fromShortToInt.convert(dobj, (short)1, 1);
         fromShortToLong.convert(dobj, (short)1, 1l);
+        fromShortToDecimal.convert(dobj, (short)1, BigDecimal.valueOf(1));
+        fromShortToInteger.convert(dobj, (short)1, BigInteger.valueOf(1));
         fromShortToString.convert(dobj, (short)1, "1");
 
         // unsupported
         fromShortToBoolean.failToConvert(dobj, (short)1, ClassCastException.class);
         fromShortToCharacter.failToConvert(dobj, (short)1, ClassCastException.class);
         fromShortToBytes.failToConvert(dobj, (short)1, ClassCastException.class);
-        fromShortToDecimal.failToConvert(dobj, (short)1, ClassCastException.class);
-        fromShortToInteger.failToConvert(dobj, (short)1, ClassCastException.class);
+        //fromShortToDecimal.failToConvert(dobj, (short)1, ClassCastException.class);
+        //fromShortToInteger.failToConvert(dobj, (short)1, ClassCastException.class);
         fromShortToDate.failToConvert(dobj, (short)1, ClassCastException.class);
     }
 
@@ -843,6 +848,7 @@ public class DataTypeConversionTest extends DataObjectTest
         fromStringToBoolean.convert(dobj, "true", true);
         fromStringToByte.convert(dobj, "3", (byte)3);
         fromStringToCharacter.convert(dobj, "3", '3');
+        fromStringToCharacter.convert(dobj, "", (char)0);
         fromStringToDouble.convert(dobj, "3.14159", 3.14159);
         fromStringToFloat.convert(dobj, "3.14159", (float)3.14159);
         fromStringToInt.convert(dobj, "3", 3);
@@ -969,18 +975,20 @@ public class DataTypeConversionTest extends DataObjectTest
 
         // supported
         BigDecimal pi = new BigDecimal("3.141592653589793");
+        fromDecimalToByte.convert(dobj, pi, (byte)3);
         fromDecimalToDouble.convert(dobj, pi, 3.141592653589793);
         fromDecimalToFloat.convert(dobj, pi, (float)3.141592653589793);
         fromDecimalToInt.convert(dobj, pi, 3);
         fromDecimalToLong.convert(dobj, pi, 3l);
+        fromDecimalToShort.convert(dobj, pi, (short)3);
         fromDecimalToString.convert(dobj, pi, "3.141592653589793");
         fromDecimalToInteger.convert(dobj, pi, pi.toBigInteger());
 
         // unsupported
         fromDecimalToBoolean.failToConvert(dobj, pi, ClassCastException.class);
-        fromDecimalToByte.failToConvert(dobj, pi, ClassCastException.class);
+        //fromDecimalToByte.failToConvert(dobj, pi, ClassCastException.class);
         fromDecimalToCharacter.failToConvert(dobj, pi, ClassCastException.class);
-        fromDecimalToShort.failToConvert(dobj, pi, ClassCastException.class);
+        //fromDecimalToShort.failToConvert(dobj, pi, ClassCastException.class);
         fromDecimalToBytes.failToConvert(dobj, pi, ClassCastException.class);
         fromDecimalToDate.failToConvert(dobj, pi, ClassCastException.class);
     }
@@ -1004,19 +1012,21 @@ public class DataTypeConversionTest extends DataObjectTest
 
         // supported
         BigInteger V11 = new BigInteger("3141592653589793");
+        fromIntegerToByte.convert(dobj, V11, V11.byteValue());
         fromIntegerToDouble.convert(dobj, V11, V11.doubleValue());
         fromIntegerToFloat.convert(dobj, V11, V11.floatValue());
         fromIntegerToInt.convert(dobj, V11, V11.intValue());
         fromIntegerToLong.convert(dobj, V11, V11.longValue());
+        fromIntegerToShort.convert(dobj, V11, V11.shortValue());
         fromIntegerToString.convert(dobj, V11, "3141592653589793");
         fromIntegerToBytes.convert(dobj, V11, V11.toByteArray());
         fromIntegerToDecimal.convert(dobj, V11, new BigDecimal(V11));
 
         // unsupported
         fromIntegerToBoolean.failToConvert(dobj, V11, ClassCastException.class);
-        fromIntegerToByte.failToConvert(dobj, V11, ClassCastException.class);
+        //fromIntegerToByte.failToConvert(dobj, V11, ClassCastException.class);
         fromIntegerToCharacter.failToConvert(dobj, V11, ClassCastException.class);
-        fromIntegerToShort.failToConvert(dobj, V11, ClassCastException.class);
+        //fromIntegerToShort.failToConvert(dobj, V11, ClassCastException.class);
         fromIntegerToDate.failToConvert(dobj, V11, ClassCastException.class);
     }
 

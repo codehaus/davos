@@ -101,6 +101,8 @@ public class BasicTest extends DataTest
         suite.addTest(new BasicTest("testUnmarshalQName"));
         suite.addTest(new BasicTest("testSetAndMarshalQName"));
         suite.addTest(new BasicTest("testUnmarshalSimpleTypeRootElement"));
+        suite.addTest(new BasicTest("testCharacter0"));
+        suite.addTest(new BasicTest("testDataFactoryWrapperTypes"));
         
         // or
         //TestSuite suite = new TestSuite(BasicTest.class);
@@ -1700,5 +1702,36 @@ public class BasicTest extends DataTest
         assertEquals(new Integer(1), e.get(0));
         assertEquals(new Integer(2), e.get(1));
         assertEquals(new Integer(3), e.get(2));
+    }
+
+    /* test handling of character with code point 0 */
+    public void testCharacter0()
+    {
+        System.out.println("testCharacter0");
+        DataObject h = factory.create("http://sdo/test/basic", "H");
+        char defaultValue = h.getChar("character");
+        h.setChar("character", defaultValue);
+        String xml = xmlHelper.save(h, "http://sdo/test/basic", "h");
+        System.out.println(xml);
+        assertTrue(xml.indexOf("character></") > 0);
+        h = xmlHelper.load(xml).getRootObject();
+        assertEquals(0, h.getChar("character"));
+        assertTrue(h.isSet("character"));
+    }
+
+    /* test DataFactory with simple types = wrapper types */
+    public void testDataFactoryWrapperTypes()
+    {
+        System.out.println("testDataFactoryWrapperTypes");
+        DataObject dobj = factory.create("commonj.sdo", "Int");
+        List instanceProperties = dobj.getInstanceProperties();
+        assertEquals(1, instanceProperties.size());
+        assertEquals("value", ((Property) instanceProperties.get(0)).getName());
+        DataObject a = factory.create("http://sdo/test/basic", "A");
+        dobj.set("value", 6);
+        a.set("any0", dobj);
+        String xml = xmlHelper.save(a, "http://sdo/test/basic", "a");
+        System.out.println(xml);
+        assertTrue(xml.indexOf("any0 xsi:type=\"xs:int") > 0);
     }
 }

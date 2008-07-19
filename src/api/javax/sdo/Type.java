@@ -1,19 +1,3 @@
-/**
- * <copyright>
- *
- * Service Data Objects
- * Version 2.1.0
- * Licensed Materials
- *
- * (c) Copyright BEA Systems, Inc., International Business Machines Corporation, 
- * Oracle Corporation, Primeton Technologies Ltd., Rogue Wave Software, SAP AG., 
- * Software AG., Sun Microsystems, Sybase Inc., Xcalia, Zend Technologies, 
- * 2005, 2006. All rights reserved.
- *
- * </copyright>
- * 
- */
-
 package javax.sdo;
 
 import java.util.List;
@@ -30,7 +14,8 @@ public interface Type
   String getName();
   
   /**
-   * Returns the namespace URI of the type.
+   * Returns the namespace URI of the type or <code>null</code> if the type has no URI
+   * (for example it was generated from a Schema with no target namespace).
    * @return the namespace URI.
    */
   String getURI();

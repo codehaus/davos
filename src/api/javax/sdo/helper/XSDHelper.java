@@ -1,19 +1,3 @@
-/**
- * <copyright>
- *
- * Service Data Objects
- * Version 2.1.0
- * Licensed Materials
- *
- * (c) Copyright BEA Systems, Inc., International Business Machines Corporation, 
- * Oracle Corporation, Primeton Technologies Ltd., Rogue Wave Software, SAP AG., 
- * Software AG., Sun Microsystems, Sybase Inc., Xcalia, Zend Technologies, 
- * 2005, 2006. All rights reserved.
- *
- * </copyright>
- * 
- */
-
 package javax.sdo.helper;
 
 import java.io.InputStream;
@@ -36,7 +20,8 @@ public interface XSDHelper
   /**
    * Returns the local name as declared in the XSD.
    * @param type to return local name for.
-   * @return the local name as declared in the XSD.
+   * @return the local name as declared in the XSD.  If <code>type</code>
+   * is one of the predefined SDO types, the result is undefined.
    */
   String getLocalName(Type type);
 
@@ -48,7 +33,8 @@ public interface XSDHelper
   String getLocalName(Property property);
   
   /**
-   * Returns the namespace URI as declared in the XSD.
+   * Returns the namespace URI as declared in the XSD. If the XSD has
+   * no namespace URI, then <code>""</code> is returned.
    * @param property to return namespace URI for.
    * @return the namespace URI as declared in the XSD.
    */
@@ -91,7 +77,11 @@ public interface XSDHelper
   
   /**
    * Returns the Property defined by the named global element or attribute 
-   *   in the targetNamespace uri, or null if not found.
+   *   in the targetNamespace uri, or null if not found. If the SDO name for a
+   * property is different than the XSD name, then only the XSD name is used
+   * for the lookup. Passing in <code>null</code> or <code>""</code> for the
+   * <code>uri</code> parameter means that an element/attribute defined in a
+   * Schema with no target namespace will be returned.
    * @param uri The uri of the targetNamespace.
    * @param propertyName The name of the global property.
    * @param isElement is true for global elements, false for global attributes.

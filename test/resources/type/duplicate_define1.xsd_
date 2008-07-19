@@ -1,0 +1,28 @@
+<xs:schema
+  targetNamespace="http://sdo/test/duplicate_define"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/duplicate_define">
+
+  <xs:simpleType name="Side">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="buy"/>
+      <xs:enumeration value="sell"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Quote">
+    <xs:sequence>
+      <xs:element name="symbol" type="xs:string"/>
+      <xs:element name="side" type="tns:Side"/>
+      <xs:element name="price" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Order">
+    <xs:sequence>
+      <xs:element name="quote" type="tns:Quote"/>
+      <xs:element name="quantity" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

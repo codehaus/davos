@@ -39,8 +39,15 @@ public interface PropertyXML
 
     public int getSchemaTypeCode();
 
+    /**
+     * @return true if property doesn't belong to a type: i.e. global and on-demand properties
+     *         false if defined inside a type (all cases, through TypeHelper.define(), XSDHelper.define() or sdocomp)
+     */
     public boolean isDynamic();
 
+    /**
+     * @return true for global properties - per spec definition
+     */
     public boolean isGlobal();
 
     public TypeXML getTypeXML();

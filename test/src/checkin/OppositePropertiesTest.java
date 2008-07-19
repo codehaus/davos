@@ -41,7 +41,9 @@ public class OppositePropertiesTest
     private static TypeHelper typeHelper = context.getTypeHelper();
 
     private static final String URI = "checkin.OppositePropertiesTest";
+    private static final String URInProps = "checkin.OppositePropertiesTest.NullableProps";
     private static boolean typesCreated = false;
+    private static boolean typesWithNullablePropsCreated = false;
 
     public static void testOppositeDynamic()
     {
@@ -641,9 +643,510 @@ public class OppositePropertiesTest
 
         assertEquals(false, o1.isSet(pOppoT1T3_NonContainmentMany));
         assertEquals(false, o3.isSet(pOppoT3T1_NonContainmentMany));
-
-
-        //todo add test for o3seq.setValue()
     }
 
+    public void createTypesWithNullableProps()
+    {
+        if (typesWithNullablePropsCreated)
+            return;
+
+        typesWithNullablePropsCreated = true;
+
+        DataObject defT1 = dataFactory.create(BuiltInTypeSystem.TYPE);
+        defT1.set("name", "T1");
+        defT1.set("uri", URInProps);
+        defT1.setBoolean("sequenced", true);
+
+        DataObject defT2 = dataFactory.create(BuiltInTypeSystem.TYPE);
+        defT2.set("name", "T2");
+        defT2.set("uri", URInProps);
+        defT2.setBoolean("sequenced", true);
+
+        DataObject defT3 = dataFactory.create(BuiltInTypeSystem.TYPE);
+        defT3.set("name", "T3");
+        defT3.set("uri", URInProps);
+        defT3.setBoolean("sequenced", true);
+
+        // T1 - T2 props, one end is always contaiment
+        // create T1 -> T2 prop single -> single
+        DataObject dpOppoT1T2_ContainmentSingle = defT1.createDataObject("property");
+        dpOppoT1T2_ContainmentSingle.set("name", "pOppoT1T2_ContainmentSingle");
+        dpOppoT1T2_ContainmentSingle.set("type", defT2);
+        dpOppoT1T2_ContainmentSingle.setBoolean("containment", true);
+       dpOppoT1T2_ContainmentSingle.setBoolean("nullable", true);
+
+        // create T2 -> T1 prop single -> single
+        DataObject dpOppoT2T1_NonContainmentSingle = defT2.createDataObject("property");
+        dpOppoT2T1_NonContainmentSingle.set("name", "pOppoT2T1_NonContainmentSingle");
+        dpOppoT2T1_NonContainmentSingle.set("type", defT1);
+       //dpOppoT2T1_NonContainmentSingle.setBoolean("nullable", true);
+
+        // set as opposites
+        dpOppoT1T2_ContainmentSingle.set("opposite", dpOppoT2T1_NonContainmentSingle);
+        dpOppoT2T1_NonContainmentSingle.set("opposite", dpOppoT1T2_ContainmentSingle);
+
+        // create T1 -> T2 prop many -> single
+        DataObject dpOppoT1T2_ContainmentMany = defT1.createDataObject("property");
+        dpOppoT1T2_ContainmentMany.set("name", "pOppoT1T2_ContainmentMany");
+        dpOppoT1T2_ContainmentMany.set("type", defT2);
+        dpOppoT1T2_ContainmentMany.setBoolean("containment", true);
+        dpOppoT1T2_ContainmentMany.setBoolean("many", true);
+       dpOppoT1T2_ContainmentMany.setBoolean("nullable", true);
+
+        // create T2 -> T1 prop single -> many
+        DataObject dpOppoT2T1_NonContainmentSingle2 = defT2.createDataObject("property");
+        dpOppoT2T1_NonContainmentSingle2.set("name", "pOppoT2T1_NonContainmentSingle2");
+        dpOppoT2T1_NonContainmentSingle2.set("type", defT1);
+
+        // set as opposites
+        dpOppoT1T2_ContainmentMany.set("opposite", dpOppoT2T1_NonContainmentSingle2);
+        dpOppoT2T1_NonContainmentSingle2.set("opposite", dpOppoT1T2_ContainmentMany);
+
+
+        // T1 - T3 props, both ends are non-containment
+        // create T1 -> T3 prop single -> single
+        DataObject dpOppoT1T3_NonContainmentSingle = defT1.createDataObject("property");
+        dpOppoT1T3_NonContainmentSingle.set("name", "pOppoT1T3_NonContainmentSingle");
+        dpOppoT1T3_NonContainmentSingle.set("type", defT3);
+       dpOppoT1T3_NonContainmentSingle.setBoolean("nullable", true);
+
+        // create T3 -> T1 prop single -> single
+        DataObject dpOppoT3T1_NonContainmentSingle = defT3.createDataObject("property");
+        dpOppoT3T1_NonContainmentSingle.set("name", "pOppoT3T1_NonContainmentSingle");
+        dpOppoT3T1_NonContainmentSingle.set("type", defT1);
+       dpOppoT3T1_NonContainmentSingle.setBoolean("nullable", true);
+
+        // set as opposites
+        dpOppoT1T3_NonContainmentSingle.set("opposite", dpOppoT3T1_NonContainmentSingle);
+        dpOppoT3T1_NonContainmentSingle.set("opposite", dpOppoT1T3_NonContainmentSingle);
+
+        // create T1 -> T3 prop many -> many
+        DataObject dpOppoT1T3_NonContainmentMany = defT1.createDataObject("property");
+        dpOppoT1T3_NonContainmentMany.set("name", "pOppoT1T3_NonContainmentMany");
+        dpOppoT1T3_NonContainmentMany.set("type", defT3);
+        dpOppoT1T3_NonContainmentMany.setBoolean("many", true);
+        dpOppoT1T3_NonContainmentMany.setBoolean("nullable", true);
+
+        // create T3 -> T1 prop many -> many
+        DataObject dpOppoT3T1_NonContainmentMany = defT3.createDataObject("property");
+        dpOppoT3T1_NonContainmentMany.set("name", "pOppoT3T1_NonContainmentMany");
+        dpOppoT3T1_NonContainmentMany.set("type", defT1);
+        dpOppoT3T1_NonContainmentMany.setBoolean("many", true);
+       //dpOppoT3T1_NonContainmentMany.setBoolean("nullable", true);
+
+        // set as opposites
+        dpOppoT1T3_NonContainmentMany.set("opposite", dpOppoT3T1_NonContainmentMany);
+        dpOppoT3T1_NonContainmentMany.set("opposite", dpOppoT1T3_NonContainmentMany);
+
+
+        typeHelper.define(Arrays.asList(new DataObject[] {defT1, defT2, defT3}));
+
+        // check if define worked fine
+        Type t1 = typeHelper.getType(URInProps, "T1");
+        Type t2 = typeHelper.getType(URInProps, "T2");
+        Type t3 = typeHelper.getType(URInProps, "T3");
+
+        // single
+        Property pOppoT1T2_ContainmentSingle = t1.getProperty("pOppoT1T2_ContainmentSingle");
+        Property pOppoT2T1_NonContainmentSingle = t2.getProperty("pOppoT2T1_NonContainmentSingle");
+
+        Property pOppoT1T3_NonContainmentSingle = t1.getProperty("pOppoT1T3_NonContainmentSingle");
+        Property pOppoT3T1_NonContainmentSingle = t3.getProperty("pOppoT3T1_NonContainmentSingle");
+
+        assert pOppoT1T2_ContainmentSingle    != null;
+        assert pOppoT2T1_NonContainmentSingle != null;
+        assert pOppoT1T3_NonContainmentSingle != null;
+        assert pOppoT3T1_NonContainmentSingle != null;
+
+        assert pOppoT1T2_ContainmentSingle.getOpposite()    == pOppoT2T1_NonContainmentSingle;
+        assert pOppoT2T1_NonContainmentSingle.getOpposite() == pOppoT1T2_ContainmentSingle;
+
+        assert pOppoT1T3_NonContainmentSingle.getOpposite() == pOppoT3T1_NonContainmentSingle;
+        assert pOppoT3T1_NonContainmentSingle.getOpposite() == pOppoT1T3_NonContainmentSingle;
+
+        // many
+        Property pOppoT1T2_ContainmentMany = t1.getProperty("pOppoT1T2_ContainmentMany");
+        Property pOppoT2T1_NonContainmentSingle2 = t2.getProperty("pOppoT2T1_NonContainmentSingle2");
+
+        Property pOppoT1T3_NonContainmentMany = t1.getProperty("pOppoT1T3_NonContainmentMany");
+        Property pOppoT3T1_NonContainmentMany = t3.getProperty("pOppoT3T1_NonContainmentMany");
+
+        assert pOppoT1T2_ContainmentMany    != null;
+        assert pOppoT2T1_NonContainmentSingle2 != null;
+        assert pOppoT1T3_NonContainmentMany != null;
+        assert pOppoT3T1_NonContainmentMany != null;
+
+        assert pOppoT1T2_ContainmentMany.getOpposite()    == pOppoT2T1_NonContainmentSingle2;
+        assert pOppoT2T1_NonContainmentSingle2.getOpposite() == pOppoT1T2_ContainmentMany;
+
+        assert pOppoT1T3_NonContainmentMany.getOpposite() == pOppoT3T1_NonContainmentMany;
+        assert pOppoT3T1_NonContainmentMany.getOpposite() == pOppoT1T3_NonContainmentMany;
+    }
+
+    /* containment single <-> non-containment single */
+    public void testNullablePropsOppoSingleContainment()
+    {
+        createTypesWithNullableProps();
+
+        Type t1 = typeHelper.getType(URInProps, "T1");
+        Type t2 = typeHelper.getType(URInProps, "T2");
+
+        Property pOppoT1T2_ContainmentSingle = t1.getProperty("pOppoT1T2_ContainmentSingle");
+        Property pOppoT2T1_NonContainmentSingle = t2.getProperty("pOppoT2T1_NonContainmentSingle");
+
+        // Contaiment Single
+        DataObject o1 = dataFactory.create(t1);
+        DataObject o2 = o1.createDataObject(pOppoT1T2_ContainmentSingle);
+
+        assertNotNull(o2);
+
+        assertEquals(o2, o1.getDataObject(pOppoT1T2_ContainmentSingle));
+        assertEquals(o1, o2.getDataObject(pOppoT2T1_NonContainmentSingle));
+
+
+        // check nulability
+        assertTrue(pOppoT1T2_ContainmentSingle.isNullable());
+        assertFalse(pOppoT2T1_NonContainmentSingle.isNullable());
+
+        // Since spec v2.1.1 : SDO-262
+        o1.set(pOppoT1T2_ContainmentSingle, null);
+        assertFalse(o2.isSet(pOppoT2T1_NonContainmentSingle));
+
+        o1.set(pOppoT1T2_ContainmentSingle, o2);        
+        o2.unset(pOppoT2T1_NonContainmentSingle);
+        assertFalse(o1.isSet(pOppoT1T2_ContainmentSingle));
+
+        o1.set(pOppoT1T2_ContainmentSingle, o2);
+        o1.unset(pOppoT1T2_ContainmentSingle);
+        assertFalse(o2.isSet(pOppoT2T1_NonContainmentSingle));
+    }
+
+    /* non-containment single <-> non-containment single */
+    public void testNullablePropsOppoSingleNonContainment()
+    {
+        createTypesWithNullableProps();
+
+        Type t1 = typeHelper.getType(URInProps, "T1");
+        Type t3 = typeHelper.getType(URInProps, "T3");
+
+        Property pOppoT1T3_NonContainmentSingle = t1.getProperty("pOppoT1T3_NonContainmentSingle");
+        Property pOppoT3T1_NonContainmentSingle = t3.getProperty("pOppoT3T1_NonContainmentSingle");
+
+        DataObject o1 = dataFactory.create(t1);
+        DataObject o3 = o1.createDataObject(pOppoT1T3_NonContainmentSingle);
+
+        assertNotNull(o3);
+
+        assertEquals(o3, o1.getDataObject(pOppoT1T3_NonContainmentSingle));
+        assertEquals(o1, o3.getDataObject(pOppoT3T1_NonContainmentSingle));
+
+
+        //check nullability
+        assertTrue(pOppoT1T3_NonContainmentSingle.isNullable());
+        assertTrue(pOppoT3T1_NonContainmentSingle.isNullable());
+
+        // Since spec v2.1.1 : SDO-262
+        o1.set(pOppoT1T3_NonContainmentSingle, null);
+        assertTrue(o3.get(pOppoT3T1_NonContainmentSingle)==null);
+
+        o1.set(pOppoT1T3_NonContainmentSingle, o3);
+        o3.unset(pOppoT3T1_NonContainmentSingle);
+        assertFalse(o1.isSet(pOppoT1T3_NonContainmentSingle));
+
+        o1.set(pOppoT1T3_NonContainmentSingle, o3);
+        o1.unset(pOppoT1T3_NonContainmentSingle);
+        assertFalse(o3.isSet(pOppoT3T1_NonContainmentSingle));
+    }
+
+    /* containment many <-> non-containment single */
+    public void testNullablePropsOppoManyContainment()
+    {
+        createTypesWithNullableProps();
+
+        Type t1 = typeHelper.getType(URInProps, "T1");
+        Type t2 = typeHelper.getType(URInProps, "T2");
+
+        Property pOppoT1T2_ContainmentMany = t1.getProperty("pOppoT1T2_ContainmentMany");
+        Property pOppoT2T1_NonContainmentSingle2 = t2.getProperty("pOppoT2T1_NonContainmentSingle2");
+
+        DataObject o1 = dataFactory.create(t1);
+        // contaiment create
+        DataObject o2 = o1.createDataObject(pOppoT1T2_ContainmentMany);
+
+        assertNotNull(o2);
+
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+        // unset
+        o1.unset(pOppoT1T2_ContainmentMany);
+        assertEquals(0, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(false, o2.isSet(pOppoT2T1_NonContainmentSingle2));
+        assertNull(o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+        // nullable props
+        assertTrue(pOppoT1T2_ContainmentMany.isNullable());
+        assertFalse(pOppoT2T1_NonContainmentSingle2.isNullable());
+
+
+        o1.set(pOppoT1T2_ContainmentMany, o2);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.get(pOppoT2T1_NonContainmentSingle2));
+        // set null
+        o1.set(pOppoT1T2_ContainmentMany, null);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(null, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertFalse(o2.isSet(pOppoT2T1_NonContainmentSingle2));
+
+        o1.set(pOppoT1T2_ContainmentMany, o2);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.get(pOppoT2T1_NonContainmentSingle2));
+        // unset
+        o2.unset(pOppoT2T1_NonContainmentSingle2);
+        assertEquals(0, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertFalse(o2.isSet(pOppoT2T1_NonContainmentSingle2));
+
+        o1.set(pOppoT1T2_ContainmentMany, o2);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.get(pOppoT2T1_NonContainmentSingle2));
+        // list set null
+        o1.getList(pOppoT1T2_ContainmentMany).set(0, null);
+        assertEquals(false, o2.isSet(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(null, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+
+
+        // list add
+        o1.getList(pOppoT1T2_ContainmentMany).add(o2);
+        assertEquals(2, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(1));
+        assertEquals(o1, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+        // list remove
+        o1.getList(pOppoT1T2_ContainmentMany).remove(1);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(false, o2.isSet(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+        // list remove null item
+        o1.getList(pOppoT1T2_ContainmentMany).remove(0);
+        assertEquals(0, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(false, o2.isSet(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+        // the other set
+        o2.set(pOppoT2T1_NonContainmentSingle2, o1);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+        // the other unset
+        o2.unset(pOppoT2T1_NonContainmentSingle2);
+        assertEquals(0, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(false, o2.isSet(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+
+
+        // sequence add
+        Sequence o1seq = o1.getSequence();
+        o1seq.add(pOppoT1T2_ContainmentMany, o2);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(1, o1seq.size());
+        assertEquals(pOppoT1T2_ContainmentMany, o1seq.getProperty(0));
+        assertEquals(o2, o1seq.getValue(0));
+
+        Sequence o2seq = o2.getSequence();
+        assertEquals(1, o2seq.size());
+        assertEquals(pOppoT2T1_NonContainmentSingle2, o2seq.getProperty(0));
+        assertEquals(o1, o2seq.getValue(0));
+
+        // sequence remove
+        o1seq.remove(0);
+        assertEquals(0, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(0, o1seq.size());
+        assertEquals(0, o2seq.size());
+
+
+        o1.set(pOppoT1T2_ContainmentMany, o2);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.get(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(1, o1seq.size());
+        // sequence setValueNull
+        o1seq.setValue(0, null);
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(null, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(1, o1seq.size());
+        assertEquals(0, o2seq.size());
+
+        o1seq.remove(0);
+        assertEquals(0, o1seq.size());
+
+
+        // the other sequence add
+        o2seq.add(pOppoT2T1_NonContainmentSingle2, o1);
+
+        assertEquals(1, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(o2, o1.getList(pOppoT1T2_ContainmentMany).get(0));
+        assertEquals(o1, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(1, o1seq.size());
+        assertEquals(pOppoT1T2_ContainmentMany, o1seq.getProperty(0));
+        assertEquals(o2, o1seq.getValue(0));
+
+        assertEquals(1, o2seq.size());
+        assertEquals(pOppoT2T1_NonContainmentSingle2, o2seq.getProperty(0));
+        assertEquals(o1, o2seq.getValue(0));
+
+
+        // the other sequence remove
+        o2seq.remove(0);
+        assertEquals(0, o1.getList(pOppoT1T2_ContainmentMany).size());
+        assertEquals(false, o2.isSet(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(null, o2.getDataObject(pOppoT2T1_NonContainmentSingle2));
+        assertEquals(0, o1seq.size());
+        assertEquals(0, o2seq.size());
+    }
+
+    /* non-containment many <-> non-containment many */
+    public void testNullablePropsOppoManyNonContainment()
+    {
+        createTypesWithNullableProps();
+
+        Type t1 = typeHelper.getType(URInProps, "T1");
+        Type t3 = typeHelper.getType(URInProps, "T3");
+
+        Property pOppoT1T3_NonContainmentMany = t1.getProperty("pOppoT1T3_NonContainmentMany");
+        Property pOppoT3T1_NonContainmentMany = t3.getProperty("pOppoT3T1_NonContainmentMany");
+
+        DataObject o1 = dataFactory.create(t1);
+        DataObject o3 = dataFactory.create(t3);
+
+        assertNotNull(o3);
+
+        assertEquals(0, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(0, o3.getList(pOppoT3T1_NonContainmentMany).size());
+
+        // nullables
+        assertTrue(pOppoT1T3_NonContainmentMany.isNullable());
+        assertFalse(pOppoT3T1_NonContainmentMany.isNullable());
+
+        // set
+        o1.set(pOppoT1T3_NonContainmentMany, o3);
+        assertEquals(1, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(o3, o1.getList(pOppoT1T3_NonContainmentMany).get(0));
+        assertEquals(1, o3.getList(pOppoT3T1_NonContainmentMany).size());
+        assertEquals(o1, o3.getList(pOppoT3T1_NonContainmentMany).get(0));
+
+        // list set null
+        o1.getList(pOppoT1T3_NonContainmentMany).set(0, null);
+        assertEquals(1, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(null, o1.getList(pOppoT1T3_NonContainmentMany).get(0));
+        assertEquals(0, o3.getList(pOppoT3T1_NonContainmentMany).size());
+
+        // list add
+        o1.getList(pOppoT1T3_NonContainmentMany).add(o3);
+        assertEquals(2, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(o3, o1.getList(pOppoT1T3_NonContainmentMany).get(1));
+        assertEquals(1, o3.getList(pOppoT3T1_NonContainmentMany).size());
+        assertEquals(o1, o3.getList(pOppoT3T1_NonContainmentMany).get(0));
+
+        // list remove
+        o1.getList(pOppoT1T3_NonContainmentMany).remove(1);
+        o1.getList(pOppoT1T3_NonContainmentMany).remove(0);
+        assertEquals(false, o1.isSet(pOppoT1T3_NonContainmentMany));
+        assertEquals(0, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(false, o3.isSet(pOppoT3T1_NonContainmentMany));
+        assertEquals(0, o3.getList(pOppoT3T1_NonContainmentMany).size());        
+
+
+        // the other set
+        o3.set(pOppoT3T1_NonContainmentMany, o1);
+        assertEquals(1, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(o3, o1.getList(pOppoT1T3_NonContainmentMany).get(0));
+        assertEquals(1, o3.getList(pOppoT3T1_NonContainmentMany).size());
+        assertEquals(o1, o3.getList(pOppoT3T1_NonContainmentMany).get(0));
+
+        // the other unset
+        o3.unset(pOppoT3T1_NonContainmentMany);
+        assertEquals(false, o1.isSet(pOppoT1T3_NonContainmentMany));
+        assertEquals(0, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(false, o3.isSet(pOppoT3T1_NonContainmentMany));
+        assertEquals(0, o3.getList(pOppoT3T1_NonContainmentMany).size());
+
+
+
+        // sequence add
+        Sequence o1seq = o1.getSequence();
+        o1seq.add(pOppoT1T3_NonContainmentMany, o3);
+        assertEquals(1, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(o3, o1.getList(pOppoT1T3_NonContainmentMany).get(0));
+        assertEquals(1, o3.getList(pOppoT3T1_NonContainmentMany).size());
+        assertEquals(o1, o3.getList(pOppoT3T1_NonContainmentMany).get(0));
+        assertEquals(1, o1seq.size());
+        assertEquals(pOppoT1T3_NonContainmentMany, o1seq.getProperty(0));
+        assertEquals(o3, o1seq.getValue(0));
+
+        Sequence o3seq = o3.getSequence();
+        assertEquals(1, o3seq.size());
+        assertEquals(pOppoT3T1_NonContainmentMany, o3seq.getProperty(0));
+        assertEquals(o1, o3seq.getValue(0));
+
+
+        // sequence setValue null
+        o1seq.setValue(0, null);
+        assertEquals(1, o1.getList(pOppoT1T3_NonContainmentMany).size());
+        assertEquals(null, o1.getList(pOppoT1T3_NonContainmentMany).get(0));
+        assertEquals(0, o3.getList(pOppoT3T1_NonContainmentMany).size());
+        assertEquals(1, o1seq.size());
+        assertEquals(null, o1seq.getValue(0));        
+        assertEquals(0, o3seq.size());
+
+        assertEquals(true, o1.isSet(pOppoT1T3_NonContainmentMany));
+        assertEquals(false, o3.isSet(pOppoT3T1_NonContainmentMany));
+
+        o1.unset(pOppoT1T3_NonContainmentMany);
+        assertEquals(0, o1seq.size());
+        assertEquals(false, o1.isSet(pOppoT1T3_NonContainmentMany));
+
+
+        o3seq.add(pOppoT3T1_NonContainmentMany, o1);
+        assertEquals(1, o1seq.size());
+        assertEquals(o3, o1seq.getValue(0));
+
+        o1seq.setValue(0, null);
+        assertEquals(1, o1seq.size());
+        assertEquals(null, o1seq.getValue(0));
+        assertEquals(0, o3seq.size());
+
+        o1seq.setValue(0, o3);
+        assertEquals(1, o1seq.size());
+        assertEquals(o3, o1seq.getValue(0));
+        assertEquals(1, o3seq.size());
+        assertEquals(o1, o3seq.getValue(0));
+
+
+        // the other sequence setValue
+        try
+        {
+            // must throw IllegalArgumentException
+            o3seq.setValue(0, null);
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertTrue(true);
+        }
+        catch (Exception e)
+        {
+            assertTrue(false);
+        }        
+    }
 }

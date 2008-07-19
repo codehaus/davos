@@ -422,7 +422,12 @@ public abstract class Step
                 if ( BuiltInTypeSystem.CHARACTER.isAssignableFrom(type) )
                     typedValue = charValue;
                 else if ( BuiltInTypeSystem.STRING.isAssignableFrom(type) )
-                    typedValue = String.valueOf(charValue);
+                {
+                    if ( charValue=='\0' )
+                        typedValue = "";
+                    else
+                        typedValue = String.valueOf(charValue);
+                }
                 else
                     throw new ClassCastException("Cannot convert char to type '" + type + "'");
                 break;
@@ -579,8 +584,8 @@ public abstract class Step
                     typedValue = bigDecimalValue;
                 else if ( BuiltInTypeSystem.STRING.isAssignableFrom(type) )
                     typedValue = String.valueOf(bigDecimalValue);
-//        else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
-//            typedValue = bigDecimalValue.byteValue());
+                else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
+                    typedValue = bigDecimalValue.byteValue();
                 else if ( BuiltInTypeSystem.DOUBLE.isAssignableFrom(type) )
                     typedValue = bigDecimalValue.doubleValue();
                 else if ( BuiltInTypeSystem.FLOAT.isAssignableFrom(type) )
@@ -589,8 +594,8 @@ public abstract class Step
                     typedValue = bigDecimalValue.longValue();
                 else if ( BuiltInTypeSystem.INT.isAssignableFrom(type) )
                     typedValue = bigDecimalValue.intValue();
-//        else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
-//            typedValue = bigDecimalValue.shortValue());
+                else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
+                    typedValue = bigDecimalValue.shortValue();
                 else if ( BuiltInTypeSystem.INTEGER.isAssignableFrom(type) )
                     typedValue = bigDecimalValue.toBigInteger();
                 else
@@ -605,8 +610,8 @@ public abstract class Step
                     typedValue = bigIntValue;
                 else if ( BuiltInTypeSystem.STRING.isAssignableFrom(type) )
                     typedValue = String.valueOf(bigIntValue);
-//        else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
-//            typedValue = bigIntValue.byteValue());
+                else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
+                    typedValue = bigIntValue.byteValue();
                 else if ( BuiltInTypeSystem.DOUBLE.isAssignableFrom(type) )
                     typedValue = bigIntValue.doubleValue();
                 else if ( BuiltInTypeSystem.FLOAT.isAssignableFrom(type) )
@@ -615,8 +620,8 @@ public abstract class Step
                     typedValue = bigIntValue.longValue();
                 else if ( BuiltInTypeSystem.INT.isAssignableFrom(type) )
                     typedValue = bigIntValue.intValue();
-//        else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
-//            typedValue = bigIntValue.shortValue());
+                else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
+                    typedValue = bigIntValue.shortValue();
                 else if ( BuiltInTypeSystem.DECIMAL.isAssignableFrom(type) )
                     typedValue = new BigDecimal(bigIntValue);
                 else if ( BuiltInTypeSystem.BYTES.isAssignableFrom(type) )
@@ -676,7 +681,10 @@ public abstract class Step
                     else if ( BuiltInTypeSystem.CHARACTER.isAssignableFrom(type) )
                         try
                         {
-                            typedValue = Character.valueOf(stringValue.charAt(0));      //todo is this correct
+                            if ( stringValue.length() == 0 )
+                                typedValue = '\0';
+                            else
+                                typedValue = Character.valueOf(stringValue.charAt(0));      //todo is this correct
                         }
                         catch (NullPointerException e) {}
                         catch (IndexOutOfBoundsException e) {}

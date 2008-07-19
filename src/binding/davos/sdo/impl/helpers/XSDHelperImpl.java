@@ -42,6 +42,7 @@ import org.apache.xmlbeans.SchemaLocalElement;
 import org.apache.xmlbeans.SchemaParticle;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlOptions;
+import org.apache.xmlbeans.impl.common.XMLChar;
 
 import javax.xml.namespace.QName;
 
@@ -69,25 +70,27 @@ public class XSDHelperImpl
         {
             TypeXML typeXML = (TypeXML) type;
             QName schemaTypeName = typeXML.getXMLSchemaTypeName();
-            return schemaTypeName == null ? null : schemaTypeName.getLocalPart();
+            if (typeXML.getXMLSchemaType() != null)
+                return schemaTypeName == null ? null : schemaTypeName.getLocalPart();
         }
-        else
+        // Compute the type name that will be generated (see XsdGenerator)
+        String typeName = type.getName();
+        if (!XMLChar.isValidNCName(typeName))
             return null;
+        return typeName;
     }
 
-    // Unfortunately, the for all the methods taking a Property as argument, the spec says that
-    // if this property did not come from Schema, the methods have to return null/false even though
-    // SDO must be able to serialize instance of these properties to XML and that involves coming
-    // up with a name and attribute/element setting which could be returned here
+    // SDO must be able to serialize instances of all properties to XML even if the property did
+    // not come from Schema and that involves coming
+    // up with a name and attribute/element setting which will be returned in that case
     public String getLocalName(Property property)
     {
         if (property instanceof PropertyXML)
         {
             PropertyXML propertyXML = (PropertyXML) property;
-            return fromSchema(propertyXML) ? ((PropertyXML) property).getXMLName() : null;
+            return propertyXML.getXMLName();
         }
-        else
-            return null;
+        return property.getName();
     }
 
     public String getNamespaceURI(Property property)
@@ -95,7 +98,7 @@ public class XSDHelperImpl
         if (property instanceof PropertyXML)
         {
             PropertyXML propertyXML = (PropertyXML) property;
-            return fromSchema(propertyXML) ? ((PropertyXML) property).getXMLNamespaceURI() : null;
+            return propertyXML.getXMLNamespaceURI();
         }
         else
             return null;
@@ -106,11 +109,10 @@ public class XSDHelperImpl
         if (property instanceof PropertyXML)
         {
             PropertyXML propertyXML = (PropertyXML) property;
-            return fromSchema(propertyXML) ? !propertyXML.isXMLElement() && !isSimpleContent(
-                propertyXML) : false;
+            return !propertyXML.isXMLElement() && !isSimpleContent(propertyXML);
         }
         else
-            return false;
+            return !XsdGenerator.isElement(property);
     }
 
     public boolean isElement(Property property)
@@ -118,10 +120,10 @@ public class XSDHelperImpl
         if (property instanceof PropertyXML)
         {
             PropertyXML propertyXML = (PropertyXML) property;
-            return fromSchema(propertyXML) ? propertyXML.isXMLElement() : false;
+            return propertyXML.isXMLElement();
         }
         else
-            return false;
+            return XsdGenerator.isElement(property);
     }
 
     public boolean isSimpleContent(PropertyXML property)
@@ -131,11 +133,6 @@ public class XSDHelperImpl
             Names.SIMPLE_CONTENT_PROP_NAME.equals(property.getName());
     }
 
-    private boolean fromSchema(PropertyXML prop)
-    {
-        return fromSchema(prop.getContainingTypeXML());
-    }
-
     public boolean isMixed(Type type)
     {
         if (type instanceof TypeXML)
@@ -143,19 +140,13 @@ public class XSDHelperImpl
             SchemaType st = ((TypeXML) type).getXMLSchemaType();
             if (st != null)
                 return st.getContentType() == SchemaType.MIXED_CONTENT;
-            else
-                return false;
         }
-        else
-            return false;
+        return type.isSequenced();
     }
 
     public boolean isXSD(Type type)
     {
-        if (type instanceof TypeXML)
-            return fromSchema((TypeXML) type);
-        else
-            return false;
+        return (type instanceof TypeXML) && fromSchema((TypeXML) type);
     }
 
     private boolean fromSchema(TypeXML type)

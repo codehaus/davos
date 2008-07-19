@@ -162,9 +162,15 @@ public class TypeHelperImpl
 
                 checkConstraints(type);
 
-                ((TypeSystemBase)typeSystem).addTypeMapping(type);
+                TypeXML existingType = typeSystem.getTypeXML(typeUri, typeName);
+                if (existingType==null)
+                {
+                    ((TypeSystemBase)typeSystem).addTypeMapping(type);
 
-                typesDefined.add(type);
+                    typesDefined.add(type);
+                }
+                else
+                    typesDefined.add(existingType);
             }
         }
         
@@ -260,8 +266,11 @@ public class TypeHelperImpl
             propertyKeysToProperties.put(propKey, declaredProp);
         }
 
+        boolean isDynamic = isGlobal;
+        boolean isIndeedGlobal = isGlobal; //isGlobal && containingTypeUri == null ? false : true;
+
         declaredProp.initMutable( propType, propName, propMany, propContainment, containingType,
-            propDefault, propReadOnly, propNullable, propOpposite, propAliasNames, isGlobal);
+            propDefault, propReadOnly, propNullable, propOpposite, propAliasNames, isIndeedGlobal, isDynamic);
 
         // add metadata property values
         List typeProps = p.getType().getInstanceProperties();
@@ -331,7 +340,8 @@ public class TypeHelperImpl
         {
             return 31 * (_containingTypeName==null ? 1 : _containingTypeName.hashCode()) +
                 31 * (_containingTypeUri==null ? 2 : _containingTypeUri.hashCode()) +
-                31 * _propertyName.hashCode() + 31*_propertyTypeName.hashCode() + 31*_propertyTypeUri.hashCode() +
+                31 * _propertyName.hashCode() + 31*_propertyTypeName.hashCode() +
+                31 * (_propertyTypeUri == null ? 3 : _propertyTypeUri.hashCode()) +
                 31 * (_isMany ? 3 : 5) +
                 31 * (_isContainment ? 7 : 11) +
                 31 * (_isReadOnly ? 13 : 17);
@@ -480,11 +490,12 @@ normal rules for serializing a ChangeSummary.
             if ( opposite.isContainment() && property.isMany() )
                 throw new IllegalArgumentException("Invalid constraint: bi-directional with containment require that the non-contaiment Property has many=false. Property with many=true: " + property + ".");
 
-            // Properties that are bi-directional require that they are not nullable.
-            if ( property.isNullable() )
-                throw new IllegalArgumentException("Invalid constraint: bi-directional require nullable=false. Property with nullable=true: " + property + ".");
-            if ( opposite.isNullable() )
-                throw new IllegalArgumentException("Invalid constraint: bi-directional require nullable=false. Property with nullable=true: " + opposite + ".");
+//            // Properties that are bi-directional require that they are not nullable.
+//            // todo cezar check for nullable opposite props
+//            if ( property.isNullable() )
+//                throw new IllegalArgumentException("Invalid constraint: bi-directional require nullable=false. Property with nullable=true: " + property + ".");
+//            if ( opposite.isNullable() )
+//                throw new IllegalArgumentException("Invalid constraint: bi-directional require nullable=false. Property with nullable=true: " + opposite + ".");
         }
     }
 }

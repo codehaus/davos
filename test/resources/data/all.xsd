@@ -1,0 +1,16 @@
+<schema targetNamespace="http://sdo/test/all"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://sdo/test/all">
+
+  <element name="root" type="tns:Root"/>
+
+  <complexType name="Root">
+    <all>
+      <element name="a" type="int"/>
+      <element name="b" type="boolean"/>
+      <element name="c" type="string"/>
+      <element name="d" type="double"/>
+    </all>
+  </complexType>
+
+</schema>

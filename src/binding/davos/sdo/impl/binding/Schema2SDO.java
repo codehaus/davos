@@ -1918,7 +1918,7 @@ public final class Schema2SDO
         switch (p.getParticleType())
         {
         case SchemaParticle.ALL:
-            return false;
+            return true;
         case SchemaParticle.SEQUENCE:
             if ((p.getMaxOccurs() == null ||
                 p.getMaxOccurs().compareTo(BigInteger.ONE) > 0) &&

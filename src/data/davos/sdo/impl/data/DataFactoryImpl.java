@@ -83,7 +83,15 @@ public class DataFactoryImpl
             throw new IllegalArgumentException("The type " + type.getName() + "@" + type.getURI() + " is an abstract type and it cannot be instantiated.");
 
         if (type.isDataType())
-            throw new IllegalArgumentException("The type " + type.getName() + "@" + type.getURI() + " is a DataType, it cannot be used to create a DataObject.");
+        {
+            DataObject wrapperObj = create(BuiltInTypeSystem.WRAPPERTYPE);
+
+            TypeXML typeXML = (TypeXML)type;
+            PropertyXML valueProp = PropertyImpl.createOnDemand("value", false, true, typeXML);
+            wrapperObj.set( valueProp, getDefaultValueForType(typeXML));
+
+            return wrapperObj;
+        }
 
         DataGraphImpl dataGraph = null;
         if (type == BuiltInTypeSystem.DATAGRAPHTYPE)
@@ -92,6 +100,33 @@ public class DataFactoryImpl
         if (dataGraph != null)
             dataGraph.setRootObject(root);
         return root;
+    }
+
+    Object getDefaultValueForType(TypeXML typeXML)
+    {
+        Object initValue;
+        switch (typeXML.getTypeCode() )
+        {
+            case BuiltInTypeSystem.TYPECODE_BOOLEAN:
+                initValue = false;
+                break;
+            case BuiltInTypeSystem.TYPECODE_BYTE:
+            case BuiltInTypeSystem.TYPECODE_DOUBLE:
+            case BuiltInTypeSystem.TYPECODE_FLOAT:
+            case BuiltInTypeSystem.TYPECODE_INT:
+            case BuiltInTypeSystem.TYPECODE_LONG:
+            case BuiltInTypeSystem.TYPECODE_SHORT:
+                initValue = 0;
+                break;
+            case BuiltInTypeSystem.TYPECODE_CHARACTER:
+                initValue = '\0';
+                break;
+            default:
+                initValue = null;
+                break;
+        }
+
+        return initValue;
     }
 
     DataObjectXML create(String uri, String typeName, DataGraph datagraph)

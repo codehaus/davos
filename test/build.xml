@@ -84,6 +84,7 @@
                ${resources.dir}/checkin/anontype.xsd,
                ${resources.dir}/data/basic.xsd,
                ${resources.dir}/data/company5.xsd,
+               ${resources.dir}/data/sequenced.xsd,
                ${resources.dir}/type/anil.xsd,
                ${resources.dir}/type/derivation.xsd,
                ${resources.dir}/type/substitution.xsd"/>
@@ -103,6 +104,7 @@
                ${resources.dir}/data/copy3a.xsd,
                ${resources.dir}/data/copy3b.xsd,
                ${resources.dir}/data/copy4.xsd,
+               ${resources.dir}/data/all.xsd,
                ${resources.dir}/data/basic0.xsd,
                ${resources.dir}/data/custom.xsd,
                ${resources.dir}/data/employee.xsd,

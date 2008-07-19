@@ -147,8 +147,7 @@ class SaxValidator implements ContentHandler
                     globalElName.toString()));
             else
             {
-                _validator = new Validator(t, null, _stl,
-                    new XmlOptions().setValidateTreatLaxAsSkip(), _errorListener);
+                _validator = new Validator(t, null, _stl, null, _errorListener);
                 _validator.nextEvent(Validator.BEGIN, new Event((QName) null));
             }
         }

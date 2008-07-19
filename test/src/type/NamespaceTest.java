@@ -81,7 +81,7 @@ public class NamespaceTest extends BaseTest
         productProperty.setBoolean("many", true);
         productProperty.setBoolean("containment", true);
         Type catalogType = typeHelper.define(catalogPrototype);
-        assertEquals("", catalogType.getURI());
+        assertNull(catalogType.getURI());
         List types = new ArrayList();
         types.add(catalogType);
         String xsd = xsdHelper.generate(types);
@@ -124,7 +124,7 @@ public class NamespaceTest extends BaseTest
         productProperty.setBoolean("many", true);
         productProperty.setBoolean("containment", true);
         Type catalogType = typeHelper.define(catalogPrototype);
-        assertEquals("", catalogType.getURI());
+        assertNull(catalogType.getURI());
         DataObject catalogProperty = factory.create("commonj.sdo", "Property");
         catalogProperty.set("name", "catalog2");
         catalogProperty.set("type", catalogType);
@@ -162,14 +162,14 @@ public class NamespaceTest extends BaseTest
         File f = getResourceFile("type", "catalognons1.xsd_");
         InputStream in = new FileInputStream(f);
         xsdHelper.define(in, f.toURL().toString());
+        // type can be retrieved using either "" or null for uri
         Type catalogType = typeHelper.getType("", "catalog3");
-        // type apparently can also be retrieved using null uri!
         Type catalogType2 = typeHelper.getType(null, "catalog3");
-        assertEquals("", catalogType.getURI());
-        assertEquals("", catalogType2.getURI());
+        assertNull(catalogType.getURI());
+        assertNull(catalogType2.getURI());
         assertTrue(catalogType == catalogType2);
+        // global element can be retrieved using either "" or null for uri
         Property globalProperty = typeHelper.getOpenContentProperty("", "catalog3");
-        // global element can also be retrieved using null uri!
         Property globalProperty2 = typeHelper.getOpenContentProperty(null, "catalog3");
         Property globalProperty3 = xsdHelper.getGlobalProperty("", "catalog3", true);
         Property globalProperty4 = xsdHelper.getGlobalProperty(null, "catalog3", true);
@@ -194,6 +194,8 @@ public class NamespaceTest extends BaseTest
         Type productType = typeHelper.getType("", "product3");
         assertEquals(productType, product1.getType());
         assertEquals("X", product1.get("name"));
+        Type productType2 = typeHelper.getType(null, "product3");
+        assertTrue(productType == productType2);
     }
 
     /* type from compiled schema */
@@ -202,8 +204,8 @@ public class NamespaceTest extends BaseTest
         Type catalogType = typeHelper.getType("", "catalog4");
         assertNotNull(catalogType);
         Type catalogType2 = typeHelper.getType(null, "catalog4");
-        assertEquals("", catalogType.getURI());
-        assertEquals("", catalogType2.getURI());
+        assertNull(catalogType.getURI());
+        assertNull(catalogType2.getURI());
         assertTrue(catalogType == catalogType2);
         Property globalProperty = typeHelper.getOpenContentProperty("", "catalog4");
         Property globalProperty2 = typeHelper.getOpenContentProperty(null, "catalog4");
@@ -230,5 +232,7 @@ public class NamespaceTest extends BaseTest
         Type productType = typeHelper.getType("", "catalog4$product4");
         assertEquals(productType, product1.getType());
         assertEquals("X", product1.get("name"));
+        Type productType2 = typeHelper.getType(null, "catalog4$product4");
+        assertTrue(productType == productType2);
     }
 }

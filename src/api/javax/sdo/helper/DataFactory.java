@@ -1,19 +1,3 @@
-/**
- * <copyright>
- *
- * Service Data Objects
- * Version 2.1.0
- * Licensed Materials
- *
- * (c) Copyright BEA Systems, Inc., International Business Machines Corporation, 
- * Oracle Corporation, Primeton Technologies Ltd., Rogue Wave Software, SAP AG., 
- * Software AG., Sun Microsystems, Sybase Inc., Xcalia, Zend Technologies, 
- * 2005, 2006. All rights reserved.
- *
- * </copyright>
- * 
- */
-
 package javax.sdo.helper;
 
 import javax.sdo.DataObject;
@@ -28,6 +12,8 @@ public interface DataFactory
 {
   /**
    * Create a DataObject of the Type specified by typeName with the given package uri.
+   * If the <code>uri</code> is <code>null</code> or <code>""</code>, then a type with null
+   * uri will be looked up.
    * @param uri The uri of the Type.
    * @param typeName The name of the Type.
    * @return the created DataObject.

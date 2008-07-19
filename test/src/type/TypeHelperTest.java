@@ -14,8 +14,13 @@
  */
 package type;
 
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.sdo.DataObject;
 import javax.sdo.Type;
 import javax.sdo.Property;
+import javax.sdo.helper.DataFactory;
 import javax.sdo.helper.TypeHelper;
 
 import junit.framework.Test;
@@ -32,13 +37,14 @@ public class TypeHelperTest extends BaseTest
     {
         super(name);
     }
-
+    
     public static Test suite()
     {
         
         TestSuite suite = new TestSuite();
         suite.addTest(new TypeHelperTest("testGetType"));
         suite.addTest(new TypeHelperTest("testGetType1"));
+        suite.addTest(new TypeHelperTest("testDefine"));
         
         // or
         //TestSuite suite = new TestSuite(TypeHelperTest.class);
@@ -50,7 +56,45 @@ public class TypeHelperTest extends BaseTest
         junit.textui.TestRunner.run(suite());
     }
 
+    private static DataFactory factory = context.getDataFactory();
     private static TypeHelper typeHelper = context.getTypeHelper();
+
+    static Type booleanType = typeHelper.getType("commonj.sdo", "Boolean");
+    static Type doubleType = typeHelper.getType("commonj.sdo", "Double");
+    static Type intType = typeHelper.getType("commonj.sdo", "Int");
+    static Type integerType = typeHelper.getType("commonj.sdo", "Integer");
+    static Type stringType = typeHelper.getType("commonj.sdo", "String");
+
+    private static DataObject prototype1, prototype2, prototype3;
+    static
+    {
+        prototype1 = factory.create("commonj.sdo", "Type");
+        prototype1.set("uri", "xxx");
+        prototype1.set("name", "TestType1");
+        DataObject booleanProperty = prototype1.createDataObject("property");
+        booleanProperty.set("name", "qualified");
+        booleanProperty.set("type", booleanType);
+        DataObject stringProperty = prototype1.createDataObject("property");
+        stringProperty.set("name", "name");
+        stringProperty.set("type", stringType);
+
+        prototype2 = factory.create("commonj.sdo", "Type");
+        prototype2.set("uri", "xxx");
+        prototype2.set("name", "TestType2");
+        DataObject intProperty = prototype2.createDataObject("property");
+        intProperty.set("name", "quantity");
+        intProperty.set("type", intType);
+        DataObject doubleProperty = prototype2.createDataObject("property");
+        doubleProperty.set("name", "amount");
+        doubleProperty.set("type", doubleType);
+
+        prototype3 = factory.create("commonj.sdo", "Type");
+        prototype3.set("uri", "xxx");
+        prototype3.set("name", "TestType3");
+        DataObject integerProperty = prototype3.createDataObject("property");
+        integerProperty.set("name", "value");
+        integerProperty.set("type", integerType);
+    }
 
     private void _testGetType(String uri, String name)
     {
@@ -181,5 +225,87 @@ public class TypeHelperTest extends BaseTest
         Type t2 = p2.getType();
         assertEquals("sdo_lds003b.xsd", t2.getURI());
         assertEquals("WLCustOrdersCD$SDO_C_CD$SDO_WLCO_CD", t2.getName());
+    }
+
+    private void checkType(Type t)
+    {
+        System.out.println(t);
+        List props = t.getProperties();
+        System.out.println("properties [" + props.size() + "] :");
+        for (Object o : props)
+        {
+            Property p = (Property)o;
+            System.out.println("  " + p.getName());
+            System.out.println("    " + p.getType());
+        }
+    }
+
+    public void testDefine()
+    {
+        List l1 = new ArrayList();
+        l1.add(prototype1);
+        l1.add(prototype2);
+        List types = typeHelper.define(l1);
+        assertEquals(2, types.size());
+        Type t1 = (Type)types.get(0);
+        checkType(t1);
+        assertEquals("xxx", t1.getURI());
+        assertEquals("TestType1", t1.getName());
+        List t1Properties = t1.getProperties();
+        assertEquals(2, t1Properties.size());
+        Property t1p1 = (Property)t1Properties.get(0);
+        assertEquals("qualified", t1p1.getName());
+        assertEquals(booleanType, t1p1.getType());
+        Property t1p2 = (Property)t1Properties.get(1);
+        assertEquals("name", t1p2.getName());
+        assertEquals(stringType, t1p2.getType());
+        Type t2 = (Type)types.get(1);
+        checkType(t2);
+        assertEquals("xxx", t2.getURI());
+        assertEquals("TestType2", t2.getName());
+        List t2Properties = t2.getProperties();
+        assertEquals(2, t2Properties.size());
+        Property t2p1 = (Property)t2Properties.get(0);
+        assertEquals("quantity", t2p1.getName());
+        assertEquals(intType, t2p1.getType());
+        Property t2p2 = (Property)t2Properties.get(1);
+        assertEquals("amount", t2p2.getName());
+        assertEquals(doubleType, t2p2.getType());
+
+        // repeated define
+        List types2 = typeHelper.define(l1);
+        assertEquals(2, types2.size());
+        Type t21 = (Type)types2.get(0);
+        checkType(t21);
+        assertEquals("xxx", t21.getURI());
+        assertEquals("TestType1", t21.getName());
+        Type t22 = (Type)types2.get(1);
+        checkType(t22);
+        assertEquals("xxx", t22.getURI());
+        assertEquals("TestType2", t22.getName());
+
+        List l2 = new ArrayList();
+        l2.add(prototype1);
+        l2.add(prototype2);
+        l2.add(prototype3);
+        List types3 = typeHelper.define(l2);
+        assertEquals(3, types3.size());
+        Type t31 = (Type)types3.get(0);
+        checkType(t31);
+        assertEquals("xxx", t31.getURI());
+        assertEquals("TestType1", t31.getName());
+        Type t32 = (Type)types3.get(1);
+        checkType(t32);
+        assertEquals("xxx", t32.getURI());
+        assertEquals("TestType2", t32.getName());
+        Type t33 = (Type)types3.get(2);
+        checkType(t33);
+        assertEquals("xxx", t33.getURI());
+        assertEquals("TestType3", t33.getName());
+        List t3Properties = t33.getProperties();
+        assertEquals(1, t3Properties.size());
+        Property t3p1 = (Property)t3Properties.get(0);
+        assertEquals("value", t3p1.getName());
+        assertEquals(integerType, t3p1.getType());
     }
 }

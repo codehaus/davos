@@ -81,7 +81,7 @@ public class TypeImpl
     {
         assert name != null;
         _name = name;
-        _uri = uri;
+        _uri = uri == null ? "" : uri;
 
         assert schemaType!=null;
         _schemaType = schemaType;
@@ -110,7 +110,7 @@ public class TypeImpl
         //assert !isDatatype || (isDatatype && instanceClass!=null) : "Spec page 38. instanceClass: " + instanceClass;
 
         _name = name;
-        _uri = uri;
+        _uri = uri == null ? "" : uri;
         _instanceClass = instanceClass;
         _isDatatype = isDatatype;
         _isOpen = isOpen;
@@ -246,7 +246,7 @@ public class TypeImpl
 
     public String getURI()
     {
-        return _uri;
+        return "".equals(_uri ) ? null : _uri;
     }
 
     public Class getInstanceClass()

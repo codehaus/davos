@@ -131,4 +131,11 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:element name="h" type="tns:H"/>
+  <xs:complexType name="H">
+    <xs:sequence>
+      <xs:element name="character" type="xs:string" sdoxml:dataType="sdo:Character"
+                  xmlns:sdo="commonj.sdo"/>
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>

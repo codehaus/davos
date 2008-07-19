@@ -399,12 +399,7 @@ public class StAXLoader extends NamespaceSupportDelegator
             org.apache.xmlbeans.impl.validator.ValidatingXMLStreamReader validator = 
                 new org.apache.xmlbeans.impl.validator.ValidatingXMLStreamReader();
             SchemaTypeLoader tl = sdoCtx.getTypeSystem().getSchemaTypeLoader(); 
-            // We need to set the VALIDATE_TREAT_LAX_AS_SKIP option because the ChangeSummaryType
-            // is declared as having lax validation, but of course the prototypes of modified objects
-            // won't validate their Schemas (because of the sdo:ref attribute if nothing else)
-            // We need to change the datagraph.xsd Schema
-            validator.init(xsr, true, null, tl, new XmlOptions().setValidateTreatLaxAsSkip(),
-                new SDOExceptionListener(marshal));
+            validator.init(xsr, true, null, tl, null, new SDOExceptionListener(marshal));
             xsr = validator;
         }
         return xsr;

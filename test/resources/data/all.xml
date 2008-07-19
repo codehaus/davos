@@ -1,0 +1,6 @@
+<all:root xmlns:all="http://sdo/test/all">
+  <b>false</b>
+  <d>3.14</d>
+  <c>cat</c>
+  <a>5</a>
+</all:root>

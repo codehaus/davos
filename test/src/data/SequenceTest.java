@@ -27,6 +27,7 @@ import javax.sdo.Sequence;
 import javax.sdo.Type;
 import javax.sdo.Property;
 import javax.sdo.helper.DataFactory;
+import javax.sdo.helper.EqualityHelper;
 import javax.sdo.helper.TypeHelper;
 import javax.sdo.helper.XMLHelper;
 import javax.sdo.helper.XSDHelper;
@@ -52,15 +53,26 @@ public class SequenceTest extends DataTest
     {
         
         TestSuite suite = new TestSuite();
+        
         suite.addTest(new SequenceTest("testXMLWithoutSchema"));
         suite.addTest(new SequenceTest("testAnnotatedSchema"));
         suite.addTest(new SequenceTest("testUnannotatedSchema"));
         suite.addTest(new SequenceTest("testNonrecurringModelGroup"));
         suite.addTest(new SequenceTest("testRecurringModelGroup"));
+        suite.addTest(new SequenceTest("testAllModelGroup"));
         suite.addTest(new SequenceTest("testMixedContent1"));
         suite.addTest(new SequenceTest("testMixedContent2"));
         suite.addTest(new SequenceTest("testDynamicType"));
         suite.addTest(new SequenceTest("testSetPropertiesDirectly"));
+        suite.addTest(new SequenceTest("testSetPropertiesDirectly2"));
+        suite.addTest(new SequenceTest("testSequenceSetValue"));
+        suite.addTest(new SequenceTest("testNPE1"));
+        suite.addTest(new SequenceTest("testNPE2"));
+        suite.addTest(new SequenceTest("testSchemaVsSDO"));
+        suite.addTest(new SequenceTest("testPlacementOfAttributes"));
+        suite.addTest(new SequenceTest("testAddInMiddle"));
+        suite.addTest(new SequenceTest("testSetInPlace"));
+        suite.addTest(new SequenceTest("testStaticSDO"));
         suite.addTest(new SequenceTest("testSequence"));
         suite.addTest(new SequenceTest("testIndexOutOfBounds"));
         suite.addTest(new SequenceTest("testLoad"));
@@ -89,6 +101,7 @@ public class SequenceTest extends DataTest
     private static final String TEST_NS5 = "http://www.example.com/seq2";
 
     private static DataFactory factory = context.getDataFactory();
+    private static EqualityHelper equalityHelper = context.getEqualityHelper();
     private static TypeHelper typeHelper = context.getTypeHelper();
     private static XMLHelper xmlHelper = context.getXMLHelper();
     private static XSDHelper xsdHelper = context.getXSDHelper();
@@ -140,11 +153,13 @@ public class SequenceTest extends DataTest
         buyOrder.set("type", buy);
         buyOrder.set("many", Boolean.TRUE);
         buyOrder.set("containment", Boolean.TRUE);
+        buyOrder.set("nullable", Boolean.TRUE);
         DataObject sellOrder = ordersType.createDataObject("property");
         sellOrder.set("name", "sell");
         sellOrder.set("type", sell);
         sellOrder.set("many", Boolean.TRUE);
         sellOrder.set("containment", Boolean.TRUE);
+        sellOrder.set("nullable", Boolean.TRUE);
         orders = typeHelper.define(ordersType);
     }
 
@@ -414,6 +429,28 @@ public class SequenceTest extends DataTest
         _testShirt(seq, 2);
     }
 
+    // complex type with all model group
+    public void testAllModelGroup() throws Exception
+    {
+        System.out.println("testAllModelGroup()");
+        DataObject root = getRootDataObject("data", "all.xml");
+        Type t = root.getType();
+        assertEquals("Root", t.getName());
+        assertEquals("http://sdo/test/all", t.getURI());
+        assertFalse(t.isOpen());
+        assertTrue(t.isSequenced());
+        Sequence seq = root.getSequence();
+        assertEquals(4, seq.size());
+        assertEquals("b", seq.getProperty(0).getName());
+        assertEquals("d", seq.getProperty(1).getName());
+        assertEquals("c", seq.getProperty(2).getName());
+        assertEquals("a", seq.getProperty(3).getName());
+        assertEquals(Boolean.FALSE, seq.getValue(0));
+        assertEquals(new Double(3.14), seq.getValue(1));
+        assertEquals("cat", seq.getValue(2));
+        assertEquals(new Integer(5), seq.getValue(3));
+    }
+
     public void testMixedContent1() throws Exception
     {
         System.out.println("testMixedContent1()");
@@ -541,6 +578,24 @@ public class SequenceTest extends DataTest
         */
     }
 
+    private DataObject createBuy(String symbol, int qty, double price)
+    {
+        DataObject b = factory.create(buy);
+        b.set("symbol", symbol);
+        b.set("qty", qty);
+        b.set("price", price);
+        return b;
+    }
+
+    private DataObject createSell(String symbol, int qty, double price)
+    {
+        DataObject s = factory.create(sell);
+        s.set("symbol", symbol);
+        s.set("qty", qty);
+        s.set("price", price);
+        return s;
+    }
+
     // dynamically defined sequenced type
     public void testDynamicType() throws Exception
     {
@@ -548,65 +603,37 @@ public class SequenceTest extends DataTest
         assertTrue(orders.isSequenced());
 
         // create some orders
-        DataObject b1 = factory.create(buy);
-        b1.set("symbol", "ABC");
-        b1.set("qty", 100);
-        b1.set("price", 10.25);
-        DataObject b2 = factory.create(buy);
-        b2.set("symbol", "XYZ");
-        b2.set("qty", 500);
-        b2.set("price", 17.55);
-        DataObject b3 = factory.create(buy);
-        b3.set("symbol", "ABC");
-        b3.set("qty", 200);
-        b3.set("price", 10.35);
-        DataObject s1 = factory.create(sell);
-        s1.set("symbol", "DEF");
-        s1.set("qty", 300);
-        s1.set("price", 5.25);
-        DataObject s2 = factory.create(sell);
-        s2.set("symbol", "ABC");
-        s2.set("qty", 300);
-        s2.set("price", 10.5);
+        DataObject b1 = createBuy("ABC", 100, 10.25);
+        DataObject b2 = createBuy("XYZ", 500, 17.55);
+        DataObject b3 = createBuy("ABC", 200, 10.35);
+        DataObject s1 = createSell("DEF", 300, 5.25);
+        DataObject s2 = createSell("ABC", 300, 10.5);
 
         DataObject o = factory.create(orders);
         Sequence seq = o.getSequence();
-        seq.add("buy", b1);
-        seq.add("sell", s1);
-        seq.add("buy", b2);
-        seq.add("buy", b3);
-        seq.add("sell", s2);
+        assertTrue(seq.add("buy", b1));
+        assertTrue(seq.add("sell", s1));
+        assertTrue(seq.add("buy", b2));
+        assertTrue(seq.add("buy", b3));
+        assertTrue(seq.add("sell", s2));
         _checkOrders(o);
     }
 
-    /* set sequenced data object by setting its properties directly */
+    /* set sequenced data object by setting its properties directly,
+       i.e., using DataObject interface */
     public void testSetPropertiesDirectly() throws Exception
     {
         System.out.println("testSetPropertiesDirectly()");
 
         // create some orders
-        DataObject b1 = factory.create(buy);
-        b1.set("symbol", "ABC");
-        b1.set("qty", 100);
-        b1.set("price", 10.25);
-        DataObject b2 = factory.create(buy);
-        b2.set("symbol", "XYZ");
-        b2.set("qty", 500);
-        b2.set("price", 17.55);
-        DataObject b3 = factory.create(buy);
-        b3.set("symbol", "ABC");
-        b3.set("qty", 200);
-        b3.set("price", 10.35);
-        DataObject s1 = factory.create(sell);
-        s1.set("symbol", "DEF");
-        s1.set("qty", 300);
-        s1.set("price", 5.25);
-        DataObject s2 = factory.create(sell);
-        s2.set("symbol", "ABC");
-        s2.set("qty", 300);
-        s2.set("price", 10.5);
+        DataObject b1 = createBuy("ABC", 100, 10.25);
+        DataObject b2 = createBuy("XYZ", 500, 17.55);
+        DataObject b3 = createBuy("ABC", 200, 10.35);
+        DataObject s1 = createSell("DEF", 300, 5.25);
+        DataObject s2 = createSell("ABC", 300, 10.5);
 
         DataObject o = factory.create(orders);
+        // set (many-valued) properties using List interface
         List b = (List)o.get("buy");
         List s = (List)o.get("sell");
         b.add(b1);
@@ -617,8 +644,314 @@ public class SequenceTest extends DataTest
         _checkOrders(o);
     }
 
+    public void testSetPropertiesDirectly2() throws Exception
+    {
+        System.out.println("testSetPropertiesDirectly2()");
+
+        // create some orders
+        // first some dummy orders
+        DataObject b1 = createBuy("AAA", 0, 0.0);
+        DataObject b2 = createBuy("BBB", 0, 0.0);
+        DataObject b3 = createBuy("CCC", 0, 0.0);
+        DataObject s1 = createSell("XXX", 0, 0.0);
+        DataObject s2 = createSell("YYY", 0, 0.0);
+        // then some real orders
+        DataObject b4 = createBuy("ABC", 100, 10.25);
+        DataObject b5 = createBuy("XYZ", 500, 17.55);
+        DataObject b6 = createBuy("ABC", 200, 10.35);
+        DataObject s3 = createSell("DEF", 300, 5.25);
+        DataObject s4 = createSell("ABC", 300, 10.5);
+
+        DataObject o = factory.create(orders);
+        List b = (List)o.get("buy");
+        List s = (List)o.get("sell");
+        b.add(b1);
+        s.add(s1);
+        b.add(b2);
+        b.add(b3);
+        s.add(s2);
+
+        // test setting (already set) properties using positional paths -
+        // order of the set calls should not matter, items in sequence 
+        // should be modified in place.
+        o.set("sell[2]", s4);
+        o.set("sell[1]", s3);
+        o.set("buy[2]", b5);
+        o.set("buy[3]", b6);
+        o.set("buy[1]", b4);
+        _checkOrders(o);
+    }
+
+    public void testSequenceSetValue() throws Exception
+    {
+        System.out.println("testSequenceSetValue()");
+
+        // create some orders
+        // first some dummy orders
+        DataObject b1 = createBuy("AAA", 0, 0.0);
+        DataObject b2 = createBuy("BBB", 0, 0.0);
+        DataObject b3 = createBuy("CCC", 0, 0.0);
+        DataObject s1 = createSell("XXX", 0, 0.0);
+        DataObject s2 = createSell("YYY", 0, 0.0);
+        // then some real orders
+        DataObject b4 = createBuy("ABC", 100, 10.25);
+        DataObject b5 = createBuy("XYZ", 500, 17.55);
+        DataObject b6 = createBuy("ABC", 200, 10.35);
+        DataObject s3 = createSell("DEF", 300, 5.25);
+        DataObject s4 = createSell("ABC", 300, 10.5);
+
+        DataObject o = factory.create(orders);
+        List b = (List)o.get("buy");
+        List s = (List)o.get("sell");
+        b.add(b1);
+        s.add(s1);
+        b.add(b2);
+        b.add(b3);
+        s.add(s2);
+
+        Sequence seq = o.getSequence();
+        assertEquals(5, seq.size());
+        assertEquals(b1, seq.setValue(0, b4));
+        assertEquals(s1, seq.setValue(1, s3));
+        assertEquals(b2, seq.setValue(2, b5));
+        assertEquals(b3, seq.setValue(3, b6));
+        assertEquals(s2, seq.setValue(4, s4));
+        _checkOrders(o);
+    }
+
+    public void testNPE1() throws Exception
+    {
+        System.out.println("testNPE1()");
+
+        // create some orders
+        DataObject b1 = createBuy("ABC", 100, 10.25);
+        DataObject b2 = createBuy("XYZ", 500, 17.55);
+        DataObject b3 = createBuy("ABC", 200, 10.35);
+        DataObject s1 = createSell("DEF", 300, 5.25);
+        DataObject s2 = createSell("ABC", 300, 10.5);
+
+        DataObject o = factory.create(orders);
+        List b = (List)o.get("buy");
+        List s = (List)o.get("sell");
+        b.add(null);
+        s.add(null);
+        b.add(null);
+        b.add(null);
+        s.add(null);
+        assertEquals(3, b.size());
+        assertEquals(2, s.size());
+        Sequence seq = o.getSequence();
+        assertEquals(5, seq.size());
+        seq.setValue(0, b1); // NPE!
+        seq.setValue(1, s1);
+        seq.setValue(2, b2);
+        seq.setValue(3, b3);
+        seq.setValue(4, s2);
+        _checkOrders(o);
+    }
+
+    public void testNPE2() throws Exception
+    {
+        System.out.println("testNPE2()");
+
+        // create some orders
+        DataObject b1 = createBuy("ABC", 100, 10.25);
+        DataObject b2 = createBuy("XYZ", 500, 17.55);
+        DataObject b3 = createBuy("ABC", 200, 10.35);
+        DataObject s1 = createSell("DEF", 300, 5.25);
+        DataObject s2 = createSell("ABC", 300, 10.5);
+
+        DataObject o = factory.create(orders);
+        List b = (List)o.get("buy");
+        List s = (List)o.get("sell");
+        b.add(null);
+        s.add(null);
+        b.add(null);
+        b.add(null);
+        s.add(null);
+        assertEquals(3, b.size());
+        assertEquals(2, s.size());
+        Sequence seq = o.getSequence();
+        assertEquals(5, seq.size());
+        o.set("sell[2]", s2); // NPE!
+        o.set("sell[1]", s1);
+        o.set("buy[2]", b2);
+        o.set("buy[3]", b3);
+        o.set("buy[1]", b1);
+        _checkOrders(o);
+    }
+
+    private static final String TEST_XML1 =
+        "<seq:root x=\"true\" y=\"yes\" xmlns:seq=\"http://sdo/test/sequenced\">" +
+        "<b>bob</b><d>1.2</d><c>c1</c><a>10</a><c>c2</c><d>2.3</d>" +
+        "</seq:root>";
+    private static final String TEST_XML2 =
+        "<seq:root y=\"yes\" x=\"true\" xmlns:seq=\"http://sdo/test/sequenced\">" +
+        "<b>bob</b><d>1.2</d><c>c1</c><a>10</a><c>c2</c><d>2.3</d>" +
+        "</seq:root>";
+    private static final String TEST_XML3 =
+        "<seq:root y=\"yes\" x=\"true\" xmlns:seq=\"http://sdo/test/sequenced\">" +
+        "<b>barb</b><d>1.2</d><c>c1</c><a>10</a><c>c2</c><d>2.3</d>" +
+        "</seq:root>";
+
+    public void testSchemaVsSDO()
+    {
+        System.out.println("testSchemaVsSDO()");
+        DataObject root = factory.create("http://sdo/test/sequenced", "Root");
+        assertNotNull(root);
+        root.set("b", "bob");
+        List cList = (List)root.get("c");
+        List dList = (List)root.get("d");
+        dList.add(new Double(1.2));
+        cList.add("c1");
+        root.set("a", new Integer(10));
+        cList.add("c2");
+        root.set("y", "yes");
+        root.set("x", Boolean.TRUE);
+        dList.add(new Double(2.3));
+
+        Sequence seq = root.getSequence();
+        assertNotNull(seq);
+        assertEquals(8, seq.size());
+        assertEquals("b", seq.getProperty(0).getName());
+        assertEquals("d", seq.getProperty(1).getName());
+        assertEquals("c", seq.getProperty(2).getName());
+        assertEquals("a", seq.getProperty(3).getName());
+        assertEquals("c", seq.getProperty(4).getName());
+        assertEquals("y", seq.getProperty(5).getName());
+        assertEquals("x", seq.getProperty(6).getName());
+        assertEquals("d", seq.getProperty(7).getName());
+        assertEquals("bob", seq.getValue(0));
+        assertEquals(new Double(1.2), seq.getValue(1));
+        assertEquals("c1", seq.getValue(2));
+        assertEquals(new Integer(10), seq.getValue(3));
+        assertEquals("c2", seq.getValue(4));
+        assertEquals("yes", seq.getValue(5));
+        assertEquals(Boolean.TRUE, seq.getValue(6));
+        assertEquals(new Double(2.3), seq.getValue(7));
+
+        // when marshalled, the sequence is preserved as best as we can
+        // but the attributes have to be together, before the elements
+        String s = xmlHelper.save(root, "http://sdo/test/sequenced", "root");
+        System.out.println(s);
+        assertEquals(TEST_XML2, s);
+
+        // consequently, when the sequenced datd object is unmarshalled back,
+        // the sequence is different
+        DataObject root2 = xmlHelper.load(TEST_XML2).getRootObject();
+        assertFalse(equalityHelper.equal(root, root2));
+        assertFalse(equalityHelper.equalShallow(root, root2));
+        Sequence seq2 = root2.getSequence();
+        assertNotNull(seq2);
+        assertEquals(8, seq2.size());
+        assertEquals("y", seq2.getProperty(0).getName());
+        assertEquals("x", seq2.getProperty(1).getName());
+        assertEquals("b", seq2.getProperty(2).getName());
+        assertEquals("d", seq2.getProperty(3).getName());
+        assertEquals("c", seq2.getProperty(4).getName());
+        assertEquals("a", seq2.getProperty(5).getName());
+        assertEquals("c", seq2.getProperty(6).getName());
+        assertEquals("d", seq2.getProperty(7).getName());
+    }
+
+    /* test to verify that equality of sequenced data objects take
+       order of all properties, including attributes, into account */
+    public void testPlacementOfAttributes()
+    {
+        System.out.println("testPlacementOfAttributes()");
+        DataObject root1 = xmlHelper.load(TEST_XML1).getRootObject();
+        DataObject root2 = xmlHelper.load(TEST_XML2).getRootObject();
+        assertFalse(equalityHelper.equal(root1, root2));
+        assertFalse(equalityHelper.equalShallow(root1, root2));
+    }
+
+    /* test to verify that using the List interface for a many-valued property,
+       adding value at index i inserts it in the sequence just before the value
+       corresponding to the value at index i+1 of that many-valued property */
+    public void testAddInMiddle()
+    {
+        System.out.println("testAddInMiddle()");
+        DataObject root = xmlHelper.load(TEST_XML1).getRootObject();
+        List cList = (List)root.get("c");
+        assertEquals(2, cList.size());
+        cList.add(1, "c1b");
+        System.out.println(xmlHelper.save(root, "http://sdo/test/sequenced", "root"));
+        Sequence seq = root.getSequence();
+        assertEquals(9, seq.size());
+        assertEquals("x", seq.getProperty(0).getName());
+        assertEquals("y", seq.getProperty(1).getName());
+        assertEquals("b", seq.getProperty(2).getName());
+        assertEquals("d", seq.getProperty(3).getName());
+        assertEquals("c", seq.getProperty(4).getName());
+        assertEquals("a", seq.getProperty(5).getName());
+        assertEquals("c", seq.getProperty(6).getName());
+        assertEquals("c", seq.getProperty(7).getName());
+        assertEquals("d", seq.getProperty(8).getName());
+        assertEquals("c1b", seq.getValue(6));
+        assertEquals("c2", seq.getValue(7));
+    }
+
+    /* set already set single-value property directly -
+       property is modified in place */
+    public void testSetInPlace()
+    {
+        System.out.println("testSetInPlace()");
+        DataObject root = xmlHelper.load(TEST_XML2).getRootObject();
+        root.set("b", "barb");
+        Sequence seq = root.getSequence();
+        assertNotNull(seq);
+        assertEquals(8, seq.size());
+        assertEquals("y", seq.getProperty(0).getName());
+        assertEquals("x", seq.getProperty(1).getName());
+        assertEquals("b", seq.getProperty(2).getName());
+        assertEquals("barb", seq.getValue(2));
+        assertEquals("d", seq.getProperty(3).getName());
+        assertEquals("c", seq.getProperty(4).getName());
+        assertEquals("a", seq.getProperty(5).getName());
+        assertEquals("c", seq.getProperty(6).getName());
+        assertEquals("d", seq.getProperty(7).getName());
+        String s = xmlHelper.save(root, "http://sdo/test/sequenced", "root");
+        System.out.println(s);
+        assertEquals(TEST_XML3, s);
+    }
+
+    public void testStaticSDO()
+    {
+        System.out.println("testStaticSDO()");
+        sdo.test.sequenced.Root root = 
+            (sdo.test.sequenced.Root)factory.create(sdo.test.sequenced.Root.class);
+        root.setB("bob");
+        List cList = (List)root.get("c");
+        List dList = (List)root.get("d");
+        dList.add(new Double(1.2));
+        cList.add("c1");
+        root.setA(new Integer(10));
+        cList.add("c2");
+        root.setB("barb");
+        dList.add(new Double(2.3));
+
+        System.out.println(xmlHelper.save(root, "http://sdo/test/sequenced", "root"));
+
+        Sequence seq = root.getSequence();
+        assertNotNull(seq);
+        assertEquals(6, seq.size());
+        assertEquals("b", seq.getProperty(0).getName());
+        assertEquals("d", seq.getProperty(1).getName());
+        assertEquals("c", seq.getProperty(2).getName());
+        assertEquals("a", seq.getProperty(3).getName());
+        assertEquals("c", seq.getProperty(4).getName());
+        assertEquals("d", seq.getProperty(5).getName());
+        assertEquals("barb", seq.getValue(0));
+        assertEquals(new Double(1.2), seq.getValue(1));
+        assertEquals("c1", seq.getValue(2));
+        assertEquals(new Integer(10), seq.getValue(3));
+        assertEquals("c2", seq.getValue(4));
+        assertEquals(new Double(2.3), seq.getValue(5));
+    }
+
     /* test Sequence interface;
-       add(String) and add(int, String) is tested in testMixedContent1() */
+       addText(String) and addText(int, String) is tested in testMixedContent1()
+    */
     public void testSequence() throws Exception
     {
         System.out.println("testSequence()");
@@ -726,8 +1059,9 @@ public class SequenceTest extends DataTest
         assertEquals("french blue", ((DataObject)seq.getValue(4)).get("color"));
         assertEquals("slate", ((DataObject)seq.getValue(5)).get("color"));
         // test set
-        seq.setValue(4, shirt4);
+        Object oldValue = seq.setValue(4, shirt4);
         assertEquals("pink", ((DataObject)seq.getValue(4)).get("color"));
+        assertEquals("french blue", ((DataObject)oldValue).get("color"));
 
         // test move
         // before

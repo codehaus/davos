@@ -97,12 +97,12 @@ public class PropertyImpl
 
     public void initMutable(TypeXML type, String name, boolean isMany, boolean isContainment, TypeXML containingType,
         Object defaultObj, boolean isReadOnly, boolean isNullable, PropertyXML opposite, List<String> aliasNames,
-        boolean isGlobal)
+        boolean isGlobal, boolean isDynamic)
     {
         boolean isElement = isElementByDefault(type, isMany, isNullable, isGlobal);
         initMutable(type, name, isMany, isContainment, containingType, defaultObj, isReadOnly, isNullable, opposite,
             aliasNames, isGlobal, name, getPropertyURI(containingType, isGlobal, isElement), ST_ANY_SIMPLE_TYPE,
-            isElement, false);
+            isElement, isDynamic);
     }
 
     void init(TypeXML type, String name, boolean isMany, boolean isContainment, TypeXML containingType,
@@ -234,9 +234,11 @@ public class PropertyImpl
             }
         }
 
-        // Spec2.1 page 19: The property's isMany value will be true for DataObject.set(List) or Sequence.add(), false otherwise.
+        // Spec2.1 page 19: The property's isMany value will be true for DataObject.set(List) or Sequence.add(),
+        // false otherwise.
         boolean isMany = forSequence || value instanceof List;
-        // Spec2.1 page 19: If the value is a DataObject that is not contained, the new property will have isContainment set to true, false otherwise.
+        // Spec2.1 page 19: If the value is a DataObject that is not contained,
+        // the new property will have isContainment set to true, false otherwise.
         boolean isContainment = (value instanceof DataObject && ((DataObject)value).getContainer() == null ) ||
             (value instanceof List && !type.isDataType());
 
@@ -262,7 +264,8 @@ public class PropertyImpl
 
     private static boolean isElementByDefault(TypeXML type, boolean isMany, boolean isNullable, boolean isGlobal)
     {
-        if ( isMany || isNullable || !type.isDataType() || isGlobal || BuiltInTypeSystem.CHANGESUMMARYTYPE.equals(type))
+        if ( isMany || isNullable || !type.isDataType() || isGlobal ||
+                BuiltInTypeSystem.CHANGESUMMARYTYPE.equals(type))
             return true;
 
         return false;
@@ -287,8 +290,9 @@ public class PropertyImpl
 
         throw new IllegalArgumentException("Other Property implementations not supported.");
 //        return PropertyImpl.create(TypeImpl.getTypeXML(property.getType()), property.getName(), property.isMany(),
-//                property.isContainment(), TypeImpl.getTypeXML(property.getContainingType()), property.getDefault(), property.isReadOnly(),
-//                getPropertyXML(property.getOpposite()), (List<String>)property.getAliasNames());
+//                property.isContainment(), TypeImpl.getTypeXML(property.getContainingType()), property.getDefault(),
+//                property.isReadOnly(), getPropertyXML(property.getOpposite()),
+//                (List<String>)property.getAliasNames());
     }
 
     public String getName()
@@ -491,7 +495,8 @@ public class PropertyImpl
 
         Property p = (Property)o;
 
-        return getName().equals(p.getName()) && getContainingType().equals(p.getContainingType()) && getType().equals(p.getType());
+        return getName().equals(p.getName()) && getContainingType().equals(p.getContainingType()) &&
+            getType().equals(p.getType());
     }
 
     public int hashCode()
@@ -507,12 +512,14 @@ public class PropertyImpl
 
     public String toString()
     {
-        return _name + " " + _type + (_isMany ? " many" : "") + (_isReadOnly ? " readonly" : "") + (_isContainment ? " containment" :"");
+        return _name + " " + _type + (_isMany ? " many" : "") + (_isReadOnly ? " readonly" : "") +
+            (_isContainment ? " containment" :"");
     }
 
     public void dump()
     {
-        System.out.print((isGlobal() ? "Global" : "") + "Property: " + _name + " " + _type + (_isMany ? " many" : "") + (_isReadOnly ? " readonly" : "") + (_isContainment ? " containment" :""));
+        System.out.print((isGlobal() ? "Global" : "") + "Property: " + _name + " " + _type +
+            (_isMany ? " many" : "") + (_isReadOnly ? " readonly" : "") + (_isContainment ? " containment" :""));
 
         if (_containingType != null)
             System.out.print(" containingType: " + (isOpenContent() ? _containingType.getURI() : _containingType));

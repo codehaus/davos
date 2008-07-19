@@ -52,6 +52,7 @@ import davos.sdo.SDOSchemaGenerationException;
 import davos.sdo.TypeXML;
 import davos.sdo.impl.common.Names;
 import davos.sdo.impl.type.SimpleValueHelper;
+import davos.sdo.impl.type.BuiltInTypeSystem;
 
 import javax.sdo.Property;
 
@@ -87,6 +88,7 @@ public class XsdGenerator extends TypeSystemHolder
             javax.sdo.Type type = types.get(i);
             String typeName = type.getName();
             String typeUri = type.getURI();
+            typeUri = typeUri == null ? "" : typeUri;
             Class instanceClass = type.getInstanceClass();
 
             if (uri == null)
@@ -255,10 +257,11 @@ public class XsdGenerator extends TypeSystemHolder
         return formDefaultQualified;
     }
 
-    private static boolean isElement(Property prop)
+    public static boolean isElement(Property prop)
     {
         return (prop instanceof PropertyXML) ? ((PropertyXML) prop).
-            isXMLElement() : prop.isMany() || prop.isContainment();
+            isXMLElement() : prop.isMany() || prop.isContainment() || prop.isNullable() ||
+            prop.get(BuiltInTypeSystem.P_PROPERTY_XMLELEMENT) == Boolean.TRUE;
     }
 
     private static boolean buildElementOrAttribute(Property prop, boolean isElem,

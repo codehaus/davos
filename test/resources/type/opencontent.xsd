@@ -2,6 +2,7 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://sdo/test/opencontent"
   xmlns="http://sdo/test/opencontent"
+  xmlns:sdox="commonj.sdo/xml"
   elementFormDefault="qualified">
 
   <xs:element name="a" type="A"/>
@@ -10,7 +11,7 @@
   <xs:element name="d" type="D"/>
   <xs:element name="e" type="E"/>
 
-  <xs:complexType name="A">
+  <xs:complexType name="A" sdox:sequence="false">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:any namespace="##any" minOccurs="0"/>
@@ -18,7 +19,7 @@
     <xs:attribute name="id" type="xs:string"/>
   </xs:complexType>
   
-  <xs:complexType name="B">
+  <xs:complexType name="B" sdox:sequence="false">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
     </xs:sequence>

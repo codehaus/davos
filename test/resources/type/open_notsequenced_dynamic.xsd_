@@ -1,0 +1,9 @@
+<xs:schema targetNamespace="http://www.bea.com/test/xsd" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sdo="commonj.sdo" xmlns:sdoxml="commonj.sdo/xml" xmlns:sdojava="commonj.sdo/java" xmlns:tns="http://www.bea.com/test/xsd">
+  <xs:complexType name="OpenNotSequencedType" sdoxml:sequence="false">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded" namespace="##other"/>
+    </xs:sequence>
+    <xs:attribute type="xs:int" name="i1"/>
+    <xs:anyAttribute/>
+  </xs:complexType>
+</xs:schema>

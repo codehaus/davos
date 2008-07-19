@@ -1,19 +1,3 @@
-/**
- * <copyright>
- *
- * Service Data Objects
- * Version 2.1.0
- * Licensed Materials
- *
- * (c) Copyright BEA Systems, Inc., International Business Machines Corporation, 
- * Oracle Corporation, Primeton Technologies Ltd., Rogue Wave Software, SAP AG., 
- * Software AG., Sun Microsystems, Sybase Inc., Xcalia, Zend Technologies, 
- * 2005, 2006. All rights reserved.
- *
- * </copyright>
- * 
- */
-
 package javax.sdo.helper;
 
 import javax.sdo.DataObject;
@@ -36,11 +20,13 @@ public interface EqualityHelper
    *  {@link DataObject#isSet(Property) set}, or set to an equal value
    *  dataObject1.get(property).equals(dataObject2.get(property))
    * <br/>If the type is a sequenced type, the sequence entries must be the same.
-   *  For each entry x in the sequence where the property is used in the comparison,
+   * This includes only text entries and entries where property.getType().isDataType() is true and
+   * their relative order must be the same.
+   *  For each pair of entries x and y in the sequence where the property is used in the comparison,
    *  dataObject1.getSequence().getValue(x).equals(
-   *   dataObject2.getSequence().getValue(x)) and
+   *   dataObject2.getSequence().getValue(y)) and
    *  dataObject1.getSequence().getProperty(x) == 
-   *   dataObject2.getSequence().getProperty(x)
+   *   dataObject2.getSequence().getProperty(y)
    *  must be true.
    * </p>
    *  Returns true the objects have the same Type and all values of all compared Properties are equal.

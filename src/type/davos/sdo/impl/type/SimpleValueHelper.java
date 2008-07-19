@@ -119,6 +119,8 @@ public class SimpleValueHelper
         }
         else if(BuiltInTypeSystem.CHARACTER.isAssignableFrom(type))
         {
+            if (stringBuffer.length() == 0)
+                return (char) 0;
             return XsTypeConverter.lexString(stringBuffer).charAt(0);
         }
         else if(BuiltInTypeSystem.DATE.isAssignableFrom(type))
@@ -338,7 +340,10 @@ public class SimpleValueHelper
         }
         case BuiltInTypeSystem.TYPECODE_CHARACTER:
         {
-            return XsTypeConverter.printString(String.valueOf((Character) value));
+            Character charValue = (Character) value;
+            if (charValue.charValue() == 0)
+                return Common.EMPTY_STRING;
+            return XsTypeConverter.printString(String.valueOf(charValue));
         }
         case BuiltInTypeSystem.TYPECODE_DATE:
         {
@@ -486,7 +491,10 @@ public class SimpleValueHelper
         }
         else if (BuiltInTypeSystem.CHARACTER.isAssignableFrom(targetType))
         {
-            return XsTypeConverter.printString(String.valueOf((Character) value));
+            Character charValue = (Character) value;
+            if (charValue.charValue() == 0)
+                return Common.EMPTY_STRING;
+            return XsTypeConverter.printString(String.valueOf(charValue));
         }
         else if (BuiltInTypeSystem.DATE.isAssignableFrom(targetType))
         {

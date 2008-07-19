@@ -1,19 +1,3 @@
-/**
- * <copyright>
- *
- * Service Data Objects
- * Version 2.1.0
- * Licensed Materials
- *
- * (c) Copyright BEA Systems, Inc., International Business Machines Corporation, 
- * Oracle Corporation, Primeton Technologies Ltd., Rogue Wave Software, SAP AG., 
- * Software AG., Sun Microsystems, Sybase Inc., Xcalia, Zend Technologies, 
- * 2005, 2006. All rights reserved.
- *
- * </copyright>
- * 
- */
-
 package javax.sdo.helper;
 
 import java.util.Calendar;

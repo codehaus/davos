@@ -164,6 +164,10 @@ public abstract class DataObjectImpl
             return ((Long)value).byteValue();
         if ( value instanceof Short)
             return ((Short)value).byteValue();
+        if ( value instanceof BigDecimal)
+            return ((BigDecimal)value).byteValue();
+        if ( value instanceof BigInteger)
+            return ((BigInteger)value).byteValue();
 
         return (Byte)value;
     }
@@ -186,7 +190,13 @@ public abstract class DataObjectImpl
         }
 
         if ( value instanceof String)
-            return ((String)value).charAt(0);
+        {
+            String stringValue = (String)value;
+            if ( stringValue.length() == 0 )
+                return '\0';
+            else
+                return stringValue.charAt(0);
+        }
 
         return ((Character)value).charValue();
     }
@@ -380,6 +390,10 @@ public abstract class DataObjectImpl
             return ((Integer)value).shortValue();
         if ( value instanceof Long)
             return ((Long)value).shortValue();
+        if ( value instanceof BigDecimal)
+            return ((BigDecimal)value).shortValue();
+        if ( value instanceof BigInteger)
+            return ((BigInteger)value).shortValue();
 
         return (Short)value;
     }
@@ -430,6 +444,8 @@ public abstract class DataObjectImpl
             return (BigDecimal)value;
         if ( value instanceof String)
             return new BigDecimal((String)value);
+        if ( value instanceof Byte)
+            return BigDecimal.valueOf((Byte)value);
         if ( value instanceof Double)
             return BigDecimal.valueOf((Double)value);
         if ( value instanceof Float)
@@ -438,8 +454,8 @@ public abstract class DataObjectImpl
             return BigDecimal.valueOf((Integer)value);
         if ( value instanceof Long)
             return BigDecimal.valueOf((Long)value);
-//        if ( value instanceof Short)
-//            return BigDecimal.valueOf((Short)value);
+        if ( value instanceof Short)
+            return BigDecimal.valueOf((Short)value);
         if ( value instanceof BigInteger)
             return new BigDecimal((BigInteger)value);
 
@@ -467,6 +483,8 @@ public abstract class DataObjectImpl
             return (BigInteger)value;
         if ( value instanceof String)
             return new BigInteger((String)value);
+        if ( value instanceof Byte)
+            return BigInteger.valueOf((Byte)value);
         if ( value instanceof Double)
             return BigInteger.valueOf(((Double)value).longValue());
         if ( value instanceof Float)
@@ -475,8 +493,8 @@ public abstract class DataObjectImpl
             return BigInteger.valueOf((Integer)value);
         if ( value instanceof Long)
             return BigInteger.valueOf((Long)value);
-//        if ( value instanceof Short)
-//            return BigInteger.valueOf((Short)value);
+        if ( value instanceof Short)
+            return BigInteger.valueOf((Short)value);
         if ( value instanceof BigDecimal)
             return ((BigDecimal)value).toBigInteger();
         if ( value instanceof byte[])
@@ -550,7 +568,12 @@ public abstract class DataObjectImpl
         if ( value instanceof Byte)
             return ((Byte)value).toString();
         if ( value instanceof Character)
-            return ((Character)value).toString();
+        {
+            if (((Character)value).charValue() == '\0')
+                return "";
+            else
+                return ((Character)value).toString();
+        }
         if ( value instanceof Double)
             return ((Double)value).toString();
         if ( value instanceof Float)
@@ -880,15 +903,16 @@ public abstract class DataObjectImpl
         return getStore().storeGet(PropertyImpl.getPropertyXML(property));
     }
 
-    public void set(Property property, Object value)
+    public void set(Property property, Object newValue)
     {
         if (property.isReadOnly())
             throw new UnsupportedOperationException("Read-only property '" + property + "' cannot be modified.");
 
         PropertyXML propXml = PropertyImpl.getPropertyXML(property);
-        checkOppositeUniqueObjectConstraint(this, propXml, value);
-        getStore().storeSet(propXml, value);
-        setOppositeProperty(this, propXml, value);
+        checkOppositeUniqueObjectConstraint(this, propXml, newValue);
+        Object oldValue = getOldValueForOppositeSet(propXml, newValue);
+        getStore().storeSet(propXml, newValue);
+        setOppositeProperty(this, propXml, newValue, oldValue);
     }
 
     public boolean isSet(Property property)
@@ -970,6 +994,10 @@ public abstract class DataObjectImpl
             return ((Long)value).byteValue();
         if ( value instanceof Short)
             return ((Short)value).byteValue();
+        if ( value instanceof BigDecimal)
+            return ((BigDecimal)value).byteValue();
+        if ( value instanceof BigInteger)
+            return ((BigInteger)value).byteValue();
 
         return (Byte)value;
     }
@@ -992,7 +1020,13 @@ public abstract class DataObjectImpl
         }
 
         if ( value instanceof String)
-            return ((String)value).charAt(0);
+        {
+            String stringValue = (String)value;
+            if ( stringValue.length() == 0 )
+                return '\0';
+            else
+                return stringValue.charAt(0);
+        }
 
         return ((Character)value).charValue();
     }
@@ -1186,6 +1220,10 @@ public abstract class DataObjectImpl
             return ((Integer)value).shortValue();
         if ( value instanceof Long)
             return ((Long)value).shortValue();
+        if ( value instanceof BigDecimal)
+            return ((BigDecimal)value).shortValue();
+        if ( value instanceof BigInteger)
+            return ((BigInteger)value).shortValue();
 
         return (Short)value;
     }
@@ -1244,8 +1282,10 @@ public abstract class DataObjectImpl
             return BigDecimal.valueOf((Integer)value);
         if ( value instanceof Long)
             return BigDecimal.valueOf(((Long)value));
-//        if ( value instanceof Short)
-//            return BigDecimal.valueOf((Short)value);
+        if ( value instanceof Short)
+            return BigDecimal.valueOf((Short)value);
+        if ( value instanceof Byte)
+            return BigDecimal.valueOf((Byte)value);
         if ( value instanceof BigInteger)
             return new BigDecimal((BigInteger)value);
 
@@ -1281,8 +1321,10 @@ public abstract class DataObjectImpl
             return BigInteger.valueOf((Integer)value);
         if ( value instanceof Long)
             return BigInteger.valueOf((Long)value);
-//        if ( value instanceof Short)
-//            return BigInteger.valueOf((Short)value);
+        if ( value instanceof Short)
+            return BigInteger.valueOf((Short)value);
+        if ( value instanceof Byte)
+            return BigInteger.valueOf((Byte)value);
         if ( value instanceof BigDecimal)
             return ((BigDecimal)value).toBigInteger();
         if ( value instanceof byte[])
@@ -1358,7 +1400,12 @@ public abstract class DataObjectImpl
         if ( value instanceof Byte)
             return ((Byte)value).toString();
         if ( value instanceof Character)
-            return ((Character)value).toString();
+        {
+            if (((Character)value).charValue() == '\0')
+                return "";
+            else
+                return ((Character)value).toString();
+        }
         if ( value instanceof Double)
             return ((Double)value).toString();
         if ( value instanceof Float)
@@ -1446,6 +1493,10 @@ public abstract class DataObjectImpl
             set(property, Integer.valueOf((int)value));
         else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
             set(property, Short.valueOf((short)value));
+        else if ( BuiltInTypeSystem.DECIMAL.isAssignableFrom(type) )
+            set(property, BigDecimal.valueOf(value));
+        else if ( BuiltInTypeSystem.INTEGER.isAssignableFrom(type) )
+            set(property, BigInteger.valueOf((long)value));
         else if ( BuiltInTypeSystem.OBJECT.equals(type) )
             set(property, value);
         else
@@ -1459,7 +1510,12 @@ public abstract class DataObjectImpl
         if ( BuiltInTypeSystem.CHARACTER.isAssignableFrom(type) )
             set(property, value);
         else if ( BuiltInTypeSystem.STRING.isAssignableFrom(type) )
-            set(property, String.valueOf(value));
+        {
+            if ( value=='\0' )
+                set (property, "");
+            else
+                set(property, String.valueOf(value));
+        }
         else if ( BuiltInTypeSystem.OBJECT.equals(type) )
             set(property, value);
         else
@@ -1600,6 +1656,10 @@ public abstract class DataObjectImpl
             set(property, Float.valueOf((float)value));
         else if ( BuiltInTypeSystem.LONG.isAssignableFrom(type) )
             set(property, Long.valueOf((long)value));
+        else if ( BuiltInTypeSystem.DECIMAL.isAssignableFrom(type) )
+            set(property, BigDecimal.valueOf(value));
+        else if ( BuiltInTypeSystem.INTEGER.isAssignableFrom(type) )
+            set(property, BigInteger.valueOf((long)value));
         else if ( BuiltInTypeSystem.OBJECT.equals(type) )
             set(property, value);
         else
@@ -1630,8 +1690,8 @@ public abstract class DataObjectImpl
             set(property, value);
         else if ( BuiltInTypeSystem.STRING.isAssignableFrom(type) )
             set(property, String.valueOf(value));
-//        else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
-//            set(property, value.byteValue());
+        else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
+            set(property, value.byteValue());
         else if ( BuiltInTypeSystem.DOUBLE.isAssignableFrom(type) )
             set(property, value.doubleValue());
         else if ( BuiltInTypeSystem.FLOAT.isAssignableFrom(type) )
@@ -1640,8 +1700,8 @@ public abstract class DataObjectImpl
             set(property, value.longValue());
         else if ( BuiltInTypeSystem.INT.isAssignableFrom(type) )
             set(property, value.intValue());
-//        else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
-//            set(property, value.shortValue());
+        else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
+            set(property, value.shortValue());
         else if ( BuiltInTypeSystem.INTEGER.isAssignableFrom(type) )
             set(property, value.toBigInteger());
         else if ( BuiltInTypeSystem.OBJECT.equals(type) )
@@ -1658,8 +1718,8 @@ public abstract class DataObjectImpl
             set(property, value);
         else if ( BuiltInTypeSystem.STRING.isAssignableFrom(type) )
             set(property, String.valueOf(value));
-//        else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
-//            set(property, value.byteValue());
+        else if ( BuiltInTypeSystem.BYTE.isAssignableFrom(type) )
+            set(property, value.byteValue());
         else if ( BuiltInTypeSystem.DOUBLE.isAssignableFrom(type) )
             set(property, value.doubleValue());
         else if ( BuiltInTypeSystem.FLOAT.isAssignableFrom(type) )
@@ -1668,8 +1728,8 @@ public abstract class DataObjectImpl
             set(property, value.longValue());
         else if ( BuiltInTypeSystem.INT.isAssignableFrom(type) )
             set(property, value.intValue());
-//        else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
-//            set(property, value.shortValue());
+        else if ( BuiltInTypeSystem.SHORT.isAssignableFrom(type) )
+            set(property, value.shortValue());
         else if ( BuiltInTypeSystem.DECIMAL.isAssignableFrom(type) )
             set(property, new BigDecimal(value));
         else if ( BuiltInTypeSystem.BYTES.isAssignableFrom(type) )
@@ -1737,8 +1797,10 @@ public abstract class DataObjectImpl
                 set(property, Byte.valueOf(value));
             else if ( BuiltInTypeSystem.CHARACTER.isAssignableFrom(type) )
             {
-                if (value == null || value.length() != 1)
+                if (value == null || value.length() > 1)
                     throw new ClassCastException("Only a String of length 1 may be converted to type '" + type + "'");
+                else if ( value.length() == 0 )
+                    set(property, '\0');
                 else
                     set(property, Character.valueOf(value.charAt(0)));
             }
@@ -1908,7 +1970,7 @@ public abstract class DataObjectImpl
         DataObject child = getDataFactoryImpl().createChild(this, propertyName);
         //checkOppositeUniqueObjectConstraint not required
         PropertyXML prop = PropertyImpl.getPropertyXML(getInstanceProperty(propertyName));
-        setOppositeProperty(this, prop, child);
+        setOppositeProperty(this, prop, child, null);
         return child;
     }
 
@@ -1917,7 +1979,7 @@ public abstract class DataObjectImpl
         PropertyXML prop = (PropertyXML)getType().getProperties().get(propertyIndex);
         // checkOppositeUniqueObjectConstraint
         DataObject child = getDataFactoryImpl().createChild(this, prop);
-        setOppositeProperty(this, prop, child);
+        setOppositeProperty(this, prop, child, null);
         return child;
     }
 
@@ -1926,7 +1988,7 @@ public abstract class DataObjectImpl
         PropertyXML propertyXML = PropertyImpl.getPropertyXML(property);
         // checkOppositeUniqueObjectConstraint not required
         DataObject child = getDataFactoryImpl().createChild(this, PropertyImpl.getPropertyXML(property));
-        setOppositeProperty(this, propertyXML, child);
+        setOppositeProperty(this, propertyXML, child, null);
         return child;
     }
 
@@ -1936,7 +1998,7 @@ public abstract class DataObjectImpl
         // checkOppositeUniqueObjectConstraint not required
         DataObject child = getDataFactoryImpl().createChild(this, propertyName, type);
         PropertyXML prop = PropertyImpl.getPropertyXML(getProperty(propertyName));
-        setOppositeProperty(this, prop, child);
+        setOppositeProperty(this, prop, child, null);
         return child;
     }
 
@@ -1946,7 +2008,7 @@ public abstract class DataObjectImpl
         PropertyXML prop = PropertyImpl.getPropertyXML((Property)getType().getProperties().get(propertyIndex));
         // checkOppositeUniqueObjectConstraint not required
         DataObject child = getDataFactoryImpl().createChild(this, propertyIndex, type);
-        setOppositeProperty(this, prop, child);
+        setOppositeProperty(this, prop, child, null);
         return child;
     }
 
@@ -1955,7 +2017,7 @@ public abstract class DataObjectImpl
         PropertyXML propertyXML = PropertyImpl.getPropertyXML(property);
         // checkOppositeUniqueObjectConstraint not required
         DataObject child = getDataFactoryImpl().createChild(this, propertyXML, _sdoContext.getTypeSystem().getTypeXML(type));
-        setOppositeProperty(this, propertyXML, child);
+        setOppositeProperty(this, propertyXML, child, null);
         return child;
     }
 
@@ -2200,7 +2262,7 @@ public abstract class DataObjectImpl
         // checkOppositeUniqueObjectConstraint not required
         DataObjectXML child = _sdoContext.getBindingSystem().createChildForDataObject(this, propertyXML, propertyXML.getTypeXML(), prefix, substitution);
 
-        setOppositeProperty(this, propertyXML, child);
+        setOppositeProperty(this, propertyXML, child, null);
 
         return child;
     }
@@ -2210,7 +2272,7 @@ public abstract class DataObjectImpl
         // checkOppositeUniqueObjectConstraint not required
         DataObjectXML child = _sdoContext.getBindingSystem().createChildForDataObject(this, propertyXML, typeXML, prefix, substitution);
 
-        setOppositeProperty(this, propertyXML, child);
+        setOppositeProperty(this, propertyXML, child, null);
 
         return child;
     }
@@ -2218,8 +2280,9 @@ public abstract class DataObjectImpl
     public void setXML(PropertyXML propertyXML, Object value, String prefix, PropertyXML substitution)
     {
         checkOppositeUniqueObjectConstraint(this, propertyXML, value);
+        Object oldOppositeObject = getOldValueForOppositeSet(propertyXML, value);
         getStore().storeSet(propertyXML, value, prefix, substitution);
-        setOppositeProperty(this, propertyXML, value);
+        setOppositeProperty(this, propertyXML, value, oldOppositeObject);
     }
 
     // methods used for SDOList implementation
@@ -2228,7 +2291,7 @@ public abstract class DataObjectImpl
     {
         checkOppositeUniqueObjectConstraint(this, propertyXML, value);
         boolean result = getStore().storeAddNew(propertyXML, value, prefix, substitution);
-        setOppositeProperty(this, propertyXML, value);
+        setOppositeProperty(this, propertyXML, value, null);
         return result;
     }
 
@@ -2237,7 +2300,7 @@ public abstract class DataObjectImpl
     {
         checkOppositeUniqueObjectConstraint(this, property, value);
         boolean result = getStore().storeSequenceAddNew(sequenceIndex, property, value, prefix, substitution);
-        setOppositeProperty(this, property, value);
+        setOppositeProperty(this, property, value, null);
         return result;
     }
 
@@ -2249,7 +2312,7 @@ public abstract class DataObjectImpl
         unsetOppositePropertySeq(this, oldProperty, oldValue);
 
         getStore().storeSequenceSet(sequenceIndex, value);
-        setOppositeProperty(this, property, value);
+        setOppositeProperty(this, property, value, null);
     }
 
     protected void sequenceUnset(PropertyXML property, int sequenceIndex)
@@ -2321,7 +2384,7 @@ public abstract class DataObjectImpl
     }
 
     // protected methods
-    protected void setOppositeProperty(DataObjectXML parent, PropertyXML prop, Object value)
+    protected void setOppositeProperty(DataObjectXML parent, PropertyXML prop, Object newValue, Object oldValue)
     {
         if (_ignoreOpposites)
             return;
@@ -2330,11 +2393,11 @@ public abstract class DataObjectImpl
             return;
 
         PropertyXML oppositeProp = prop.getOppositeXML();
-        if (oppositeProp==null || value==null)
+        if (oppositeProp==null)
             return;
 
         // check constraint
-        assert value instanceof DataObject : "Properties that are bidirectional require type.dataType=false";
+        assert newValue==null || newValue instanceof DataObject : "Properties that are bidirectional require type.dataType=false";
         // check constraint
         assert !(prop.isContainment() && oppositeProp.isContainment()) : "Properties that are bidirectional require that no more than one end has containment=true";
         // check constraint
@@ -2344,28 +2407,84 @@ public abstract class DataObjectImpl
             (prop.isContainment() && !oppositeProp.isMany()) || (oppositeProp.isContainment() && !prop.isMany()) :
             "Properties that are bidirectional with containment require that the noncontainment Property has many=false.";
 
-        // we're using the Store here to avoid
-        Store valueStore = (Store)value;
-        if ( oppositeProp.isContainment() && oppositeProp.isMany() )
-        {
-            //expensive constraint check: Values of bidirectional Properties with many=true must be unique objects within the same list.
-            //checkUniqueObjectsConstraint(valueStore, oppositeProp, (Store)parent);
+        // we're using the Store here to avoid recursivity
 
-            valueStore.storeAddNew(oppositeProp, parent);
+        if (newValue ==null)
+        {
+            if (oldValue!=null)
+            {
+                if ( !prop.isMany() )
+                {
+                    if ( oppositeProp.isNullable() )
+                        ((Store)oldValue).storeSet(oppositeProp, newValue /*i.e. null*/);
+                    else
+                        ((Store)oldValue).storeUnset(oppositeProp);
+                }
+                else
+                {
+                    // this is the case when the entire list is to be set to null
+                    // need to null or unset all objests' oposite properties pointing to parent
+                    List<DataObjectXML> listOfPropValues = (List<DataObjectXML>)oldValue;
+                    for ( DataObjectXML itemInListOfPropValues : listOfPropValues )
+                    {
+                        if (itemInListOfPropValues == null )
+                            continue;
+                        
+                        // and since prop.isMany(), oppositeProp must be !isMany() so we can just set or unset it directly
+                        assert !oppositeProp.isMany(); 
+                        if ( oppositeProp.isNullable() )
+                            ((Store)itemInListOfPropValues).storeSet(oppositeProp, newValue /*i.e. null*/);
+                        else
+                            ((Store)itemInListOfPropValues).storeUnset(oppositeProp);
+                    }
+                }
+            }
         }
         else
-            if (!oppositeProp.isMany())
-                valueStore.storeSet(oppositeProp, parent);
-            else
+        {
+            Store valueStore = (Store) newValue;
+            if ( oppositeProp.isContainment() && oppositeProp.isMany() )
             {
-                List li = (List)valueStore.storeGet(oppositeProp);
-                if (li.contains(parent))
-                    return;
-                else
-                    valueStore.storeAddNew(oppositeProp, parent);
-            }
+                //expensive constraint check: Values of bidirectional Properties with many=true must be unique objects within the same list.
+                //checkUniqueObjectsConstraint(valueStore, oppositeProp, (Store)parent);
 
-        assert assertOppositeProperties((Store)parent, prop, valueStore) : "Opposite property not set corectly.";
+                valueStore.storeAddNew(oppositeProp, parent);
+            }
+            else
+                if (!oppositeProp.isMany())
+                    valueStore.storeSet(oppositeProp, parent);
+                else
+                {
+                    List li = (List)valueStore.storeGet(oppositeProp);
+                    if (li.contains(parent))
+                        return;
+                    else
+                        valueStore.storeAddNew(oppositeProp, parent);
+                }
+
+            assert assertOppositeProperties((Store)parent, prop, valueStore) : "Opposite property not set corectly.";
+        }
+    }
+
+    /**
+     * Only if newValue is null and prop has opposite prop returns the old object
+     * else null
+     */
+    private Object getOldValueForOppositeSet(PropertyXML propXml, Object newValue)
+    {
+        if (newValue != null)
+            return null;
+
+        if ( propXml.getOppositeXML() == null )
+            return null;
+
+        if ( !propXml.isMany() )
+            return getStore().storeGet(propXml);
+        else
+        {   // same thing but this will be a list
+            List oldValueList = (List)(getStore().storeGet(propXml));
+            return new ArrayList(oldValueList); //make a copy of live list
+        }
     }
 
     private static boolean assertOppositeProperties(Store dObjStore, PropertyXML prop, Store oppoStore)
@@ -2401,6 +2520,9 @@ public abstract class DataObjectImpl
         if (prop.getOppositeXML()==null)
             return;
 
+        if ( value == null )
+            return; // do nothing
+
         // value can be a DataObject or a list if it has an opposite prop
         if (value instanceof Store)
         {
@@ -2432,7 +2554,7 @@ public abstract class DataObjectImpl
             }
         }
         else
-            throw new IllegalStateException("Unhandled instance type.");
+            throw new IllegalStateException("Unhandled instance type: " + (value != null ? value.getClass() : value ));
     }
 
     private static void checkUniqueObjectsConstraint(Store dObjStore, PropertyXML prop, Store oppoStore)

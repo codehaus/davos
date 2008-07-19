@@ -22,6 +22,8 @@ import javax.sdo.helper.*;
 
 import junit.framework.*;
 import common.BaseTest;
+import davos.sdo.impl.type.BuiltInTypeSystem;
+import davos.sdo.PropertyXML;
 
 /**
  * @author Wing Yew Poon
@@ -40,14 +42,17 @@ public class XSDHelperTest extends BaseTest
         suite.addTest(new XSDHelperTest("testType"));
         suite.addTest(new XSDHelperTest("testProperty"));
         suite.addTest(new XSDHelperTest("testDefineAndGenerate"));
+        suite.addTest(new XSDHelperTest("testDuplicateDefine"));
         suite.addTest(new XSDHelperTest("testGenerate"));
         suite.addTest(new XSDHelperTest("testGenerateComplexType"));
         suite.addTest(new XSDHelperTest("testGenerateSequenced1"));
         suite.addTest(new XSDHelperTest("testGenerateSequenced2"));
+        suite.addTest(new XSDHelperTest("testGenerateNonSequenced"));
         suite.addTest(new XSDHelperTest("testGlobalProperty"));
         suite.addTest(new XSDHelperTest("testCompositeNames"));
         suite.addTest(new XSDHelperTest("testGenerateWithNSToSLMap"));
         suite.addTest(new XSDHelperTest("testAppinfo"));
+        suite.addTest(new XSDHelperTest("testNoNamespace"));
         
         // or
         //TestSuite suite = new TestSuite(XSDHelperTest.class);
@@ -71,6 +76,7 @@ public class XSDHelperTest extends BaseTest
     private static XSDHelper xsdHelper = context.getXSDHelper();
     private static Type simpleType;
     private static Type sequencedType;
+    private static Type openNotSequencedType;
     static String testURI = "http://www.bea.com/test/xsd";
     static Type booleanType = typeHelper.getType("commonj.sdo", "Boolean");
     static Type intType = typeHelper.getType("commonj.sdo", "Int");
@@ -111,6 +117,16 @@ public class XSDHelperTest extends BaseTest
         stringProperty3.set("name", "s3");
         stringProperty3.set("type", stringType);
         sequencedType = typeHelper.define(prototype2);
+
+        // initialize (define) open, but not sequenced, type
+        DataObject prototype3 = factory.create("commonj.sdo", "Type");
+        prototype3.set("uri", testURI);
+        prototype3.set("name", "OpenNotSequencedType");
+        prototype3.setBoolean("open", true);
+        DataObject intProperty1 = prototype3.createDataObject("property");
+        intProperty1.set("name", "i1");
+        intProperty1.set("type", intType);
+        openNotSequencedType = typeHelper.define(prototype3);
 
         // load annotations.xsd types
         File resourceFile = new File(RESOURCES + S + "sdocomp" + S +
@@ -159,14 +175,14 @@ public class XSDHelperTest extends BaseTest
         assertEquals("ShirtType", xsdHelper.getLocalName(t1));
         assertEquals("ItemsType", xsdHelper.getLocalName(t2a));
         assertEquals("FormLetter", xsdHelper.getLocalName(t2b));
-        assertNull(xsdHelper.getLocalName(t3));
-        assertNull(xsdHelper.getLocalName(t4));
+        assertEquals("SimpleType", xsdHelper.getLocalName(t3));
+        assertEquals("SequencedType", xsdHelper.getLocalName(t4));
         // is mixed
         assertFalse(xsdHelper.isMixed(t1));
         assertFalse(xsdHelper.isMixed(t2a));
         assertTrue(xsdHelper.isMixed(t2b));
-        assertFalse(xsdHelper.isMixed(t3)); // no information
-        assertFalse(xsdHelper.isMixed(t4)); // no information
+        assertFalse(xsdHelper.isMixed(t3));
+        assertTrue(xsdHelper.isMixed(t4));
         assertFalse(((davos.sdo.TypeXML)t3).isMixedContent());
         assertTrue(((davos.sdo.TypeXML)t4).isMixedContent());
     }
@@ -186,8 +202,8 @@ public class XSDHelperTest extends BaseTest
         assertEquals("orderDate", xsdHelper.getLocalName(p02));
         assertEquals("color", xsdHelper.getLocalName(p1));
         assertEquals("id", xsdHelper.getLocalName(p2));
-        assertNull(xsdHelper.getLocalName(p3));
-        assertNull(xsdHelper.getLocalName(p4));
+        assertEquals("string", xsdHelper.getLocalName(p3));
+        assertEquals("time", xsdHelper.getLocalName(p4));
         // namespace uri
         assertEquals("http://www.example.com/choice", xsdHelper.getNamespaceURI(p1));
         assertEquals("http://www.example.com/choice", xsdHelper.getNamespaceURI(p2));
@@ -196,13 +212,13 @@ public class XSDHelperTest extends BaseTest
         // is attribute
         assertFalse(xsdHelper.isAttribute(p1));
         assertTrue(xsdHelper.isAttribute(p2));
-        assertFalse(xsdHelper.isAttribute(p3)); // no information
-        assertFalse(xsdHelper.isAttribute(p4)); // no information
+        assertTrue(xsdHelper.isAttribute(p3));
+        assertTrue(xsdHelper.isAttribute(p4));
         // is element
         assertTrue(xsdHelper.isElement(p1));
         assertFalse(xsdHelper.isElement(p2));
-        assertFalse(xsdHelper.isElement(p3)); // no information
-        assertFalse(xsdHelper.isElement(p4)); // no information
+        assertFalse(xsdHelper.isElement(p3));
+        assertFalse(xsdHelper.isElement(p4));
     }
 
     private static final String APPINFO_START_FRAG = "<xs:appinfo";
@@ -369,6 +385,64 @@ public class XSDHelperTest extends BaseTest
         
     }
 
+    public void testDuplicateDefine() throws Exception
+    {
+        File f0 = getResourceFile("type", "duplicate_define0.xsd_");
+        Reader r0 = new FileReader(f0);
+        List types0 = xsdHelper.define(r0, f0.toURL().toString());
+        r0.close();
+        assertEquals(2, types0.size());
+        Type t1 = (Type)types0.get(0);
+        System.out.println(t1);
+        Type t2 = (Type)types0.get(1);
+        System.out.println(t2);
+        assertEquals("http://sdo/test/duplicate_define", t1.getURI());
+        assertEquals("http://sdo/test/duplicate_define", t2.getURI());
+        // it's not clear what order the types are found,
+        // so we do the following
+        boolean quoteFound = false;
+        boolean sideFound = false;
+        if (t1.getName().equals("Quote")) quoteFound = true;
+        if (t2.getName().equals("Quote")) quoteFound = true;
+        if (t1.getName().equals("Side")) sideFound = true;
+        if (t2.getName().equals("Side")) sideFound = true;
+        assertTrue(quoteFound);
+        assertTrue(sideFound);
+
+        // define again using xsd containing t1, t2, and in addition, t3
+        File f1 = getResourceFile("type", "duplicate_define1.xsd_");
+        Reader r1 = new FileReader(f1);
+        List types1 = xsdHelper.define(r1, f1.toURL().toString());
+        r1.close();
+        // types1 contains only t3
+        assertEquals(1, types1.size());
+        Type t3 = (Type)types1.get(0);
+        System.out.println(t3);
+        assertEquals("http://sdo/test/duplicate_define", t3.getURI());
+        assertEquals("Order", t3.getName());
+        Type t3a = typeHelper.getType("http://sdo/test/duplicate_define", "Order");
+        assertTrue(t3 == t3a);
+        List t3aprops = t3a.getProperties();
+        assertEquals(2, t3aprops.size());
+        assertEquals("quote", ((Property)t3aprops.get(0)).getName());
+        assertEquals("quantity", ((Property)t3aprops.get(1)).getName());
+
+        // define again using xsd containing t1, t1, and a modified t3
+        File f2 = getResourceFile("type", "duplicate_define2.xsd_");
+        Reader r2 = new FileReader(f2);
+        List types2 = xsdHelper.define(r2, f2.toURL().toString());
+        r2.close();
+        // this define should be a no-op
+        assertEquals(0, types2.size());
+        Type t3b = typeHelper.getType("http://sdo/test/duplicate_define", "Order");
+        assertTrue(t3 == t3b);
+        List t3bprops = t3b.getProperties();
+        assertEquals(2, t3bprops.size());
+        assertEquals("quote", ((Property)t3bprops.get(0)).getName());
+        // duplicate xsd has "qty" instead of "quantity", but t3 should not have changed
+        assertEquals("quantity", ((Property)t3bprops.get(1)).getName());
+    }
+
     /* a simple case of a dynamically defined complex type
        - attributes only (unqualified)
     */
@@ -426,8 +500,19 @@ public class XSDHelperTest extends BaseTest
         loadedTypes.add(sequencedType);
         String xsd1 = xsdHelper.generate(loadedTypes);
         System.out.println(xsd1);
-        //String xsd = getXML(getResourceFile("type", "sequenced_dynamic.xsd_")).trim();
-        //assertEquals(xsd, xsd1);
+        String xsd = getXML(getResourceFile("type", "sequenced_dynamic.xsd_")).trim();
+        assertEquals(xsd, xsd1);
+    }
+
+    /* dynamically defined open type, not sequenced */
+    public void testGenerateNonSequenced() throws Exception
+    {
+        List<Type> types = new ArrayList<Type>();
+        types.add(openNotSequencedType);
+        String xsdl = xsdHelper.generate(types);
+        System.out.println(xsdl);
+        String xsd = getXML(getResourceFile("type", "open_notsequenced_dynamic.xsd_")).trim();
+        assertEquals(xsd, xsdl);
     }
 
     public void testCompositeNames() throws Exception
@@ -459,5 +544,64 @@ public class XSDHelperTest extends BaseTest
         w.write(xsd);
         w.close();
         compareXMLFiles(getResourceFile("type", "cbv_gen2.xsd_"), f);
+    }
+
+    public void testNoNamespace() throws Exception
+    {
+        // Check that passing "" or null as parameter finds a global element with no namespace URI
+        Property globalNoNSElem = xsdHelper.getGlobalProperty("", "catalog4", true);
+        assertNotNull(globalNoNSElem);
+        assertEquals("catalog4", globalNoNSElem.getType().getName());
+        globalNoNSElem = xsdHelper.getGlobalProperty(null, "catalog4", true);
+        assertNotNull(globalNoNSElem);
+        assertEquals("catalog4", globalNoNSElem.getType().getName());
+        // Check that getNamespaceURI(property) returns "" if the property has the default ns URI
+        assertEquals("", xsdHelper.getNamespaceURI(globalNoNSElem));
+        // Check that type.getURI() returns null for a type with no namespace URI
+        assertNull(globalNoNSElem.getType().getURI());
+        // Check that TypeHelper interprets "" or null as meaning a property/type with no
+        // namespace when doing look-ups
+        Type catalogType = typeHelper.getType(null, "catalog4");
+        assertNotNull(catalogType);
+        assertEquals(1, catalogType.getProperties().size());
+        catalogType =  typeHelper.getType("", "catalog4");
+        assertNotNull(catalogType);
+        assertEquals(1, catalogType.getProperties().size());
+        globalNoNSElem = typeHelper.getOpenContentProperty(null, "catalog4");
+        assertNotNull(globalNoNSElem);
+        assertEquals("catalog4", globalNoNSElem.getType().getName());
+        globalNoNSElem = typeHelper.getOpenContentProperty("", "catalog4");
+        assertNotNull(globalNoNSElem);
+        assertEquals("catalog4", globalNoNSElem.getType().getName());
+        DataObject o = factory.create(null, "catalog4");
+        assertSame(o.getType(), catalogType);
+        o = factory.create("", "catalog4");
+        assertSame(o.getType(), catalogType);
+        // Check that calling TypeHelper.defineOpenContentProperty() will create an on-demand
+        // open-content property if the URI passed in is null and a global property with empty URI
+        // if the URI passed in is ""
+        DataObject propAsDO = factory.create(BuiltInTypeSystem.PROPERTY);
+        propAsDO.set("name", "XSDHelperTest.testNoNamespace.Prop1");
+        propAsDO.set("type", BuiltInTypeSystem.STRING);
+        propAsDO.set(BuiltInTypeSystem.P_PROPERTY_XMLELEMENT, true);
+        PropertyXML onDemandProp = (PropertyXML) typeHelper.defineOpenContentProperty(null, propAsDO);
+        assertTrue(onDemandProp.isXMLElement());
+        assertTrue(onDemandProp.isDynamic());
+        assertFalse(onDemandProp.isGlobal());
+        assertNull(typeHelper.getOpenContentProperty(null, "XSDHelperTest.testNoNamespace.Prop1"));
+        propAsDO.set("name", "XSDHelperTest.testNoNamespace.Prop2");
+        onDemandProp = (PropertyXML) typeHelper.defineOpenContentProperty("", propAsDO);
+        assertTrue(onDemandProp.isXMLElement());
+        assertTrue(onDemandProp.isDynamic());
+        assertTrue(onDemandProp.isGlobal());
+        assertNotNull(typeHelper.getOpenContentProperty(null, "XSDHelperTest.testNoNamespace.Prop2"));
+        // Check that if the "uri" property on a Type DataObject is set to "", after TypeHelper.define
+        // the getURI() methods will return null for consistency
+        DataObject typeAsDO = factory.create(BuiltInTypeSystem.TYPE);
+        typeAsDO.set("uri", "");
+        typeAsDO.set("name", "XSDHelperTest.testNoNamespace.Type1");
+        Type definedType = typeHelper.define(typeAsDO);
+        assertNull(definedType.getURI());
+        assertEquals("XSDHelperTest.testNoNamespace.Type1", definedType.getName());
     }
 }

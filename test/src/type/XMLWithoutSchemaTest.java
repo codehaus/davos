@@ -128,7 +128,7 @@ public class XMLWithoutSchemaTest extends BaseTest
         assertNotNull(system);
         ct = system.getContainingType();
         //assertEquals("DocumentRoot", ct.getName());
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
         Property code = getPropertyByName(subproperties, "code");
         assertNotNull(code);
         ct = code.getContainingType();
@@ -175,17 +175,17 @@ public class XMLWithoutSchemaTest extends BaseTest
 
         Type ct = p1.getContainingType();
         //assertEquals("DocumentRoot", ct.getName());
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
         ct = p2.getContainingType();
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
         ct = p3.getContainingType();
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
         ct = p4.getContainingType();
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
         ct = p5.getContainingType();
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
         ct = p6.getContainingType();
-        assertEquals("", ct.getURI());
+        assertNull(ct.getURI());
 
         Object st1 = root.get("st1[1]");
         assertTrue(st1 instanceof String);
@@ -329,7 +329,7 @@ public class XMLWithoutSchemaTest extends BaseTest
         assertEquals("b", b2.getName());
         assertTrue(((PropertyXML)b2).isXMLElement());
         assertEquals("", ((PropertyXML)b2).getXMLNamespaceURI());
-        assertEquals("", b2.getContainingType().getURI());
+        assertNull(b2.getContainingType().getURI());
         assertEquals(T_DATAOBJECT, b2.getType());
         Object b2val = aseq.getValue(1);
         assertTrue(b2val instanceof DataObject);

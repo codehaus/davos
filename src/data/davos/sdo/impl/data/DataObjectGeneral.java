@@ -717,7 +717,7 @@ public class DataObjectGeneral
 
     public static void clearContainer(Object value, Property property)
     {
-        if (property!=null && property.isContainment())
+        if (property!=null && property.isContainment() && value!=null)
             ((DataObjectImpl)value).clearContainer();
     }
 
@@ -1260,8 +1260,11 @@ public class DataObjectGeneral
             unsetOppositePropertySingle(_dataObject, oldProp, oldValue);
 
             checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
-            _dataObject.storeSequenceSet(index, value);
-            setOppositeProperty(_dataObject, prop, value);
+            if (_dataObject.storeSequenceSize()==0)
+                _dataObject.storeSequenceAddNew(0, prop, value, null, null);
+            else
+                _dataObject.storeSequenceSet(index, value);
+            setOppositeProperty(_dataObject, prop, value, null);
             return  oldValue;
         }
 
@@ -1289,7 +1292,7 @@ public class DataObjectGeneral
         {
             checkOppositeUniqueObjectConstraint(_dataObject, property, value);
             boolean rezult = _dataObject.storeAddNew(property, value, prefix, substitution);
-            setOppositeProperty(_dataObject, property, value);
+            setOppositeProperty(_dataObject, property, value, null);
             return rezult;
         }
 
@@ -1310,7 +1313,7 @@ public class DataObjectGeneral
             PropertyXML prop = PropertyImpl.getPropertyXML(property);
             checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
             _dataObject.storeSequenceAddNew(index, prop, value, null, prop);
-            setOppositeProperty(_dataObject, prop, value);
+            setOppositeProperty(_dataObject, prop, value, null);
         }
 
         public void remove(int index)
@@ -1318,7 +1321,6 @@ public class DataObjectGeneral
             Object value = getValue(index);
             PropertyXML prop = getPropertyXML(index);
             _dataObject.storeSequenceUnset(index);
-            //unsetOppositePropertySingle(_dataObject, prop, value);
             unsetOppositePropertySeq(_dataObject, prop, value);
         }
 
