@@ -253,8 +253,8 @@ public class DataObjectGeneral
 
             private DataObjectGeneral _dataObjGen;
             private PropertyXML _property;
-            private int _dogIndex;
-            private int _index;  // the index of this iterator
+            private int _dogIndex;                  // index in DataObjectGeneral
+            private int _index;                     // the index of this iterator
             private int _expectedVersion;
 
             SDOListIterator(DataObjectGeneral dataObjGen, PropertyXML property)
@@ -410,7 +410,15 @@ public class DataObjectGeneral
             {
                 ensureVersion();
 
-                _dataObjGen.sequenceAddNew(_property, _dogIndex + 1, o, null, _property);
+                if ( hasNext() )
+                {
+                    int i = findNext();
+                    _dataObjGen.sequenceAddNew(_property, i , o, null, _property);
+                }
+                else
+                {
+                    _dataObjGen.sequenceAddNew(_property, _dogIndex + 1, o, null, _property);
+                }
 
                 recordVersion();
             }
@@ -718,7 +726,8 @@ public class DataObjectGeneral
     public static void clearContainer(Object value, Property property)
     {
         if (property!=null && property.isContainment() && value!=null)
-            ((DataObjectImpl)value).clearContainer();
+            if ( value instanceof DataObjectImpl)
+                ((DataObjectImpl)value).clearContainer();
     }
 
     public static void detachValueIfContainment(Object value, Property property)
@@ -1279,7 +1288,7 @@ public class DataObjectGeneral
 
         public boolean add(int propertyIndex, Object value)
         {
-            return add(Common.getProperty(_dataObject.getType(), propertyIndex), value);
+            return add(Common.getProperty(_dataObject, propertyIndex), value);
         }
 
         public boolean add(Property property, Object value)

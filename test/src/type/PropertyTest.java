@@ -39,6 +39,7 @@ public class PropertyTest extends MetaDataTest
         
         TestSuite suite = new TestSuite();
         suite.addTest(new PropertyTest("testXmlElement"));
+        suite.addTest(new PropertyTest("testXmlElement2"));
         suite.addTest(new PropertyTest("testInstanceProperties"));
         suite.addTest(new PropertyTest("testInstanceProperties2"));
         
@@ -71,6 +72,13 @@ public class PropertyTest extends MetaDataTest
         // xmlElement is a static field defined in the superclass
         assertNotNull(xmlElement);
         assertEquals(booleanType, xmlElement.getType());
+    }
+
+    public void testXmlElement2()
+    {
+        Property xmlElement2 = xsdHelper.getGlobalProperty("commonj.sdo/xml", "xmlElement", false);
+        assertNotNull(xmlElement2);
+        assertEquals(booleanType, xmlElement2.getType());
     }
 
     /* test instance properties of properties, of dynamically defined type */

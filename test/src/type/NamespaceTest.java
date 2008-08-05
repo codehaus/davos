@@ -191,10 +191,10 @@ public class NamespaceTest extends BaseTest
         List productList = (List)product;
         assertEquals(1, productList.size());
         DataObject product1 = (DataObject)productList.get(0);
-        Type productType = typeHelper.getType("", "product3");
+        Type productType = typeHelper.getType("", "catalog3$product3");
         assertEquals(productType, product1.getType());
         assertEquals("X", product1.get("name"));
-        Type productType2 = typeHelper.getType(null, "product3");
+        Type productType2 = typeHelper.getType(null, "catalog3$product3");
         assertTrue(productType == productType2);
     }
 

@@ -94,7 +94,7 @@ public final class Schema2SDO
     private static final int MANY_FALSE = 2;
 
     // What kind of naming strategy for types we employ by default
-    /*package*/static final int DEFAULT_TYPE_NAMING = Options.NAMES_STANDARD;
+    /*package*/static final int DEFAULT_TYPE_NAMING = Options.NAMES_COMPOSITE;
     private static final char TYPE_NAME_SEPARATOR_ELEMENT = '$';
     private static final char TYPE_NAME_SEPARATOR_ATTRIBUTE = '@';
 

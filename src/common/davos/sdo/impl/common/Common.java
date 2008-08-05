@@ -25,6 +25,7 @@ import org.apache.xmlbeans.SchemaType;
 
 import davos.sdo.TypeXML;
 import davos.sdo.PropertyXML;
+import davos.sdo.DataObjectXML;
 
 /**
  * @author Cezar Andrei (cezar dot andrei at gmail dot com)
@@ -43,6 +44,11 @@ public class Common
     public static PropertyXML getProperty(Type type, int propertyIndex)
     {
         return (PropertyXML)type.getProperties().get(propertyIndex);
+    }
+
+    public static PropertyXML getProperty(DataObjectXML dObj, int propertyIndex)
+    {
+        return dObj.getInstancePropertiesXML().get(propertyIndex);
     }
 
     public static int getBuiltinTypeCode(SchemaType type)

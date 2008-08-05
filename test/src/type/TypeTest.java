@@ -44,6 +44,7 @@ public class TypeTest extends MetaDataTest
         suite.addTest(new TypeTest("testBaseTypesNone"));
         suite.addTest(new TypeTest("testProperties"));
         suite.addTest(new TypeTest("testJavaClass"));
+        suite.addTest(new TypeTest("testJavaClass2"));
         suite.addTest(new TypeTest("testInstanceProperties"));
         suite.addTest(new TypeTest("testMarshalAndUnmarshal"));
         
@@ -187,6 +188,13 @@ public class TypeTest extends MetaDataTest
         // javaClass is a static field defined in the superclass
         assertNotNull(javaClass);
         assertEquals(stringType, javaClass.getType());
+    }
+
+    public void testJavaClass2()
+    {
+        Property javaClass2 = xsdHelper.getGlobalProperty("commonj.sdo/java", "javaClass", false);
+        assertNotNull(javaClass2);
+        assertEquals(stringType, javaClass2.getType());
     }
 
     /* test metadata on the metadata */

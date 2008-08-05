@@ -343,7 +343,7 @@ public class ListBugTest extends DataTest
         list2.add("wfirst");
         list2.add("wsecond");
 //        list.set(1, null); // not possible
-        //dobj.set("w[2]", "wthird"); // BUG: ClassCastException
+        dobj.set("w[2]", "wthird"); 
 
         System.out.println(list2);
 

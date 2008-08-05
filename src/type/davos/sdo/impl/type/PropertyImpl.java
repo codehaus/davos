@@ -495,8 +495,10 @@ public class PropertyImpl
 
         Property p = (Property)o;
 
-        return getName().equals(p.getName()) && getContainingType().equals(p.getContainingType()) &&
-            getType().equals(p.getType());
+        return getName().equals(p.getName()) &&
+            ( ( getContainingType()==null && p.getContainingType()==null ) ||
+              ( getContainingType().equals(p.getContainingType()) && getType().equals(p.getType()) )
+            );
     }
 
     public int hashCode()

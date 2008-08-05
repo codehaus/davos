@@ -267,7 +267,7 @@ public class TypeHelperImpl
         }
 
         boolean isDynamic = isGlobal;
-        boolean isIndeedGlobal = isGlobal; //isGlobal && containingTypeUri == null ? false : true;
+        boolean isIndeedGlobal = isGlobal && containingTypeUri != null;
 
         declaredProp.initMutable( propType, propName, propMany, propContainment, containingType,
             propDefault, propReadOnly, propNullable, propOpposite, propAliasNames, isIndeedGlobal, isDynamic);
@@ -554,7 +554,24 @@ normal rules for serializing a ChangeSummary.
             containingType.makeImmutable();
 
         if ( uri != null )
-            ((TypeSystemBase)_sdoContext.getTypeSystem()).addGlobalProperty(result);
+        {
+            // check to see if a property with this name already exists
+            PropertyXML existingProp =
+                _sdoContext.getBindingSystem().loadGlobalPropertyByTopLevelElemQName(uri, propName);
+            if (existingProp==null )
+                existingProp =
+                    _sdoContext.getBindingSystem().loadGlobalPropertyByTopLevelAttrQName(uri, propName);
+
+            if ( existingProp==null )
+                ((TypeSystemBase)_sdoContext.getTypeSystem()).addGlobalProperty(result);
+            else
+            {
+                if ( !existingProp.getType().equals(result.getType()) )
+                    throw new IllegalArgumentException("Redefinition o property '" + result + "' with a different type is not allwed.");
+
+                result = existingProp;
+            }
+        }
 
         return result;
     }
