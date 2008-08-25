@@ -73,15 +73,19 @@ public class OpenContentTest extends MetaDataTest
         suite.addTest(new OpenContentTest("testSetOnDemand7"));
         suite.addTest(new OpenContentTest("testSetOnDemand8"));
         suite.addTest(new OpenContentTest("testSetOnDemand9"));
+        suite.addTest(new OpenContentTest("testSetOnDemand9b"));
         suite.addTest(new OpenContentTest("testSetOnDemand10"));
         suite.addTest(new OpenContentTest("testSetOnDemand11"));
+        
         suite.addTest(new OpenContentTest("testAddToSequenceOnDemand1"));
         suite.addTest(new OpenContentTest("testAddToSequenceOnDemand2"));
         suite.addTest(new OpenContentTest("testAddToSequenceOnDemand3"));
+        
         suite.addTest(new OpenContentTest("testCreateDataObjectOnDemand1"));
         suite.addTest(new OpenContentTest("testCreateDataObjectOnDemand2"));
         
         suite.addTest(new OpenContentTest("testGetListOnDemand1"));
+        suite.addTest(new OpenContentTest("testGetListOnDemand1b"));
         
         suite.addTest(new OpenContentTest("testUnmarshalKnownOpenContentAttribute"));
         suite.addTest(new OpenContentTest("testUnmarshalUnknownOpenContentAttribute"));
@@ -698,6 +702,7 @@ public class OpenContentTest extends MetaDataTest
         catch (Exception e)
         {
             System.out.println(e.getMessage());
+            // "Property 'open' not allowed on this type: sdoType C@http://sdo/test/opencontent"
             assertTrue(e instanceof IllegalArgumentException);
             String msg = e.getMessage();
             int i = msg.indexOf("Property");
@@ -725,7 +730,13 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        // no xsi:type written for o (property type is String)
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o>open content</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is an Integer
@@ -738,7 +749,7 @@ public class OpenContentTest extends MetaDataTest
         a.set("o", new Integer(100));
         Property p = a.getInstanceProperty("o");
         assertTrue(p.isOpenContent());
-        assertEquals(intObjectType, p.getType());
+        assertEquals(intObjectType, p.getType()); // would be better if it were intType; but this needs spec amendment/clarification
         assertFalse(p.isContainment());
         assertFalse(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
@@ -747,7 +758,12 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">100</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a (typed) DataObject, not contained
@@ -774,7 +790,15 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a DataObject, contained
@@ -804,7 +828,16 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "    <r>#/open:a/o</r>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a List, homogeneous contents
@@ -819,7 +852,7 @@ public class OpenContentTest extends MetaDataTest
         a.set("o", l);
         Property p = a.getInstanceProperty("o");
         assertTrue(p.isOpenContent());
-        assertEquals(intObjectType, p.getType());
+        assertEquals(intObjectType, p.getType()); // would be better if it were intType; but this needs spec amendment/clarification
         assertFalse(p.isContainment());
         assertTrue(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
@@ -827,7 +860,14 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1</o>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">2</o>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">3</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a List, heterogeneous contents (simple types)
@@ -850,15 +890,24 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1</o>" + newline +
+            "    <o>two</o>" + newline +
+            "    <o xsi:type=\"xs:dateTime\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1970-01-01T00:00:00Z</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a Date
     public void testSetOnDemand7() throws Exception
     {
         System.out.println("testSetOnDemand7()");
+        Date dt = new Date(0l);
+        System.out.println(dt.toString());
         DataObject a = createOpenA();
-        a.set("o", new Date(0l));
+        a.set("o", dt);
         Property p = a.getInstanceProperty("o");
         assertTrue(p.isOpenContent());
         assertEquals(dateType, p.getType());
@@ -870,18 +919,130 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"xs:dateTime\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1970-01-01T00:00:00Z</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a List, homogeneous (typed DataObject)
     public void testSetOnDemand8() throws Exception
     {
+        System.out.println("testSetOnDemand8()");
+        DataObject a = createOpenA();
+        assertTrue(a.getType().isOpen());
+        Type t = typeHelper.getType("http://sdo/test/global", "SimpleType");
+        DataObject test1 = factory.create(t);
+        test1.set("x", "Extra! Extra!");
+        test1.set("y", 1000000);
+        DataObject test2 = factory.create(t);
+        test2.set("x", "Read all about it!");
+        test2.set("y", 2000000);
+        List l = new ArrayList();
+        l.add(test1);
+        l.add(test2);
+        a.set("o", l);
+        Property p = a.getInstanceProperty("o");
+        assertTrue(p.isOpenContent());
+        assertEquals(t, p.getType());
+        assertTrue(p.isContainment());
+        assertTrue(p.isMany());
+        assertNull(((PropertyXML)p).getXMLNamespaceURI());
+        StringWriter out = new StringWriter();
+        XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
+        doc.setXMLDeclaration(false);
+        xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Read all about it!</glob:x>" + newline +
+            "        <glob:y>2000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is a List, heterogeneous (includes DataObject)
     public void testSetOnDemand9() throws Exception
     {
         // property type is T_DATAOBJECT
+        System.out.println("testSetOnDemand9()");
+        DataObject a = createOpenA();
+        assertTrue(a.getType().isOpen());
+        Type t = typeHelper.getType("http://sdo/test/global", "SimpleType");
+        DataObject test = factory.create(t);
+        test.set("x", "Extra! Extra!");
+        test.set("y", 1000000);
+        List l = new ArrayList();
+        l.add(test);
+        l.add(new Integer(1));
+        l.add("xxx");
+        a.set("o", l);
+        Property p = a.getInstanceProperty("o");
+        assertTrue(p.isOpenContent());
+        assertEquals(T_DATAOBJECT, p.getType());
+        assertTrue(p.isContainment());
+        assertTrue(p.isMany());
+        assertNull(((PropertyXML)p).getXMLNamespaceURI());
+        StringWriter out = new StringWriter();
+        XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
+        doc.setXMLDeclaration(false);
+        xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1</o>" + newline +
+            "    <o xsi:type=\"xs:string\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">xxx</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
+    }
+
+    public void testSetOnDemand9b() throws Exception
+    {
+        System.out.println("testSetOnDemand9b()");
+        DataObject a = createOpenA();
+        assertTrue(a.getType().isOpen());
+        Type t = typeHelper.getType("http://sdo/test/global", "SimpleType");
+        DataObject test = factory.create(t);
+        test.set("x", "Extra! Extra!");
+        test.set("y", 1000000);
+        List l = new ArrayList();
+        l.add(new Integer(1));
+        l.add(test);
+        l.add("xxx");
+        a.set("o", l);
+        Property p = a.getInstanceProperty("o");
+        assertTrue(p.isOpenContent());
+        assertEquals(T_DATAOBJECT, p.getType());
+        assertTrue(p.isContainment());
+        assertTrue(p.isMany());
+        assertNull(((PropertyXML)p).getXMLNamespaceURI());
+        StringWriter out = new StringWriter();
+        XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
+        doc.setXMLDeclaration(false);
+        xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1</o>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "    <o xsi:type=\"xs:string\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">xxx</o>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // Object is an empty List -> no property is created
@@ -906,12 +1067,14 @@ public class OpenContentTest extends MetaDataTest
         l.add(new Integer(3));
         a.set("o", l);
         Property p = a.getInstanceProperty("o");
+        assertTrue(p.isOpenContent());
+        assertEquals(intObjectType, p.getType());
+        assertFalse(p.isContainment());
+        assertTrue(p.isMany());
+        assertNull(((PropertyXML)p).getXMLNamespaceURI());
+        assertTrue(((PropertyXML)p).isXMLElement());
         List ol = a.getList("o"); // this is a live list, l is not
-        // clearing list unsets the property
-        ol.clear();
-        assertFalse(a.isSet("o"));
-        assertFalse(a.isSet(p));
-        /* this fails right now
+        /* this doesn't work in general, not just for on-demand properties
         try
         {
             ol.add("string");
@@ -920,12 +1083,42 @@ public class OpenContentTest extends MetaDataTest
         catch (Exception e)
         {
             // check the exception
+            e.printStackTrace();
         }
         */
-        ol.add(new Integer(42));
+        // clearing list unsets the property
+        ol.clear();
+        assertFalse(a.isSet("o"));
+        assertFalse(a.isSet(p));
+        // at this point, a no longer has an instance property "o"
+        // is this correct?
+        assertNull(a.getInstanceProperty("o"));
+        // but does the open content property still exist in the types system?
+        /* this fails for same reason as above
+        try
+        {
+            ol.add("string");
+            fail("adding incompatible type should have failed");
+        }
+        catch (Exception e)
+        {
+            // check the exception
+            e.printStackTrace();
+        }
+        */
+        //ol.add(new Integer(42));
+        ol.add("xxx");
         assertTrue(a.isSet("o"));
         assertTrue(a.isSet(p));
         assertNotNull(a.getInstanceProperty("o"));
+        assertTrue(p == a.getInstanceProperty("o"));
+        System.out.println(p.getType()); // still "sdoType IntObject@javax.sdo/java"
+        //assertEquals(42, a.getInt("o[1]"));
+        StringWriter out = new StringWriter();
+        XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
+        doc.setXMLDeclaration(false);
+        xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
+        System.out.println(out.toString());
     }
 
     // 2. getSequence() and add(String, Object) or add(int, String, Object)
@@ -952,7 +1145,11 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(root, uri, "e");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:e xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <o>xxx</o>" + newline +
+            "</open:e>";
+        assertEquals(exp, out.toString());
     }
 
     public void testAddToSequenceOnDemand2() throws Exception
@@ -975,7 +1172,11 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(root, uri, "e");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:e xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <o xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">0</o>" + newline +
+            "</open:e>";
+        assertEquals(exp, out.toString());
     }
 
     public void testAddToSequenceOnDemand3() throws Exception
@@ -1003,7 +1204,16 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(root, uri, "e");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:e xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:symbol>XXX</open:symbol>" + newline +
+            "    <open:number>1000</open:number>" + newline +
+            "    <o xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </o>" + newline +
+            "</open:e>";
+        assertEquals(exp, out.toString());
     }
 
     // 3. createDataObject
@@ -1016,12 +1226,12 @@ public class OpenContentTest extends MetaDataTest
         DataObject test = a.createDataObject("t");
         Property p = a.getInstanceProperty("t");
         assertNotNull(p);
-        System.out.println(p);
         assertTrue(p.isOpenContent());
+        // type of property is SDO DataObject, type of value is BEA DataObject
         assertEquals(T_DATAOBJECT, p.getType());
+        assertEquals(T_BEADATAOBJECT, test.getType());
         assertTrue(p.isContainment());
         assertFalse(p.isMany()); 
-        System.out.println(((PropertyXML)p).getXMLNamespaceURI()); // http://sdo/test/opencontent
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
         test.set("x", "Extra! Extra!");
         test.set("y", 1000000);
@@ -1029,8 +1239,15 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
-        System.out.println(a.getInstanceProperty("t"));
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <t>" +
+            "<x>Extra! Extra!</x>" +
+            "<y xsi:type=\"xs:int\" xmlns:xs=\"" + XSD_URI + "\" xmlns:xsi=\"" + XSI_URI + "\">1000000</y>" +
+            "</t>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // typed DataObject
@@ -1042,11 +1259,10 @@ public class OpenContentTest extends MetaDataTest
         Type t1 = typeHelper.getType("http://sdo/test/global", "SimpleType");
         Property p = a.getInstanceProperty("t");
         assertNotNull(p);
-        System.out.println(p);
         assertTrue(p.isOpenContent());
         assertEquals(t1, p.getType());
         assertTrue(p.isContainment());
-        assertTrue(p.isMany());
+        assertFalse(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
         test.set("x", "Extra! Extra!");
         test.set("y", 1000000);
@@ -1054,7 +1270,15 @@ public class OpenContentTest extends MetaDataTest
         XMLDocument doc = xmlHelper.createDocument(a, "http://sdo/test/opencontent", "a");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
-        System.out.println(out.toString());
+        String exp =
+            "<open:a xmlns:open=\"http://sdo/test/opencontent\">" + newline +
+            "    <open:name>My open content object</open:name>" + newline +
+            "    <t xsi:type=\"glob:SimpleType\" xmlns:glob=\"http://sdo/test/global\" xmlns:xsi=\"" + XSI_URI + "\">" + newline +
+            "        <glob:x>Extra! Extra!</glob:x>" + newline +
+            "        <glob:y>1000000</glob:y>" + newline +
+            "    </t>" + newline +
+            "</open:a>";
+        assertEquals(exp, out.toString());
     }
 
     // 4. getList(String) and add to List
@@ -1070,32 +1294,56 @@ public class OpenContentTest extends MetaDataTest
         List openList = root.getList("t");
         assertNotNull(openList);
         assertEquals(0, openList.size());
-        Property p = root.getInstanceProperty("t");
-        System.out.println(p);
-        //Type pt = p.getType();
-        //System.out.println(pt);
+        Type t1 = typeHelper.getType("http://sdo/test/global", "SimpleType");
         DataObject test1 = factory.create("http://sdo/test/global", "SimpleType");
         test1.set("x", "Extra! Extra!");
         test1.set("y", 1000000);
         openList.add(test1);
+        Property p = root.getInstanceProperty("t");
+        assertTrue(p.isOpenContent());
+        //assertEquals(t1, p.getType()); // FAILS, is T_DATAOBJECT instead
+        assertTrue(p.isContainment());
+        assertTrue(p.isMany());
+        assertNull(((PropertyXML)p).getXMLNamespaceURI());
         DataObject test2 = factory.create("http://sdo/test/global", "SimpleType");
         test2.set("x", "More! More!");
         test2.set("y", 2000000);
         openList.add(test2);
-        System.out.println(root.getInstanceProperty("t"));
-        System.out.println(root.get("t[1]"));
-        System.out.println(root.get("t[1]/x"));
-        System.out.println(root.get("t[1]/y"));
-        System.out.println(root.get("t[2]"));
-        System.out.println(root.get("t[2]/x"));
-        System.out.println(root.get("t[2]/y"));
-        //xmlHelper.save(root, "http://sdo/test/opencontent", "d", System.out);
-        //System.out.println();
         StringWriter out = new StringWriter();
         XMLDocument doc = xmlHelper.createDocument(root, "http://sdo/test/opencontent", "d");
         doc.setXMLDeclaration(false);
         xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
         assertEquals(OPEN_Dt, out.toString());
+    }
+
+    public void testGetListOnDemand1b() throws Exception
+    {
+        System.out.println("testGetListOnDemand1b()");
+        Type t = typeHelper.getType("http://sdo/test/opencontent", "D");
+        assertTrue(t.isOpen());
+        DataObject root = factory.create(t);
+        root.set("name", "My open content object");
+        root.set("number", 2);
+        List openList = root.getList("t");
+        assertNotNull(openList);
+        assertEquals(0, openList.size());
+        Type t1 = typeHelper.getType("http://sdo/test/global", "SimpleType");
+        DataObject test1 = factory.create("http://sdo/test/global", "SimpleType");
+        test1.set("x", "Extra! Extra!");
+        test1.set("y", 1000000);
+        openList.add(test1);
+        Property p = root.getInstanceProperty("t");
+        assertTrue(p.isOpenContent());
+        //assertEquals(t1, p.getType()); // FAILS, is T_DATAOBJECT instead
+        assertTrue(p.isContainment());
+        assertTrue(p.isMany());
+        assertNull(((PropertyXML)p).getXMLNamespaceURI());
+        openList.add("incompatible type");
+        StringWriter out = new StringWriter();
+        XMLDocument doc = xmlHelper.createDocument(root, "http://sdo/test/opencontent", "d");
+        doc.setXMLDeclaration(false);
+        xmlHelper.save(doc, out, new Options().setSavePrettyPrint());
+        System.out.println(out.toString());
     }
 
     // unmarshalling xs:anyAttribute

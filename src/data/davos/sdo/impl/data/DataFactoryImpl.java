@@ -241,7 +241,7 @@ public class DataFactoryImpl
 //            prop = PropertyImpl.create(derivedPropType, propertyName, false, true,
 //                parent.getTypeXML(), null, false, true, null, Common.EMPTY_STRING_LIST,
 //                propertyName, null, SchemaType.BTC_NOT_BUILTIN /* BEADATAOBJECT has schemaType==null*/, true, true, false);
-            prop = PropertyImpl.createOnDemand( propertyName, true, !derivedPropType.isDataType(), derivedPropType);
+            prop = PropertyImpl.createOnDemand(propertyName, false, !derivedPropType.isDataType(), derivedPropType);
         }
         
         return createChild(parent, prop, derivedPropType);

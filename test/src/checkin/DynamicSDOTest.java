@@ -718,4 +718,21 @@ public class DynamicSDOTest extends BaseTest
         result &= i3 < i2;
         assertTrue(result);
     }
+
+    public void testComplexElementWithSimpleContent() 
+    {
+        String xml = "<root><name lang=\"en_US\">Adam</name></root>";
+        XMLDocument doc = XMLHelper.INSTANCE.load( xml );
+        DataObject root = doc.getRootObject();
+        Property nameProperty = root.getInstanceProperty( "name" );
+
+        assert "commonj.sdo".equals( nameProperty.getType().getURI() );
+        assert "DataObject".equals( nameProperty.getType().getName() );
+
+        DataObject dobj = root.getDataObject( "name.0" );
+        assert "en_US".equals( dobj.getString( "lang" ) );
+
+        Sequence seq = dobj.getSequence();
+        assert "Adam".equals( seq.getValue(0) );
+    }
 }

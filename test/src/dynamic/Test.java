@@ -176,7 +176,8 @@ public class Test
         //testSingleGetSetOnManyProp();
         //testSdoTsLoad();
         //testXbCDATA();
-        testXbPath();
+        //testXbPath();
+        testComplexElementWithSimpleContent();
     }
 
     static void createAndTraverse()
@@ -3123,11 +3124,19 @@ public class Test
     static void testXbCDATA()
             throws XmlException
     {
-        String xmlText = "<a>\n" +
+        String xmlText = /*"<a>\n" +
                 "<a><![CDATA[cdata text]]></a>\n" +
                 "<b><![CDATA[cdata text]]> regular text</b>\n" +
                 "<c>text <![CDATA[cdata text]]></c>\n" +
-                "</a>";
+                "</a>"; */
+                "<ns1:MarksAndNumber xmlns:ns1='ns1'>\n" +
+                        " <![CDATA[\n" +
+                        "\n" +
+                        "\"NOT AVAILABLE\"\n" +
+                        "!@#$!@#$!@#$$%^&$&*&*()&()&()L:|OP{}O}{<>?\n" +
+                        "\n" +
+                        "  ]]>\n" +
+                        " </ns1:MarksAndNumber>";
         System.out.println(xmlText);
 
         XmlOptions opts = new XmlOptions();
@@ -3173,4 +3182,21 @@ public class Test
 
        System.out.println("l: " + l);
     }
+
+    static void testComplexElementWithSimpleContent() 
+    {
+        String xml = "<root><name lang=\"en_US\">Adam</name></root>";
+        XMLDocument doc = XMLHelper.INSTANCE.load( xml );
+        DataObject root = doc.getRootObject();
+        Property nameProperty = root.getInstanceProperty( "name" );
+
+        assert "commonj.sdo".equals( nameProperty.getType().getURI() );
+        //assert "DataObject".equals( nameProperty.getType().getName() );
+
+        DataObject dobj = root.getDataObject( "name.0" );
+        assert "en_US".equals( dobj.getString( "lang" ) );
+
+        Sequence seq = dobj.getSequence();
+        assert "Adam".equals( seq.getValue(0) );
+  }
 }

@@ -60,16 +60,19 @@ public class ChangeSummaryTest extends BaseTest
 
     public static Test suite()
     {
-        /*
+/*
         TestSuite suite = new TestSuite();
         suite.addTest(new ChangeSummaryTest("testTypedUndo"));
-        suite.addTest(new ChangeSummaryTest("testUntypedUndo"));
+//        suite.addTest(new ChangeSummaryTest("testUntypedUndo"));
         suite.addTest(new ChangeSummaryTest("testTypedChangeSummary"));
-        suite.addTest(new ChangeSummaryTest("testUntypedChangeSummary"));
-        suite.addTest(new ChangeSummaryTest("testCopyHelper"));
+//        suite.addTest(new ChangeSummaryTest("testUntypedChangeSummary"));
+//        suite.addTest(new ChangeSummaryTest("testCopyHelper"));
         suite.addTest(new ChangeSummaryTest("testEqualityHelper"));
-        suite.addTest(new ChangeSummaryTest("testCascadingDeletes"));
-        */
+//        suite.addTest(new ChangeSummaryTest("testCascadingDeletes"));
+        suite.addTest(new ChangeSummaryTest("testDataObjectBuilder"));
+        suite.addTest(new ChangeSummaryTest("testStAXChangeSummaryTyped"));
+        suite.addTest(new ChangeSummaryTest("testSimpleList"));
+*/
         TestSuite suite = new TestSuite(ChangeSummaryTest.class);
         return suite;
     }
@@ -291,8 +294,8 @@ public class ChangeSummaryTest extends BaseTest
     private void changeHelperUntyped(DataObject root)
     {
         Sequence s = root.getSequence();
-        s.setValue(8, "n");
-        root.unset(s.getProperty(0));
+        s.setValue(7, "n");
+        root.unset(root.getInstanceProperty("att1"));
         Property att2 = ((DataFactoryImpl)dataFactory).getRootProperty("", "att2",
             BuiltInTypeSystem.STRING, false);
         
@@ -331,7 +334,7 @@ public class ChangeSummaryTest extends BaseTest
         Sequence oldSeq = c.getOldSequence(root);
         checkSameSequence(oldSeq, savedPropertyList); 
         // The values of elements inside the sequence is still the new one
-        assertEquals("foo2", ((DataObject) oldSeq.getValue(4)).getString("att"));
+        assertEquals("foo2", ((DataObject) oldSeq.getValue(3)).getString("att"));
 
         c.undoChanges();
         checkSameSequence(seq, savedPropertyList);
@@ -458,44 +461,44 @@ public class ChangeSummaryTest extends BaseTest
         c = (ChangeSummaryImpl) root.getChangeSummary();
         assertEquals(0, c.getInsertedObjects().size());
         assertEquals(0, c.getDeletedObjects().size());
-        ChangeSummaryImpl.Change change = c.getModifiedObjects().get(root)[0];
+        ChangeSummaryImpl.Change change = ChangeSummaryImpl.getFirstSequenceChange(c.getModifiedObjects().get(root));
         assertNotNull(change);
         assertEquals("att1", change.getProperty().getName());
         assertEquals(0, change.getArrayPos());
         assertEquals("1", change.getValue());
-        change = change.next;
+        change = change.next2;
         assertNotNull(change);
         assertEquals("att2", change.getProperty().getName());
         assertEquals(0, change.getArrayPos());
         assertEquals("2", change.getValue());
-        change = change.next;
+        change = change.next2;
         assertNotNull(change);
         assertEquals("a", change.getProperty().getName());
         assertEquals(2, change.getArrayPos());
         assertEquals(20, change.getValue());
-        change = change.next;
+        change = change.next2;
         // Here we skip over a text property that has not really changed but is included because
         // of the way the diff algorithm works
-        change = change.next;
+        change = change.next2;
         assertNotNull(change);
         assertEquals("c", change.getProperty().getName());
         assertEquals(0, change.getArrayPos());
         assertEquals("newC", change.getValue());
-        change = change.next;
+        change = change.next2;
         // Here we skip over a text property that has not really changed but is included because
         // of the way the diff algorithm works
-        change = change.next;
+        change = change.next2;
         assertNotNull(change);
         assertEquals( null /*ie text*/, change.getProperty());
         assertEquals(5, change.getArrayPos());
         assertEquals("\n", change.getValue());
-        change = change.next.next; // skip a text change
+        change = change.next2.next2; // skip a text change
         assertNotNull(change);
         assertEquals("a", change.getProperty().getName());
         assertEquals(1, change.getArrayPos());
         assertEquals("newnewA", change.getValue());
 
-        change = c.getModifiedObjects().get(root.get("b[1]"))[0];
+        change = ChangeSummaryImpl.getFirstSequenceChange(c.getModifiedObjects().get(root.get("b[1]")));
         assertNotNull(change);
         assertEquals("att", change.getProperty().getName());
         assertEquals(0, change.getArrayPos());
@@ -504,14 +507,13 @@ public class ChangeSummaryTest extends BaseTest
 
     private void checkSameSequence(Sequence s, List<Property> savedPropertyList)
     {
-        assertEquals(9, s.size());
+        assertEquals(8, s.size());
         for (int i = 0; i < s.size(); i++)
             assertSame(savedPropertyList.get(i), s.getProperty(i));
-        assertEquals("1", s.getValue(0));
-        assertEquals("\nabcd\n", s.getValue(1));
-        assertEquals(20, s.getValue(2));
-        assertEquals("\n", s.getValue(8));
-        assertEquals("40", s.getValue(7));
+        assertEquals("\nabcd\n", s.getValue(0));
+        assertEquals(20, s.getValue(1));
+        assertEquals("\n", s.getValue(7));
+        assertEquals("40", s.getValue(6));
     }
 
     private ChangeSummaryImpl.Change findChange(ChangeSummaryImpl.Change[] changes, Property prop)
@@ -971,39 +973,39 @@ public class ChangeSummaryTest extends BaseTest
     {
         DataObject root = dataGraph.getDataObject("document[1]");
         Sequence s = root.getSequence();
-        assertEquals("att2", s.getProperty(0).getName());
-        assertEquals("2", s.getValue(0));
-        assertEquals(null, s.getProperty(1));
-        assertEquals("\nabcd\n", s.getValue(1));
-        assertEquals("c", s.getProperty(2).getName());
-        assertEquals("newC", s.getValue(2));
-        assertEquals("b", s.getProperty(4).getName());
-        assertEquals("foo2", ((DataObject) s.getValue(4)).get("att"));
-        assertEquals(null, s.getProperty(5));
-        assertEquals("\n", s.getValue(5));
-        assertEquals("c", s.getProperty(6).getName());
-        assertEquals("100", s.getValue(6));
-        assertEquals("a", s.getProperty(7).getName());
-        assertEquals("40", s.getValue(7));
-        assertEquals(null, s.getProperty(8));
-        assertEquals("n", s.getValue(8));
-        assertEquals("a", s.getProperty(9).getName());
-        assertEquals("newnewA", s.getValue(9));
-        assertEquals(10, s.size());
+        assertEquals("att2", root.getInstanceProperty("att2").getName());
+        assertEquals("2", root.get("att2"));
+        assertEquals(null, s.getProperty(0));
+        assertEquals("\nabcd\n", s.getValue(0));
+        assertEquals("c", s.getProperty(1).getName());
+        assertEquals("newC", s.getValue(1));
+        assertEquals("b", s.getProperty(3).getName());
+        assertEquals("foo2", ((DataObject) s.getValue(3)).get("att"));
+        assertEquals(null, s.getProperty(4));
+        assertEquals("\n", s.getValue(4));
+        assertEquals("c", s.getProperty(5).getName());
+        assertEquals("100", s.getValue(5));
+        assertEquals("a", s.getProperty(6).getName());
+        assertEquals("40", s.getValue(6));
+        assertEquals(null, s.getProperty(7));
+        assertEquals("n", s.getValue(7));
+        assertEquals("a", s.getProperty(8).getName());
+        assertEquals("newnewA", s.getValue(8));
+        assertEquals(9, s.size());
     }
 
     private void checkUntypedDataGraphOriginal(DataObject dataGraph)
     {
         DataObject root = dataGraph.getDataObject("document[1]");
         Sequence s = root.getSequence();
-        assertEquals("att1", s.getProperty(0).getName());
-        assertEquals("1", s.getValue(0));
-        assertEquals("a", s.getProperty(2).getName());
-        assertEquals(20, s.getValue(2));
-        assertEquals(null, s.getProperty(1));
-        assertEquals("\nabcd\n", s.getValue(1));
-        assertEquals(null, s.getProperty(8));
-        assertEquals("\n", s.getValue(8));
-        assertEquals(9, s.size());
+        assertEquals("att1", root.getInstanceProperty("att1").getName());
+        assertEquals("1", root.get("att1"));
+        assertEquals("a", s.getProperty(1).getName());
+        assertEquals(20, s.getValue(1));
+        assertEquals(null, s.getProperty(0));
+        assertEquals("\nabcd\n", s.getValue(0));
+        assertEquals(null, s.getProperty(7));
+        assertEquals("\n", s.getValue(7));
+        assertEquals(8, s.size());
     }
 }

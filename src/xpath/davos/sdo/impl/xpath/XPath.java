@@ -23,6 +23,7 @@ import davos.sdo.impl.common.ChangeSummaryXML;
 import davos.sdo.impl.common.Common;
 import davos.sdo.impl.type.BuiltInTypeSystem;
 import davos.sdo.impl.type.SimpleValueHelper;
+import davos.sdo.impl.data.Store;
 import javax.sdo.helper.XMLDocument;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
@@ -1778,12 +1779,47 @@ public class XPath
             {
                 if ( _dataObject.getType().isSequenced() )
                 {
-                    SequenceXML seq = _dataObject.getSequenceXML();
-                    int size = seq.size();
+//                    SequenceXML seq = _dataObject.getSequenceXML();
+//                    int size = seq.size();
+//                    if ( _itemIndex < size )
+//                    {
+//                        PropertyXML prop = seq.getPropertyXML(_itemIndex);
+//                        Object value = seq.getValue(_itemIndex);
+//                        _itemIndex++;
+//                        if (prop!=null)
+//                        {
+//                            if (adv2(prop, value))
+//                                return false;
+//                            if (prop.isXMLElement())
+//                            {
+//                                int isHit = end();
+//                                if ((isHit&COND_TRUE)!=0 || (isHit&COND_FALSE)!=0)
+//                                    _selection.popCondition((isHit&COND_TRUE)!=0);
+//
+//                                if (isFinished())
+//                                    return true;
+//                            }
+//                        }
+//                    }
+//                    else
+//                    {
+//                        if (isAtBottom())
+//                        {
+//                            return true;
+//                        }
+//
+//                        int isHit = end();
+//                        if ((isHit&COND_TRUE)!=0 || (isHit&COND_FALSE)!=0)
+//                            _selection.popCondition((isHit&COND_TRUE)!=0);
+//
+//                        pop();
+//                    }
+                    Store seq = (Store)_dataObject;
+                    int size = seq.storeSequenceSize();
                     if ( _itemIndex < size )
                     {
-                        PropertyXML prop = seq.getPropertyXML(_itemIndex);
-                        Object value = seq.getValue(_itemIndex);
+                        PropertyXML prop = seq.storeSequenceGetPropertyXML(_itemIndex);
+                        Object value = seq.storeSequenceGetValue(_itemIndex);
                         _itemIndex++;
                         if (prop!=null)
                         {

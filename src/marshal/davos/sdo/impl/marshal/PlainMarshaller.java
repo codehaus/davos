@@ -256,6 +256,35 @@ class PlainMarshaller extends Marshaller implements ReferenceBuilder
         boolean doIndent = (_options & OPT_PRETTY_PRINT) != 0;
         boolean wasIndentIncremented = false;
         // Serialize all properties
+        List props = object.getInstanceProperties();
+        int size = props.size();
+        int indexOfFirstElement = size;
+        boolean simpleContent = type.isSimpleContent();
+        for (int i = 0; i < size; i++)
+        {
+            PropertyXML p = (PropertyXML) props.get(i);
+            Object value = object.get(p);
+            if (p.isXMLElement())
+            {
+                if (indexOfFirstElement == size)
+                    indexOfFirstElement = i;
+            }
+            else
+            {
+                // Marshal attribute
+                if (object.isSet(p))
+                {
+                    if (simpleContent && Names.SIMPLE_CONTENT_PROP_NAME.equals(p.getName()))
+                        indexOfFirstElement = i;
+                    else if (value != null)
+                    {
+                        ListXMLIterator it = object.getListXMLIterator(p);
+                        it.next();
+                        marshalAttributeProperty(it.getSubstitution(), value, it.getPrefix(), object);
+                    }
+                }
+            }
+        }
         if (object.getType().isSequenced())
         {
             if (doIndent)
@@ -265,47 +294,23 @@ class PlainMarshaller extends Marshaller implements ReferenceBuilder
                     doIndent = false;
             SequenceXML s = object.getSequenceXML();
             // Use the Sequence to populate the children
-            int size = s.size();
-            if (size > 0)
+            int seqSize = s.size();
+            // Now process elements/text
+            for (int i = 0; i < seqSize; i++)
             {
-                int indexOfFirstElement = size;
-                for (int i = 0; i < size; i++)
-                {
-                    PropertyXML p = s.getPropertyXML(i);
-                    if (p!=null && !p.isXMLElement())
-                    {
-                        marshalAttributeProperty(s.getSubstitution(i), s.getValue(i),
-                            s.getPrefixXML(i), object);
-                    }
-                    else if (indexOfFirstElement == size)
-                    {
-                        indexOfFirstElement = i;
-                    }
-                }
-                if (indexOfFirstElement >= size)
-                {
-                    // No elements
-                    if (wasIndentIncremented)
-                        decrementIndent();
-                    return;
-                }
-                // Now process elements/text
-                for (int i = indexOfFirstElement; i < size; i++)
-                {
-                    PropertyXML p = s.getPropertyXML(i);
+                PropertyXML p = s.getPropertyXML(i);
 
-                    if ( p == null /*ie is text*/ )
-                        _h.text((String) s.getValue(i));
-                    else if (p.isXMLElement())
-                    {
-                        Object val = s.getValue(i);
-                        if (val == null)
-                            marshalXsiNil(s.getSubstitution(i).getXMLNamespaceURI(),
-                                s.getSubstitution(i).getXMLName(), s.getPrefixXML(i), doIndent);
-                        else
-                            marshalElementProperty(s.getSubstitution(i), val, s.getPrefixXML(i),
-                                object, true, doIndent);
-                    }
+                if ( p == null /*ie is text*/ )
+                    _h.text((String) s.getValue(i));
+                else if (p.isXMLElement())
+                {
+                    Object val = s.getValue(i);
+                    if (val == null)
+                        marshalXsiNil(s.getSubstitution(i).getXMLNamespaceURI(),
+                            s.getSubstitution(i).getXMLName(), s.getPrefixXML(i), doIndent);
+                    else
+                        marshalElementProperty(s.getSubstitution(i), val, s.getPrefixXML(i),
+                            object, true, doIndent);
                 }
             }
         }
@@ -313,35 +318,6 @@ class PlainMarshaller extends Marshaller implements ReferenceBuilder
         {
             if (doIndent)
                 wasIndentIncremented = incrementIndent();
-            List props = object.getInstanceProperties();
-            int size = props.size();
-            int indexOfFirstElement = size;
-            boolean simpleContent = type.isSimpleContent();
-            for (int i = 0; i < size; i++)
-            {
-                PropertyXML p = (PropertyXML) props.get(i);
-                Object value = object.get(p);
-                if (p.isXMLElement())
-                {
-                    if (indexOfFirstElement == size)
-                        indexOfFirstElement = i;
-                }
-                else
-                {
-                    // Marshal attribute
-                    if (object.isSet(p))
-                    {
-                        if (simpleContent && Names.SIMPLE_CONTENT_PROP_NAME.equals(p.getName()))
-                            indexOfFirstElement = i;
-                        else if (value != null)
-                        {
-                            ListXMLIterator it = object.getListXMLIterator(p);
-                            it.next();
-                            marshalAttributeProperty(it.getSubstitution(), value, it.getPrefix(), object);
-                        }
-                    }
-                }
-            }
             if (simpleContent && indexOfFirstElement < size)
             {
                 PropertyXML p = (PropertyXML) props.get(indexOfFirstElement);

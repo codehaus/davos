@@ -917,7 +917,8 @@ public abstract class DataObjectImpl
 
     public boolean isSet(Property property)
     {
-        return getStore().storeIsSet(property);
+        PropertyXML propXml = PropertyImpl.getPropertyXML(property);
+        return getStore().storeIsSet(propXml);
     }
 
     public void unset(Property property)
@@ -2250,11 +2251,6 @@ public abstract class DataObjectImpl
     public ListXMLIterator getListXMLIterator(PropertyXML property)
     {
         return getStore().storeGetListXMLIterator(property);
-    }
-
-    public String getXMLPrefix(int index)
-    {
-        return getStore().storeSequenceGetXMLPrefix(index);
     }
 
     public DataObjectXML createDataObjectXML(PropertyXML propertyXML, String prefix, PropertyXML substitution)

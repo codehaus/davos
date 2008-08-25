@@ -424,7 +424,7 @@ public class MarshalTest extends BaseTest
         dobj = dobj.getDataObject("root[1]");
         PropertyXML a = (PropertyXML) dobj.getInstanceProperty("a");
         assertEquals("bill", dobj.getList(a).get(0));
-        assertEquals("bob", dobj.getChangeSummary().getOldValue(dobj, a).getValue());
+        assertEquals("bob", ((List)dobj.getChangeSummary().getOldValue(dobj, a).getValue()).get(0));
     }
 
     public void testSubstitutions() throws IOException

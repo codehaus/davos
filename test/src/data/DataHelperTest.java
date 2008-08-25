@@ -1014,12 +1014,12 @@ public class DataHelperTest extends BaseTest
         c.set(Calendar.ZONE_OFFSET, 0);
         String fromc = dataHelper.toDay(c);
         Date d = c.getTime();
-        String exp = "---30Z";
+        String exp = "---30";
         String act = dataHelper.toDay(d);
         System.out.println("exp: " + exp);
         System.out.println("act: " + act);
         assertEquals(exp, act);
-        assertEquals(fromc, act);
+        assertEquals(exp + "Z", fromc);
     }
 
     public void testDateToMonth()
@@ -1030,12 +1030,12 @@ public class DataHelperTest extends BaseTest
         c.set(Calendar.ZONE_OFFSET, 0);
         String fromc = dataHelper.toMonth(c);
         Date d = c.getTime();
-        String exp = "--06Z";
+        String exp = "--06";
         String act = dataHelper.toMonth(d);
         System.out.println("exp: " + exp);
         System.out.println("act: " + act);
         assertEquals(exp, act);
-        assertEquals(fromc, act);
+        assertEquals(exp + "Z", fromc);
     }
 
     public void testDateToMonthDay()
@@ -1046,12 +1046,12 @@ public class DataHelperTest extends BaseTest
         c.set(Calendar.ZONE_OFFSET, 0);
         String fromc = dataHelper.toMonthDay(c);
         Date d = c.getTime();
-        String exp = "--06-30Z";
+        String exp = "--06-30";
         String act = dataHelper.toMonthDay(d);
         System.out.println("exp: " + exp);
         System.out.println("act: " + act);
         assertEquals(exp, act);
-        assertEquals(fromc, act);
+        assertEquals(exp + "Z", fromc);
     }
 
     public void testDateToYear()
@@ -1062,12 +1062,12 @@ public class DataHelperTest extends BaseTest
         c.set(Calendar.ZONE_OFFSET, 0);
         String fromc = dataHelper.toYear(c);
         Date d = c.getTime();
-        String exp = "2006Z";
+        String exp = "2006";
         String act = dataHelper.toYear(d);
         System.out.println("exp: " + exp);
         System.out.println("act: " + act);
         assertEquals(exp, act);
-        assertEquals(fromc, act);
+        assertEquals(exp + "Z", fromc);
     }
 
     public void testDateToYearMonth()
@@ -1078,12 +1078,12 @@ public class DataHelperTest extends BaseTest
         c.set(Calendar.ZONE_OFFSET, 0);
         String fromc = dataHelper.toYearMonth(c);
         Date d = c.getTime();
-        String exp = "2006-06Z";
+        String exp = "2006-06";
         String act = dataHelper.toYearMonth(d);
         System.out.println("exp: " + exp);
         System.out.println("act: " + act);
         assertEquals(exp, act);
-        assertEquals(fromc, act);
+        assertEquals(exp + "Z", fromc);
     }
 
     public void testDateToYearMonthDay()
@@ -1094,12 +1094,12 @@ public class DataHelperTest extends BaseTest
         c.set(Calendar.ZONE_OFFSET, 0);
         String fromc = dataHelper.toYearMonthDay(c);
         Date d = c.getTime();
-        String exp = "2006-06-30Z";
+        String exp = "2006-06-30";
         String act = dataHelper.toYearMonthDay(d);
         System.out.println("exp: " + exp);
         System.out.println("act: " + act);
         assertEquals(exp, act);
-        assertEquals(fromc, act);
+        assertEquals(exp + "Z", fromc);
     }
 
 }

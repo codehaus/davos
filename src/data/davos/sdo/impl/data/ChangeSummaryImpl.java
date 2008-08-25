@@ -36,9 +36,12 @@ import davos.sdo.DataObjectXML;
 import davos.sdo.PropertyXML;
 import davos.sdo.SequenceXML;
 import davos.sdo.SDOContext;
+import davos.sdo.impl.common.Common;
 import davos.sdo.impl.common.NamespaceStack;
 import davos.sdo.impl.common.ChangeSummaryXML;
 import davos.sdo.impl.helpers.CopyHelperImpl;
+import davos.sdo.impl.type.BuiltInTypeSystem;
+import davos.sdo.impl.type.PropertyImpl;
 import davos.sdo.impl.util.XmlPath;
 import org.apache.xmlbeans.SchemaType;
 
@@ -52,8 +55,9 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
     private DataObject dataObject = null;
     /**
      * We keep a HashMap (our own impl) of property to list of changes for that property
-     * For sequenced types, this hashmap has only one entry, because everything is considered a big
-     * array
+     * For sequenced types, this hashmap has entries for all the attribute properties plus
+     * one entry for the elements with key the SEQUENCE sentinel property, because all elements
+     * have their changes tracked at the same time
      * Arrays are represented with only the modifications in a separate list, with the index of
      * each change representing the offset from the previous change, this way the indexes don't
      * need updating at every insert.
@@ -75,6 +79,9 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
     public static final String CHANGE_SUMMARY_CREATE = "create";
     public static final String CHANGE_SUMMARY_URI = "".intern();
     public static final String CHANGE_SUMMARY_ELEM = "changeSummary";
+    public static final Property SEQUENCE = PropertyImpl.create(BuiltInTypeSystem.DATAOBJECT,
+        "sequence", true, false, null, null, false, false, null, Common.EMPTY_STRING_LIST,
+        "sequence", Common.EMPTY_STRING, -1, true, false, true);
 
     public ChangeSummaryImpl()
     {}
@@ -112,14 +119,42 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
         ArrayList<DataObject> result = new ArrayList<DataObject>(modifiedObjects.size() +
             insertedObjects.size() + deletedObjects.size());
         result.addAll(modifiedObjects.keySet());
-        result.addAll(insertedObjects);
-        result.addAll(deletedObjects.keySet());
+        addSubTree(result, insertedObjects);
+        addSubTree(result, deletedObjects.keySet());
         return result;
+    }
+
+    private void addSubTree(ArrayList<DataObject> result, Set<DataObject> roots)
+    {
+        // Add all the root DataObject and all their contained DataObjects to the result
+        int i = result.size();
+        result.addAll(roots);
+        while (i < result.size())
+        {
+            DataObject o = result.get(i++);
+            for (Property p : (List<Property>) o.getInstanceProperties())
+                if (p.isContainment() && !p.getType().isDataType())
+                    if (p.isMany())
+                    {
+                        List valueAsList = o.getList(p);
+                        for (DataObject oo : (List<DataObject>) valueAsList)
+                            if (oo != null)
+                                result.add(oo);
+                    }
+                    else
+                    {
+                        DataObject value = o.getDataObject(p);
+                        if (value != null)
+                            result.add(value);
+                    }
+        }
     }
 
     public boolean isCreated(DataObject dataObject)
     {
-        return insertedObjects.contains(dataObject);
+        while (dataObject != null && !insertedObjects.contains(dataObject))
+            dataObject = dataObject.getContainer();
+        return dataObject != null;
     }
 
     /*
@@ -149,115 +184,118 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
     */
     public boolean isDeleted(DataObject dataObject)
     {
-        return liveObjectDeletedObjectMapping.containsKey(dataObject) ||
-            deletedObjects.containsKey(dataObject);
+        if (liveObjectDeletedObjectMapping.containsKey(dataObject))
+            return true;
+        while (dataObject != null && !deletedObjects.containsKey(dataObject))
+            dataObject = dataObject.getContainer();
+        return dataObject != null;
     }
 
     public List /*ChangeSummary.Setting*/ getOldValues(DataObject dataObject)
     {
         if (isModified(dataObject))
         {
-        Change[] loggedChanges = modifiedObjects.get(dataObject);
-        List<Change> result = new ArrayList<Change>();
-        if (dataObject.getSequence() != null)
-        {
-            Sequence currentSeq = dataObject.getSequence();
-            HashSet<Property> seenProperties = new HashSet<Property>();
-            int currentIndex = 0;
-            for (Change c = loggedChanges[0]; c != null; c = c.next)
-            {
-                currentIndex += c.getArrayPos();
-                Property prop = c.getProperty();
-                if (seenProperties.contains(prop))
-                    continue;
-                else
-                    seenProperties.add(prop);
-                if (prop == null || prop.isMany())
+            Change[] loggedChanges = modifiedObjects.get(dataObject);
+            List<Change> result = new ArrayList<Change>();
+            for (int i = 0; i < loggedChanges.length; i++)
+                for (Change c = loggedChanges[i]; c != null; c = c.next)
                 {
-                    // We need to go through the list of changes
-                    // and collect all that pertain to this property
-                    List originalList = new ArrayList();
-                    int index = 0;
-                    int currentIndex2 = currentIndex - c.getArrayPos();
-                    Change c2 = c;
-                    while (c2 != null)
+                    Property prop = c.getProperty();
+                    if (prop == SEQUENCE)
                     {
-                        currentIndex2 += c2.getArrayPos();
-                        if (c2.getProperty() == prop)
+                        if (dataObject.getSequence() == null)
+                            throw new IllegalStateException("Sequence change found on a " +
+                                "non-sequenced DataObject, type = " + dataObject.getType());
+                        Store currentStore = ((DataObjectImpl) dataObject).getStore();
+                        HashSet<Property> seenProperties = new HashSet<Property>();
+                        int currentIndex = 0;
+                        for (Change cs = c.next2; cs != null; cs = cs.next2)
                         {
-                            while (index < currentIndex2)
+                            currentIndex += cs.getArrayPos();
+                            prop = cs.getProperty();
+                            if (seenProperties.contains(prop))
+                                continue;
+                            else
+                                seenProperties.add(prop);
+                            if (prop == null || prop.isMany())
                             {
-                                if (currentSeq.getProperty(index) == prop)
-                                    originalList.add(currentSeq.getValue(index));
-                                index++;
+                                // We need to go through the list of changes
+                                // and collect all that pertain to this property
+                                List originalList = new ArrayList();
+                                int index = 0;
+                                int currentIndex2 = currentIndex - cs.getArrayPos();
+                                Change c2 = cs;
+                                while (c2 != null)
+                                {
+                                    currentIndex2 += c2.getArrayPos();
+                                    if (c2.getProperty() == prop)
+                                    {
+                                        while (index < currentIndex2)
+                                        {
+                                           if(currentStore.storeSequenceGetPropertyXML(index)==prop)
+                                        originalList.add(currentStore.storeSequenceGetValue(index));
+                                            index++;
+                                        }
+                                        if (c2.isSet())
+                                        {
+                                            // It was a deletion
+                                            originalList.add(c2.getValue());
+                                        }
+                                        else
+                                        {
+                                            // It was an insertion
+                                            index++;
+                                        }
+                                    }
+                                    c2 = c2.next2;
+                                }
+                                while (index < currentStore.storeSequenceSize())
+                                {
+                                    if (currentStore.storeSequenceGetPropertyXML(index) == prop)
+                                        originalList.add(currentStore.storeSequenceGetValue(index));
+                                    index++;
+                                }
+                                result.add(new Change(prop, originalList, originalList.size() > 0, -1));
                             }
-                            if (c2.isSet())
+                            else
+                                result.add(cs);
+                        }
+                    }
+                    else if (prop.isMany() && !prop.getType().isDataType())
+                    {
+                        // For arrays of DataObjects, we keep the individual changes
+                        // as separate Settings objects, but for the purpose of this
+                        // API we need to aggregate them into one old values list
+                        List currentList = dataObject.getList(prop);
+                        List originalList = new ArrayList();
+                        int index = 0;
+                        int currentIndex = 0;
+                        Change c2 = c;
+                        while (c2 != null)
+                        {
+                            currentIndex += c2.getArrayPos();
+                            while (index < currentIndex)
+                                originalList.add(currentList.get(index++));
+                            if (c.isSet())
                             {
-                                // It was a deletion
-                                originalList.add(c2.getValue());
+                                // Deletion
+                                originalList.add(c.getValue());
                             }
                             else
                             {
-                                // It was an insertion
+                                // Insertion
                                 index++;
                             }
+                            c2 = c2.next2;
                         }
-                        c2 = c2.next;
-                    }
-                    while (index < currentSeq.size())
-                    {
-                        if (currentSeq.getProperty(index) == prop)
-                            originalList.add(currentSeq.getValue(index));
-                        index++;
-                    }
-                    result.add(new Change(prop, originalList, originalList.size() > 0, -1));
-                }
-                else
-                    result.add(c);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < loggedChanges.length; i++)
-            for (Change c = loggedChanges[i]; c != null; c = c.next)
-            {
-                Property prop = c.getProperty();
-                if (prop.isMany() && !prop.getType().isDataType())
-                {
-                    // For arrays of DataObjects, we keep the individual changes
-                    // as separate Settings objects, but for the purpose of this
-                    // API we need to aggregate them into one old values list
-                    List currentList = dataObject.getList(prop);
-                    List originalList = new ArrayList();
-                    int index = 0;
-                    int currentIndex = 0;
-                    Change c2 = c;
-                    while (c2 != null)
-                    {
-                        currentIndex += c2.getArrayPos();
-                        while (index < currentIndex)
+                        while (index < currentList.size())
                             originalList.add(currentList.get(index++));
-                        if (c.isSet())
-                        {
-                            // Deletion
-                            originalList.add(c.getValue());
-                        }
-                        else
-                        {
-                            // Insertion
-                            index++;
-                        }
-                        c2 = c2.next2;
+                        result.add(new Change(prop, originalList, originalList.size() > 0, -1));
                     }
-                    while (index < currentList.size())
-                        originalList.add(currentList.get(index++));
-                    result.add(new Change(prop, originalList, originalList.size() > 0, -1));
+                    else
+                        result.add(c);
                 }
-                else
-                    result.add(c);
-            }
-        }
-        return result;
+            return result;
         }
         else if (isDeleted(dataObject))
         {
@@ -308,92 +346,105 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
     {
         if (isModified(dataObject))
         {
-        Change[] chgs = modifiedObjects.get(dataObject);
-        if (chgs == null)
-            return null;
-        if (!property.isMany() || property.getType().isDataType())
-        {
-            // First change found is the one that we are looking for
-            int hash = hashCode(property, chgs.length);
-            for (Change c = chgs[hash]; c != null; c = c.next)
-                if (c.getProperty() == property)
-                    return c;
-        }
-        else if (dataObject.getSequence() != null)
-        {
-            int index = 0;
-            List originalList = new ArrayList();
-            Sequence currentSeq = dataObject.getSequence();
-            int currentIndex = 0;
-            for (Change c = chgs[0]; c != null; c = c.next)
+            Change[] chgs = modifiedObjects.get(dataObject);
+            if (chgs == null)
+                return null;
+            if (!property.isMany() || property.getType().isDataType())
             {
-                currentIndex += c.getArrayPos();
-                if (c.getProperty() == property)
-                {
-                    while (index < currentIndex)
-                    {
-                        if (currentSeq.getProperty(index) == property)
-                            originalList.add(currentSeq.getValue(index));
-                        index++;
-                    }
-                    if (c.isSet())
-                    {
-                        // It was a deletion
-                        originalList.add(c.getValue());
-                    }
-                    else
-                    {
-                        // It was an insertion
-                        index++;
-                    }
-                }
+                // Even for sequenced DOs, there is a chance that we'll find the property without
+                // having to look inside the sequence
+                // First change found is the one that we are looking for
+                int hash = hashCode(property, chgs.length);
+                for (Change c = chgs[hash]; c != null; c = c.next)
+                    if (c.getProperty() == property)
+                        return c;
             }
-            while (index < currentSeq.size())
+            if (dataObject.getSequence() != null)
             {
-                if (currentSeq.getProperty(index) == property)
-                    originalList.add(currentSeq.getValue(index));
-                index++;
-            }
-            return new Change(property, originalList, originalList.size() > 0, -1);
-        }
-        else
-        {
-            // For arrays of DataObjects, we keep the individual changes
-            // as separate Settings objects, but for the purpose of this
-            // API we need to aggregate them into one old values list
-            List currentList = dataObject.getList(property);
-            List originalList = new ArrayList();
-            int index = 0;
-            for (Change c = chgs[hashCode(property, chgs.length)]; c != null; c = c.next)
-            {
-                if (c.getProperty() == property)
+                int index = 0;
+                List originalList = new ArrayList();
+                boolean seenModification = false;
+                Store currentStore = ((DataObjectImpl) dataObject).getStore();
+                int currentIndex = 0;
+                for (Change c = getFirstSequenceChange(chgs); c != null; c = c.next2)
                 {
-                    int currentIndex = 0;
-                    Change c2 = c;
-                    while (c2 != null)
+                    currentIndex += c.getArrayPos();
+                    if (c.getProperty() == property)
                     {
-                        currentIndex += c.getArrayPos();
+                        seenModification = true;
                         while (index < currentIndex)
-                            originalList.add(currentList.get(index++));
+                        {
+                            if (currentStore.storeSequenceGetPropertyXML(index) == property)
+                                originalList.add(currentStore.storeSequenceGetValue(index));
+                            index++;
+                        }
                         if (c.isSet())
                         {
-                            // Deletion
+                            // It was a deletion
                             originalList.add(c.getValue());
                         }
                         else
                         {
-                            // Insertion
+                            // It was an insertion
                             index++;
                         }
-                        c2 = c2.next2;
                     }
-                    while (index < currentList.size())
-                        originalList.add(currentList.get(index++));
-                    return new Change(property, originalList, originalList.size() > 0, -1);
+                }
+                while (index < currentStore.storeSequenceSize())
+                {
+                    if (currentStore.storeSequenceGetPropertyXML(index) == property)
+                    {
+                        seenModification = true;
+                        originalList.add(currentStore.storeSequenceGetValue(index));
+                    }
+                    index++;
+                }
+                if (seenModification)
+                    if (property.isMany())
+                        return new Change(property, originalList, originalList.size() > 0, -1);
+                    else if (originalList.size() > 0)
+                        return new Change(property, originalList.get(0), true, -1);
+                    else
+                        return new Change(property, null, false, -1);
+            }
+            else if (property.isMany())
+            {
+                // For arrays of DataObjects, we keep the individual changes
+                // as separate Settings objects, but for the purpose of this
+                // API we need to aggregate them into one old values list
+                List currentList = dataObject.getList(property);
+                List originalList = new ArrayList();
+                int index = 0;
+                for (Change c = chgs[hashCode(property, chgs.length)]; c != null; c = c.next)
+                {
+                    if (c.getProperty() == property)
+                    {
+                        int currentIndex = 0;
+                        Change c2 = c;
+                        while (c2 != null)
+                        {
+                            currentIndex += c.getArrayPos();
+                            while (index < currentIndex)
+                                originalList.add(currentList.get(index++));
+                            if (c.isSet())
+                            {
+                                // Deletion
+                                originalList.add(c.getValue());
+                            }
+                            else
+                            {
+                                // Insertion
+                                index++;
+                            }
+                            c2 = c2.next2;
+                        }
+                        while (index < currentList.size())
+                            originalList.add(currentList.get(index++));
+                        return new Change(property, originalList, originalList.size() > 0, -1);
+                    }
                 }
             }
-        }
-        return null;
+            return null;
         }
         else if (isDeleted(dataObject))
         {
@@ -434,8 +485,7 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
             return null;
         Change[] chgs = modifiedObjects.get(dataObject);
         assert chgs != null;
-        SequenceXML newSequence = (SequenceXML) dataObject.getSequence();
-        assert newSequence != null;
+        Store newStore = ((DataObjectImpl) dataObject).getStore();
         DataObjectGeneral impl = new DataObjectGeneral();
         DataObjectXML oXML = (DataObjectXML) dataObject;
         impl.init( oXML.getTypeXML(), null, null, oXML.getContainmentPropertyXML());
@@ -445,13 +495,14 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
 
         int currentIndex = 0;
         int index = 0;
-        for (Change c = chgs[0]; c != null; c = c.next)
+        for (Change c = getFirstSequenceChange(chgs); c != null; c = c.next2)
         {
             currentIndex += c.getArrayPos();
             while (index < currentIndex)
             {
-                PropertyXML prop = newSequence.getPropertyXML(index);
-                impl.storeAddNewBasic( prop, newSequence.getValue(index), newSequence.getPrefixXML(index), prop);
+                PropertyXML prop = newStore.storeSequenceGetPropertyXML(index);
+                impl.storeAddNewBasic( prop, newStore.storeSequenceGetValue(index),
+                    newStore.storeSequenceGetXMLPrefix(index), prop);
                 index++;
             }
             if (c.isSet())
@@ -459,10 +510,11 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
             else
                 index++;
         }
-        while (index < newSequence.size())
+        while (index < newStore.storeSequenceSize())
         {
-            PropertyXML prop = newSequence.getPropertyXML(index);
-            impl.storeAddNewBasic(prop, newSequence.getValue(index), newSequence.getPrefixXML(index), prop);
+            PropertyXML prop = newStore.storeSequenceGetPropertyXML(index);
+            impl.storeAddNewBasic(prop, newStore.storeSequenceGetValue(index),
+                newStore.storeSequenceGetXMLPrefix(index), prop);
             index++;
         }
         return impl.storeGetSequenceXML();
@@ -492,12 +544,142 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
         // bidirectional properties, otherwise operation on this DataObject can have as
         // side-effect setting of properties on a "live" (not deleted) DataObject
         ((DataObjectImpl) dobj).setOppositeIgnore(true);
-        if (dobj.getSequence() == null)
-        {
-            for (int i = 0; i < changes.length; i++)
+        for (int i = 0; i < changes.length; i++)
             for (Change c = changes[i]; c != null; c = c.next)
             {
                 Property prop = c.getProperty();
+                if (prop == SEQUENCE)
+                {
+                    // Revert to the old sequence
+                    Store newStore = ((DataObjectImpl) dobj).getStore();
+//                    if (newSequence == null)
+//                        throw new IllegalStateException("Sequence change found on a " +
+//                            "non-sequenced DataObject, type = " + dataObject.getType());
+                    int offset = 0;
+
+                    Change cs = c.next2;
+                    for (int j = 0; j < newStore.storeSequenceSize() && cs != null; j++)
+                    {
+                        offset += cs.getArrayPos();
+                        j = offset; // Move to the place of the change in the sequence
+                        if (j >= newStore.storeSequenceSize())
+                            break; // Defensive programming
+                        do
+                        {
+                            PropertyXML propseq = newStore.storeSequenceGetPropertyXML(j);
+                            if (propseq == cs.getProperty())
+                            {
+                                if (cs.isSet())
+                                {
+                                    // In principle, this is a deletion, but if we have a deletion
+                                    // followed by an insertion of the same property in the same
+                                    // place, then we can optimize this by doing a set instead
+                                    Change c2 = cs.next2;
+                                    if (c2 != null && propseq == c2.getProperty() && !c2.isSet() &&
+                                        c2.getArrayPos() == 0)
+                                    {
+                                        if(propseq != null && !propseq.getType().isDataType() &&
+                                            ctx != null)
+                                        {
+                                            if (propseq.isContainment())
+                                            {
+                                                DataObject deletedObject =(DataObject)cs.getValue();
+                                                deletedObjects.remove(deletedObject);
+                                                newStore.storeSequenceSet(j, deletedObject);
+                                            }
+                                            else
+                                                newStore.storeSequenceSet(j, ctx.copyReference(
+                                                    (DataObjectXML) cs.getValue(), false));
+                                        }
+                                        else
+                                            newStore.storeSequenceSet(j, cs.getValue());
+                                        cs = c2;
+                                    }
+                                    else
+                                    {
+                                        if (propseq != null && !propseq.getType().isDataType() &&
+                                            ctx != null)
+                                        {
+                                            if (propseq.isContainment())
+                                            {
+                                                DataObject deletedObject = (DataObject)cs.getValue();
+                                                deletedObjects.remove(deletedObject);
+                                                newStore.storeSequenceAddNew(j++, propseq,
+                                                    deletedObject, null, propseq);
+                                            }
+                                            else
+                                                newStore.storeSequenceAddNew(j++, propseq,
+                                                    ctx.copyReference((DataObjectXML) cs.getValue(),
+                                                        false), null, propseq);
+                                        }
+                                        else
+                                            newStore.storeSequenceAddNew(j++, propseq, cs.getValue()
+                                                , null, propseq);
+                                        offset++;
+                                    }
+                                }
+                                else
+                                {
+                                    newStore.storeSequenceUnset(j--);
+                                    offset--;
+                                }
+                            }
+                            else
+                            {
+                                // Must be the deletion of another property
+                                assert cs.getValue() != null && cs.isSet();
+                                Property p = cs.getProperty();
+                                if (p != null && !p.getType().isDataType() && ctx != null)
+                                {
+                                    if (p.isContainment())
+                                    {
+                                        DataObject deletedObject = (DataObject) cs.getValue();
+                                        deletedObjects.remove(deletedObject);
+                                        newStore.storeSequenceAddNew(j++, (PropertyXML) p,
+                                            deletedObject, null, (PropertyXML) p);
+                                    }
+                                    else
+                                        newStore.storeSequenceAddNew(j++,
+                                            (PropertyXML) cs.getProperty(),
+                                            ctx.copyReference((DataObjectXML) cs.getValue(), false),
+                                            null, (PropertyXML) cs.getProperty());
+                                }
+                                else
+                                    newStore.storeSequenceAddNew(j++, (PropertyXML) p,cs.getValue(),
+                                        null, (PropertyXML) p);
+                                offset++;
+                            }
+                            cs = cs.next2;
+                        } while (cs != null && cs.getArrayPos() == 0);
+                    }
+                    while (cs != null)
+                    {
+                        // Deletions from the end
+                        if (cs.isSet())
+                        {
+                            Property p = cs.getProperty();
+                            if (p != null && !p.getType().isDataType() && ctx != null)
+                            {
+                                if (p.isContainment())
+                                {
+                                    DataObject deletedObject = (DataObject) cs.getValue();
+                                    deletedObjects.remove(deletedObject);
+                                    newStore.storeAddNew((PropertyXML) p, deletedObject, null,
+                                        (PropertyXML) p);
+                                }
+                                else
+                                    newStore.storeAddNew((PropertyXML) cs.getProperty(),
+                                        ctx.copyReference((DataObjectXML) cs.getValue(), false),
+                                        null, (PropertyXML) p);
+                            }
+                            else
+                                newStore.storeAddNew((PropertyXML) p, cs.getValue(), null,
+                                    (PropertyXML) p);
+                            offset++;
+                        }
+                        cs = cs.next2;
+                    }
+                }
                 if (c.getArrayPos() == -1)
                 {
                     if (prop.getType().isDataType())
@@ -637,125 +819,6 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                     }
                 }
             }
-        }
-        else
-        {
-            // Revert to the old sequence
-            SequenceXML newSequence = (SequenceXML) dobj.getSequence();
-            assert newSequence != null;
-            int offset = 0;
-
-            Change c = changes[0];
-            for (int i = 0; i < newSequence.size() && c != null; i++)
-            {
-                offset += c.getArrayPos();
-                i = offset; // Move to the place of the change in the sequence
-                if (i >= newSequence.size())
-                    break; // Defensive programming
-                do
-                {
-                    PropertyXML prop = newSequence.getPropertyXML(i);
-                    if (prop == c.getProperty())
-                    {
-                        if (c.isSet())
-                        {
-                            // In principle, this is a deletion, but if we have a deletion followed
-                            // by an insertion of the same property in the same place, then we can
-                            // optimize this by doing a set instead
-                            Change c2 = c.next;
-                            if (c2 != null && prop == c2.getProperty() && !c2.isSet() &&
-                                c2.getArrayPos() == 0)
-                            {
-                                if(prop != null && !prop.getType().isDataType() && ctx != null)
-                                {
-                                    if (prop.isContainment())
-                                    {
-                                        DataObject deletedObject = (DataObject) c.getValue();
-                                        deletedObjects.remove(deletedObject);
-                                        newSequence.setValue(i, deletedObject);
-                                    }
-                                    else
-                                        newSequence.setValue(i,
-                                            ctx.copyReference((DataObjectXML) c.getValue(), false));
-                                }
-                                else
-                                    newSequence.setValue(i, c.getValue());
-                                c = c2;
-                            }
-                            else
-                            {
-                                if (prop != null && !prop.getType().isDataType() && ctx != null)
-                                {
-                                    if (prop.isContainment())
-                                    {
-                                        DataObject deletedObject = (DataObject) c.getValue();
-                                        deletedObjects.remove(deletedObject);
-                                        newSequence.add(i++, prop, deletedObject);
-                                    }
-                                    else
-                                        newSequence.add(i++, prop, ctx.copyReference(
-                                            (DataObjectXML) c.getValue(), false));
-                                }
-                                else
-                                    newSequence.add(i++, prop, c.getValue());
-                                offset++;
-                            }
-                        }
-                        else
-                        {
-                            newSequence.remove(i--);
-                            offset--;
-                        }
-                    }
-                    else
-                    {
-                        // Must be the deletion of another property
-                        assert c.getValue() != null && c.isSet();
-                        Property p = c.getProperty();
-                        if (p != null && !p.getType().isDataType() && ctx != null)
-                        {
-                            if (p.isContainment())
-                            {
-                                DataObject deletedObject = (DataObject) c.getValue();
-                                deletedObjects.remove(deletedObject);
-                                newSequence.add(i++, p, deletedObject);
-                            }
-                            else
-                                newSequence.add(i++, c.getProperty(),
-                                    ctx.copyReference((DataObjectXML) c.getValue(), false));
-                        }
-                        else
-                            newSequence.add(i++, p, c.getValue());
-                        offset++;
-                    }
-                    c = c.next;
-                } while (c != null && c.getArrayPos() == 0);
-            }
-            while (c != null)
-            {
-                // Deletions from the end
-                if (c.isSet())
-                {
-                    Property p = c.getProperty();
-                    if (p != null && !p.getType().isDataType() && ctx != null)
-                    {
-                        if (p.isContainment())
-                        {
-                            DataObject deletedObject = (DataObject) c.getValue();
-                            deletedObjects.remove(deletedObject);
-                            newSequence.add(p, deletedObject);
-                        }
-                        else
-                            newSequence.add(c.getProperty(),
-                                ctx.copyReference((DataObjectXML) c.getValue(), false));
-                    }
-                    else
-                        newSequence.add(p, c.getValue());
-                    offset++;
-                }
-                c = c.next;
-            }
-        }
         ((DataObjectImpl) dobj).setOppositeIgnore(false);
     }
 
@@ -913,15 +976,12 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
         else
             chgs = modifiedObjects.get(parent);
 
-        if (parent.getSequence() != null)
+        if (parent.getSequence() != null && arrayIndex >= 0)
         {
             // For sequenced types, we need the index as a pointer into the
             // array of children elements and text of the containing object
-            if (arrayIndex < 0)
-                throw new IllegalArgumentException();
-
-            Change change = chgs[0];
-            Change lastChange = null;
+            Change lastChange = getcreateSequenceChange(chgs); // the sentinel
+            Change change = lastChange.next2;
             int currentIndex = 0;
             boolean added = false;
             while(change != null)
@@ -929,7 +989,7 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                 currentIndex += change.getArrayPos();
                 if (arrayIndex == currentIndex && prop == change.getProperty())
                 {
-                    Change change2 = change.next;
+                    Change change2 = change.next2;
                     if (!change.isSet() || change2 != null && prop == change2.getProperty() &&
                             change2.getArrayPos() == 0 && !change2.isSet() &&
                             wasSet && !delete)
@@ -945,63 +1005,36 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                     break;
                 }
                 lastChange = change;
-                change = change.next;
+                change = change.next2;
             }
             if (!added)
             {
-                if (lastChange == null)
+                Change newChange2 = null;
+                if (wasSet && !delete)
+                    newChange2 = new Change(prop, null, false, 0);
+                if (change == null)
                 {
-                    newChange = new Change(prop, oldValue, wasSet, arrayIndex);
-                    Change newChange2 = null;
-                    if (wasSet && !delete)
-                    {
-                        newChange2 = new Change(prop, null, false, 0);
-                        newChange.next = newChange2;
-                    }
-                    chgs[0] = newChange;
-                    if (change != null)
-                    {
-                        if (newChange2 != null)
-                        {
-                            change.setArrayPos(change.getArrayPos() - arrayIndex);
-                            newChange2.next = change;
-                        }
-                        else
-                        {
-                            newChange.next = change;
-                            change.setArrayPos(change.getArrayPos() - arrayIndex + (delete?-1:1));
-                        }
-                    }
+                    newChange = new Change(prop, oldValue, wasSet, arrayIndex - currentIndex);
+                    newChange.next2 = newChange2;
                 }
                 else
                 {
-                    Change newChange2 = null;
-                    if (wasSet && !delete)
-                        newChange2 = new Change(prop, null, false, 0);
-                    if (change == null)
+                    newChange = new Change(prop, oldValue, wasSet, arrayIndex - currentIndex +
+                        change.getArrayPos());
+                    if (newChange2 != null)
                     {
-                        newChange = new Change(prop, oldValue, wasSet, arrayIndex - currentIndex);
-                        newChange.next = newChange2;
+                        change.setArrayPos(change.getArrayPos() - newChange.getArrayPos());
+                        newChange.next2 = newChange2;
+                        newChange2.next2 = change;
                     }
                     else
                     {
-                        newChange = new Change(prop, oldValue, wasSet, arrayIndex - currentIndex +
-                            change.getArrayPos());
-                        if (newChange2 != null)
-                        {
-                            change.setArrayPos(change.getArrayPos() - newChange.getArrayPos());
-                            newChange.next = newChange2;
-                            newChange2.next = change;
-                        }
-                        else
-                        {
-                            change.setArrayPos(change.getArrayPos() - newChange.getArrayPos() +
-                                (delete ? -1 : 1));
-                            newChange.next = change;
-                        }
+                        change.setArrayPos(change.getArrayPos() - newChange.getArrayPos() +
+                            (delete ? -1 : 1));
+                        newChange.next2 = change;
                     }
-                    lastChange.next = newChange;
                 }
+                lastChange.next2 = newChange;
             }
         }
         else
@@ -1094,8 +1127,8 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
             // array of children elements and text of the containing object
             if (arrayIndex < 0)
                 throw new IllegalArgumentException();
-            Change change = chgs[0];
-            Change lastChange = null;
+            Change lastChange = getcreateSequenceChange(chgs); // the sentinel
+            Change change = lastChange.next2;
             int currentIndex = 0;
             while (change != null)
             {
@@ -1103,34 +1136,21 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                 if (arrayIndex <= currentIndex)
                     break;
                 lastChange = change;
-                change = change.next;
+                change = change.next2;
             }
-            if (lastChange == null)
+            Change newChange;
+            if (change == null)
             {
-                Change newChange = new Change(prop, newValue, false, arrayIndex);
-                chgs[0] = newChange;
-                if (change != null)
-                {
-                    newChange.next = change;
-                    change.setArrayPos(change.getArrayPos() - arrayIndex + 1);
-                }
+                newChange = new Change(prop, newValue, false, arrayIndex - currentIndex);
             }
             else
             {
-                Change newChange;
-                if (change == null)
-                {
-                    newChange = new Change(prop, newValue, false, arrayIndex - currentIndex);
-                }
-                else
-                {
-                    newChange = new Change(prop, newValue, false, arrayIndex - currentIndex +
-                        change.getArrayPos());
-                    newChange.next = change;
-                    change.setArrayPos(change.getArrayPos() - newChange.getArrayPos() + 1);
-                }
-                lastChange.next = newChange;
+                newChange = new Change(prop, newValue, false, arrayIndex - currentIndex +
+                    change.getArrayPos());
+                newChange.next2 = change;
+                change.setArrayPos(change.getArrayPos() - newChange.getArrayPos() + 1);
             }
+            lastChange.next2 = newChange;
         }
         else
         {
@@ -1238,8 +1258,8 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
             // array of children elements and text of the containing object
             if (arrayIndex < 0)
                 throw new IllegalArgumentException();
-            Change change = chgs[0];
-            Change lastChange = null;
+            Change lastChange = getcreateSequenceChange(chgs);
+            Change change = lastChange.next2;
             int currentIndex = 0;
             while (change != null)
             {
@@ -1254,45 +1274,29 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                     // An inserted object has now been deleted
                     deletedObjects.remove(copiedValue);
                     insertedObjects.remove(oldValue);
-                    if (lastChange != null)
-                        lastChange.next = change.next;
-                    else
-                        chgs[0] = change.next;
-                    if (change.next != null)
+                    lastChange.next2 = change.next2;
+                    if (change.next2 != null)
                     {
-                        change.next.setArrayPos(change.next.getArrayPos() + change.getArrayPos()-1);
+                       change.next2.setArrayPos(change.next2.getArrayPos()+change.getArrayPos()-1);
                     }
                     return;
                 }
                 lastChange = change;
-                change = change.next;
+                change = change.next2;
             }
-            if (lastChange == null)
+            Change newChange;
+            if (change == null)
             {
-                Change newChange = new Change(prop, copiedValue, true, arrayIndex);
-                chgs[0] = newChange;
-                if (change != null)
-                {
-                    newChange.next = change;
-                    change.setArrayPos(change.getArrayPos() - arrayIndex - 1);
-                }
+                newChange = new Change(prop, copiedValue, true, arrayIndex - currentIndex);
             }
             else
             {
-                Change newChange;
-                if (change == null)
-                {
-                    newChange = new Change(prop, copiedValue, true, arrayIndex - currentIndex);
-                }
-                else
-                {
-                    newChange = new Change(prop, copiedValue, true, arrayIndex - currentIndex +
-                        change.getArrayPos());
-                    change.setArrayPos(change.getArrayPos() - newChange.getArrayPos() - 1);
-                    newChange.next = change;
-                }
-                lastChange.next = newChange;
+                newChange = new Change(prop, copiedValue, true, arrayIndex - currentIndex +
+                    change.getArrayPos());
+                change.setArrayPos(change.getArrayPos() - newChange.getArrayPos() - 1);
+                newChange.next2 = change;
             }
+            lastChange.next2 = newChange;
         }
         else
         {
@@ -1417,6 +1421,39 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
     {
         int result = prop.hashCode() % length;
         return result > 0 ? result : -result;
+    }
+
+    /*
+     * Return the change corresponding to the sequence, creating it if necessary
+     */
+    private static Change getcreateSequenceChange(Change[] chgs)
+    {
+        int hashCode = hashCode(SEQUENCE, chgs.length);
+        Change change = chgs[hashCode];
+        Change lastChange = change;
+        for (; change != null && change.property != SEQUENCE; change = change.next)
+            lastChange = change;
+        if (change != null)
+            return change;
+        else
+        {
+            change = new Change(SEQUENCE, null, false, -1);
+            if (lastChange != null)
+                lastChange.next = change;
+            else
+                chgs[hashCode] = change;
+            return change;
+        }
+    }
+
+    /*
+     * Return the first change in the sequence, null if not found
+     */
+    public static Change getFirstSequenceChange(Change[] chgs)
+    {
+        Change change = chgs[hashCode(SEQUENCE, chgs.length)];
+        for (; change != null && change.property != SEQUENCE; change = change.next);
+        return change == null ? null : change.next2;
     }
 
     // =================================================================
@@ -1559,7 +1596,7 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                     int count = 0;
                     int currentIndex = 0;
                     Change change = null;
-                    for (Change c = modifications[0]; c != null; c = c.next)
+                    for (Change c = getFirstSequenceChange(modifications); c != null; c = c.next2)
                     {
                         PropertyXML p = (PropertyXML) c.getProperty();
                         currentIndex += c.getArrayPos();

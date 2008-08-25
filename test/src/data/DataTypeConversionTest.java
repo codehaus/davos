@@ -1152,15 +1152,20 @@ public class DataTypeConversionTest extends DataObjectTest
         String s4 = "---31Z";
         Date d4 = toDate(s4);
         checkDate(d4, fields, new int[] {31});
+        String s5 = "---04+02:00"; // in GMT, it is still the 3rd
+        Date d5 = toDate(s5);
+        checkDate(d5, fields, new int[] {3});
 
         fromDayToDate.convert(dobj, s1, d1);
-        fromDateToDay.convert(dobj, d1, s2);
+        fromDateToDay.convert(dobj, d1, s1);
         fromDayToDate.convert(dobj, s2, d2);
-        fromDateToDay.convert(dobj, d2, s2);
+        fromDateToDay.convert(dobj, d2, s1);
         fromDayToDate.convert(dobj, s3, d3);
-        fromDateToDay.convert(dobj, d3, "---04Z");
+        fromDateToDay.convert(dobj, d3, "---04");
         fromDayToDate.convert(dobj, s4, d4);
-        fromDateToDay.convert(dobj, d4, s4);
+        fromDateToDay.convert(dobj, d4, "---31");
+        fromDayToDate.convert(dobj, s5, d5);
+        fromDateToDay.convert(dobj, d5, "---03");
     }
 
     public void testDateTimeConversion() throws Exception
@@ -1246,11 +1251,11 @@ public class DataTypeConversionTest extends DataObjectTest
         checkDate(d3, fields, values);
 
         fromMonthToDate.convert(dobj, s1, d1);
-        fromDateToMonth.convert(dobj, d1, s2);
+        fromDateToMonth.convert(dobj, d1, s1);
         fromMonthToDate.convert(dobj, s2, d2);
-        fromDateToMonth.convert(dobj, d2, s2);
+        fromDateToMonth.convert(dobj, d2, s1);
         fromMonthToDate.convert(dobj, s3, d3);
-        fromDateToMonth.convert(dobj, d3, s2);
+        fromDateToMonth.convert(dobj, d3, s1);
     }
 
     public void testMonthDayConversion() throws Exception
@@ -1276,13 +1281,13 @@ public class DataTypeConversionTest extends DataObjectTest
         checkDate(d4, fields, new int[] {Calendar.FEBRUARY, 29});
 
         fromMonthDayToDate.convert(dobj, s1, d1);
-        fromDateToMonthDay.convert(dobj, d1, s2);
+        fromDateToMonthDay.convert(dobj, d1, s1);
         fromMonthDayToDate.convert(dobj, s2, d2);
-        fromDateToMonthDay.convert(dobj, d2, s2);
+        fromDateToMonthDay.convert(dobj, d2, s1);
         fromMonthDayToDate.convert(dobj, s3, d3);
-        fromDateToMonthDay.convert(dobj, d3, s2);
+        fromDateToMonthDay.convert(dobj, d3, s1);
         fromMonthDayToDate.convert(dobj, s4, d4);
-        fromDateToMonthDay.convert(dobj, d4, s4);
+        fromDateToMonthDay.convert(dobj, d4, "--02-29");
     }
 
     public void testTimeConversion() throws Exception
@@ -1332,11 +1337,11 @@ public class DataTypeConversionTest extends DataObjectTest
         checkDate(d3, fields, new int[] {1999});
 
         fromYearToDate.convert(dobj, s1, d1);
-        fromDateToYear.convert(dobj, d1, s2);
+        fromDateToYear.convert(dobj, d1, s1);
         fromYearToDate.convert(dobj, s2, d2);
-        fromDateToYear.convert(dobj, d2, s2);
+        fromDateToYear.convert(dobj, d2, s1);
         fromYearToDate.convert(dobj, s3, d3);
-        fromDateToYear.convert(dobj, d3, "1999Z");
+        fromDateToYear.convert(dobj, d3, "1999");
     }
 
     public void testYearMonthConversion() throws Exception
@@ -1360,11 +1365,11 @@ public class DataTypeConversionTest extends DataObjectTest
         checkDate(d3, fields, values);
 
         fromYearMonthToDate.convert(dobj, s1, d1);
-        fromDateToYearMonth.convert(dobj, d1, s2);
+        fromDateToYearMonth.convert(dobj, d1, s1);
         fromYearMonthToDate.convert(dobj, s2, d2);
-        fromDateToYearMonth.convert(dobj, d2, s2);
+        fromDateToYearMonth.convert(dobj, d2, s1);
         fromYearMonthToDate.convert(dobj, s3, d3);
-        fromDateToYearMonth.convert(dobj, d3, s2);
+        fromDateToYearMonth.convert(dobj, d3, s1);
     }
 
     public void testYearMonthDayConversion() throws Exception
@@ -1391,15 +1396,29 @@ public class DataTypeConversionTest extends DataObjectTest
         //fields = new int[] {Calendar.ERA, Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH};
         //values = new int[] {0, 1, Calendar.JANUARY, 1};
         //checkDate(d4, fields, values); // FAILS!
+        String s4 = "2001-07-15+02:00";
+        Date d4 = toDate(s4);
+        checkDate(d4, fields, values);
+        long l0 = d1.getTime();
+        long l1 = (23 * 60 * 60 * 1000)
+            + (59 * 60 * 1000)
+            + (59 * 1000)
+            + 999;
+        long l = l0 + l1;
+        Date d5 = new Date(l);
+        checkDate(d5, fields, values);
 
         fromYearMonthDayToDate.convert(dobj, s1, d1);
-        fromDateToYearMonthDay.convert(dobj, d1, s2);
+        fromDateToYearMonthDay.convert(dobj, d1, s1);
         fromYearMonthDayToDate.convert(dobj, s2, d2);
-        fromDateToYearMonthDay.convert(dobj, d2, s2);
+        fromDateToYearMonthDay.convert(dobj, d2, s1);
         fromYearMonthDayToDate.convert(dobj, s3, d3);
-        fromDateToYearMonthDay.convert(dobj, d3, s2);
+        fromDateToYearMonthDay.convert(dobj, d3, s1);
         //fromYearMonthDayToDate.convert(dobj, s4, d4);
         //fromDateToYearMonthDay.convert(dobj, d4, s4);
+        fromYearMonthDayToDate.convert(dobj, s4, d4);
+        fromDateToYearMonthDay.convert(dobj, d4, s1);
+        fromDateToYearMonthDay.convert(dobj, d5, s1);
     }
 
     public void testCalendar()

@@ -606,7 +606,7 @@ public class BuiltInTypeSystem
 
         // instance property of type "Type"
         P_TYPE_JAVACLASS = PropertyImpl.create(STRING, "javaClass", false, false, TYPE, null, false, false, null,
-            Common.EMPTY_STRING_LIST, "javaClass", Names.URI_SDOJAVA, SchemaType.BTC_STRING, true, false, true);
+            Common.EMPTY_STRING_LIST, "javaClass", Names.URI_SDOJAVA, SchemaType.BTC_STRING, false, true, true);
 
         // properties of TYPES type
         PropertyImpl p_types_type = PropertyImpl.create(TYPE, "type", true, true, TYPES, null, false, false, null, Common.EMPTY_STRING_LIST, 
@@ -653,7 +653,7 @@ public class BuiltInTypeSystem
 
         // instance property of type "Property"
         P_PROPERTY_XMLELEMENT = PropertyImpl.create(BOOLEAN, "xmlElement", false, false, PROPERTY, null, false, false, null,
-            Common.EMPTY_STRING_LIST, "xmlElement", Names.URI_SDOXML, SchemaType.BTC_BOOLEAN, true, true, true);
+            Common.EMPTY_STRING_LIST, "xmlElement", Names.URI_SDOXML, SchemaType.BTC_BOOLEAN, false, true, true);
 
         // now that we have the properties we add them to the type's list of properties before makeing the type immutable
         t_type_propList.add(p_type_basetype);

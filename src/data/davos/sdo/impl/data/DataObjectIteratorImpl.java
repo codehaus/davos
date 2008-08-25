@@ -37,36 +37,36 @@ public class DataObjectIteratorImpl implements DataObjectIterator
     private int offset;
     private PropertyXML currentProperty;
     // For the sequence case
-    private SequenceXML sequence;
-    private int sequenceIndex;
+    private Store store;
+    private int storeIndex;
 
     public DataObjectIteratorImpl(DataObjectXML object)
     {
         dataObject = object;
-        sequence = object.getSequenceXML();
-        sequenceIndex = 0;
+        storeIndex = 0;
         ChangeSummaryImpl c = (ChangeSummaryImpl) object.getChangeSummary();
         if (c != null)
             changes = c.getModifiedObjects().get(dataObject);
         buffer = new LinkedList<Change>();
-        if (sequence == null)
+        if (object.getSequenceXML() == null)
         {
             propertyIterator = object.getInstanceProperties().iterator();
             advanceProperty();
         }
         else
         {
-            change = changes != null ? changes[0] : null;
+            store = ((DataObjectImpl) object).getStore();
+            change = changes != null ? ChangeSummaryImpl.getFirstSequenceChange(changes) : null;
             lookForDeletes();
         }
     }
 
     public boolean hasNext()
     {
-        if (sequence == null)
+        if (store == null)
             return !buffer.isEmpty() || currentProperty != null;
         else
-            return !buffer.isEmpty() || sequenceIndex < sequence.size();
+            return !buffer.isEmpty() || storeIndex < store.storeSequenceSize();
     }
 
     public Change next()
@@ -76,7 +76,7 @@ public class DataObjectIteratorImpl implements DataObjectIterator
         if (!buffer.isEmpty())
             return buffer.removeFirst();
         Change result;
-        if (sequence == null)
+        if (store == null)
         {
             if (valueIterator == null)
             {
@@ -263,8 +263,8 @@ public class DataObjectIteratorImpl implements DataObjectIterator
         }
         else
         {
-            PropertyXML property = sequence.getSubstitution(sequenceIndex);
-            Object value = sequence.getValue(sequenceIndex);
+            PropertyXML property = store.storeSequenceGetSubstitution(storeIndex);
+            Object value = store.storeSequenceGetValue(storeIndex);
             result = new Change(property);
             result.setValue(value);
             result.setChangeType(Change.SAME);
@@ -283,11 +283,11 @@ public class DataObjectIteratorImpl implements DataObjectIterator
                     buffer.add(delete);
                 }
                 offset = 0;
-                change = change.next;
+                change = change.next2;
             }
             offset++;
             lookForDeletes();
-            sequenceIndex++;
+            storeIndex++;
         }
         return result;
     }
@@ -366,7 +366,7 @@ public class DataObjectIteratorImpl implements DataObjectIterator
             delete.setChangeType(Change.OLD);
             buffer.add(delete);
             offset = 0;
-            change = change.next;
+            change = change.next2;
         }
     }
 

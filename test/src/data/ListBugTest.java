@@ -349,4 +349,33 @@ public class ListBugTest extends DataTest
 
         System.out.println(xmlHelper.save(dobj, "example.com/test", "test"));
     }
+
+    public void testAddIncompatibleType() throws Exception
+    {
+        DataObject company = getRootDataObject("checkin", "company.xml");
+        DataObject department = company.getDataObject("departments[1]");
+        List dP = department.getInstanceProperties();
+        Property p = (Property)dP.get(0);
+        assertEquals("employees", p.getName());
+        Type employeeType = p.getType();
+        assertEquals("company.xsd", employeeType.getURI());
+        assertEquals("EmployeeType", employeeType.getName());
+        List employees = department.getList(p);
+        assertEquals(3, employees.size());
+        for (Object o : employees)
+        {
+            DataObject employee = (DataObject)o;
+            assertEquals(employeeType, employee.getType());
+        }
+        try
+        {
+            employees.add("Mike Blow");
+            fail("adding incompatible type should have failed");
+        }
+        catch (Exception e)
+        {
+            // check the exception
+            e.printStackTrace();
+        }
+    }
 }

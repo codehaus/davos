@@ -1037,12 +1037,12 @@ public class DataObjectGeneral
         }
     }
 
-    public boolean storeIsSet(Property property)
+    public boolean storeIsSet(PropertyXML property)
     {
         assert property!=null;
         for (int i = 0; i < _size; i++)
         {
-            Property p = _properties[i];
+            PropertyXML p = _properties[i];
             if (p !=null && p.equals(property))
                 return true;
         }
@@ -1233,7 +1233,14 @@ public class DataObjectGeneral
 
         public int size()
         {
-            return _dataObject.storeSequenceSize();
+            int seqSize = 0;
+            for( int i = 0; i<_dataObject.storeSequenceSize() ; i++)
+            {
+                PropertyXML p = _dataObject.storeSequenceGetPropertyXML(i);
+                if ( p==null || p.isXMLElement() )
+                    seqSize++;
+            }
+            return seqSize;
         }
 
         public Property getProperty(int index)
@@ -1243,36 +1250,37 @@ public class DataObjectGeneral
 
         public PropertyXML getPropertyXML(int index)
         {
-            return _dataObject.storeSequenceGetPropertyXML(index);
+            return _dataObject.storeSequenceGetPropertyXML(findStoreIndex(index));
         }
 
         public String getPrefixXML(int index)
         {
-            return _dataObject.storeSequenceGetXMLPrefix(index);
+            return _dataObject.storeSequenceGetXMLPrefix(findStoreIndex(index));
         }
 
         public PropertyXML getSubstitution(int index)
         {
-            return _dataObject.storeSequenceGetSubstitution(index);
+            return _dataObject.storeSequenceGetSubstitution(findStoreIndex(index));
         }
 
         public Object getValue(int index)
         {
-            return _dataObject.storeSequenceGetValue(index);
+            return _dataObject.storeSequenceGetValue(findStoreIndex(index));
         }
 
         public Object setValue(int index, Object value)
         {
             PropertyXML prop = getPropertyXML(index);
-            Object oldValue = _dataObject.storeSequenceGetValue(index);
-            PropertyXML oldProp = _dataObject.storeSequenceGetPropertyXML(index);
+            int storeIndex = findStoreIndex(index);
+            Object oldValue = _dataObject.storeSequenceGetValue(storeIndex);
+            PropertyXML oldProp = _dataObject.storeSequenceGetPropertyXML(storeIndex);
             unsetOppositePropertySingle(_dataObject, oldProp, oldValue);
 
             checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
             if (_dataObject.storeSequenceSize()==0)
                 _dataObject.storeSequenceAddNew(0, prop, value, null, null);
             else
-                _dataObject.storeSequenceSet(index, value);
+                _dataObject.storeSequenceSet(storeIndex, value);
             setOppositeProperty(_dataObject, prop, value, null);
             return  oldValue;
         }
@@ -1321,7 +1329,7 @@ public class DataObjectGeneral
         {
             PropertyXML prop = PropertyImpl.getPropertyXML(property);
             checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
-            _dataObject.storeSequenceAddNew(index, prop, value, null, prop);
+            _dataObject.storeSequenceAddNew(findStoreIndex(index), prop, value, null, prop);
             setOppositeProperty(_dataObject, prop, value, null);
         }
 
@@ -1329,7 +1337,7 @@ public class DataObjectGeneral
         {
             Object value = getValue(index);
             PropertyXML prop = getPropertyXML(index);
-            _dataObject.storeSequenceUnset(index);
+            _dataObject.storeSequenceUnset(findStoreIndex(index));
             unsetOppositePropertySeq(_dataObject, prop, value);
         }
 
@@ -1340,12 +1348,12 @@ public class DataObjectGeneral
                 throw new IndexOutOfBoundsException("toIndex: " + toIndex + " fromIndex: " + fromIndex + " size: " + size);
 
             _dataObject._version++;
-            PropertyXML prop = _dataObject.storeSequenceGetPropertyXML(fromIndex);
-            Object value = _dataObject.storeSequenceGetValue(fromIndex);
-            String prefix = _dataObject.storeSequenceGetXMLPrefix(fromIndex);
+            PropertyXML prop = _dataObject.storeSequenceGetPropertyXML(findStoreIndex(fromIndex));
+            Object value = _dataObject.storeSequenceGetValue(findStoreIndex(fromIndex));
+            String prefix = _dataObject.storeSequenceGetXMLPrefix(findStoreIndex(fromIndex));
 
-            _dataObject.storeSequenceUnset(fromIndex);
-            _dataObject.storeSequenceAddNew(toIndex, prop, value, prefix, prop);
+            _dataObject.storeSequenceUnset(findStoreIndex(fromIndex));
+            _dataObject.storeSequenceAddNew(findStoreIndex(toIndex), prop, value, prefix, prop);
         }
 
         public void addText(String text)
@@ -1355,7 +1363,7 @@ public class DataObjectGeneral
 
         public void addText(int index, String text)
         {
-            _dataObject.storeSequenceAddNew(index, null, text, null, null);
+            _dataObject.storeSequenceAddNew(findStoreIndex(index), null, text, null, null);
         }
 
         /**
@@ -1372,6 +1380,35 @@ public class DataObjectGeneral
         public void add(int index, String text)
         {
             addText(index, text);
+        }
+
+        /**
+         * Converts seqIndex into storeIndex by skiping attribute properties entries
+         * Note:  inneficient elem seq implementation, but less destructive at this point 
+         */
+        private int findStoreIndex(int seqIndex)
+        {
+            int storeSize = _dataObject.storeSequenceSize();
+            if ( seqIndex<0 || seqIndex > storeSize )
+                throw new IllegalArgumentException("Index out of bounds.");
+
+            int storeIdx = 0;
+            int seqIdx = 0;
+            while( storeIdx < storeSize )
+            {
+                PropertyXML p = _dataObject.storeSequenceGetPropertyXML(storeIdx);
+                if ( p==null || p.isXMLElement() )
+                {
+                    if (seqIdx == seqIndex)
+                        return storeIdx;
+
+                    seqIdx++;
+                }
+
+                storeIdx++;
+            }
+
+            return storeIdx;
         }
     }
 

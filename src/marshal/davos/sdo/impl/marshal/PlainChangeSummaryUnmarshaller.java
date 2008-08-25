@@ -23,6 +23,8 @@ import davos.sdo.SequenceXML;
 import davos.sdo.TypeXML;
 import davos.sdo.impl.data.ChangeSummaryImpl;
 import davos.sdo.impl.data.DataFactoryImpl;
+import davos.sdo.impl.data.Store;
+import davos.sdo.impl.data.DataObjectImpl;
 import davos.sdo.impl.type.BuiltInTypeSystem;
 import davos.sdo.impl.type.SimpleValueHelper;
 import davos.sdo.impl.xpath.XPath;
@@ -1218,7 +1220,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
             }
             else
             {
-                SequenceXML newSequence = parent.getSequenceXML();
+                Store newStore = ((DataObjectImpl) parent).getStore();
                 ArrayList<PropertyXML> oldProperties = new ArrayList<PropertyXML>();
                 ArrayList<Object> oldValues = new ArrayList<Object>();
                 Map<String, PropertyXML> onDemandProperties = new HashMap<String, PropertyXML>();
@@ -1226,8 +1228,8 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                 {
                     if (c.isAttribute())
                     {
-                        PropertyXML prop = findAttributePropertyByName(newSequence,
-                            c.getUri(), c.getName());
+                        PropertyXML prop = findAttributePropertyByName(newStore, c.getUri(),
+                            c.getName());
                         if (prop == null)
                         {
                             prop = getDataFactoryImpl().getRootProperty(null, c.getName(),
@@ -1413,16 +1415,33 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                     }
                 }
                 int i, j;
-                // We'll simplyfiy things a little bit by adding a "dummy" change at the
-                // beginning of the list
-                ChangeSummaryImpl.Change lastChange = new ChangeSummaryImpl.Change(
-                    null, null, false, 0);
-                chgs[0] = lastChange;
+                ChangeSummaryImpl.Change lastChange = new ChangeSummaryImpl.Change( 
+                    ChangeSummaryImpl.SEQUENCE, null, false, -1);
+                chgs[ChangeSummaryImpl.hashCode(ChangeSummaryImpl.SEQUENCE, chgs.length)] = lastChange;
+                List<QName> unsetList = r.getUnset();
+                if (unsetList != null)
+                    for (QName unsetPropName : unsetList)
+                    {
+                        PropertyXML prop = findAttributePropertyByName(newStore,
+                            unsetPropName.getNamespaceURI(), unsetPropName.getLocalPart());
+                        ChangeSummaryImpl.Change newChange = null;
+                        if (prop != null && (prop.getType().isDataType() || !prop.isContainment()))
+                        {
+                            // Add a new 'unset' change
+                            newChange = new ChangeSummaryImpl.Change(prop, null, false, 0);
+                        }
+                        // else do nothing
+                        if (newChange != null)
+                        {
+                            lastChange.next2 = newChange;
+                            lastChange = newChange;
+                        }
+                    }
                 int currentIndex = 0;
-                for (i = 0, j = 0; i < newSequence.size(); )
+                for (i = 0, j = 0; i < newStore.storeSequenceSize(); )
                 {
-                    PropertyXML prop = newSequence.getPropertyXML(i);
-                    Object value = newSequence.getValue(i);
+                    PropertyXML prop = newStore.storeSequenceGetPropertyXML(i);
+                    Object value = newStore.storeSequenceGetValue(i);
                     PropertyXML oldProp = j >= oldProperties.size() ? MARKER_PROPERTY :
                         oldProperties.get(j);
                     if ( prop!=null && !prop.isXMLElement())
@@ -1460,8 +1479,8 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                     if (!sameReference)
                                     {
                                         currentIndex = i;
-                                        lastChange.next = newChange;
-                                        newChange.next = newChange2;
+                                        lastChange.next2 = newChange;
+                                        newChange.next2 = newChange2;
                                         lastChange = newChange2;
                                     }
                                 }
@@ -1475,7 +1494,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                     oldProp, oldValues.get(j), true, i - currentIndex);
                                 currentIndex = i;
-                                lastChange.next = newChange;
+                                lastChange.next2 = newChange;
                                 lastChange = newChange;
                                 if (!prop.getType().isDataType())
                                 {
@@ -1493,7 +1512,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                             ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                 prop, value, false, i - currentIndex);
                             currentIndex = i++;
-                            lastChange.next = newChange;
+                            lastChange.next2 = newChange;
                             lastChange = newChange;
                             if (!prop.getType().isDataType())
                             {
@@ -1518,7 +1537,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                             ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                 oldProp, oldValues.get(j), true, i - currentIndex);
                             currentIndex = i;
-                            lastChange.next = newChange;
+                            lastChange.next2 = newChange;
                             lastChange = newChange;
                             oldProp = ++j >= oldProperties.size() ? MARKER_PROPERTY :
                                 oldProperties.get(j);
@@ -1548,7 +1567,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                     oldProp, oldValues.get(j), true, i - currentIndex);
                                 currentIndex = i;
-                                lastChange.next = newChange;
+                                lastChange.next2 = newChange;
                                 lastChange = newChange;
                                 oldProp = ++j >= oldProperties.size() ? MARKER_PROPERTY :
                                     oldProperties.get(j);
@@ -1567,7 +1586,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                     oldProp, oldValues.get(j), true, i - currentIndex);
                                 currentIndex = i;
-                                lastChange.next = newChange;
+                                lastChange.next2 = newChange;
                                 lastChange = newChange;
                                 oldProp = ++j >= oldProperties.size() ? MARKER_PROPERTY :
                                     oldProperties.get(j);
@@ -1580,8 +1599,8 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange2 = new ChangeSummaryImpl.Change(
                                     oldProp, null, false, 0);
                                 currentIndex = i;
-                                lastChange.next = newChange;
-                                newChange.next = newChange2;
+                                lastChange.next2 = newChange;
+                                newChange.next2 = newChange2;
                                 lastChange = newChange2;
                                 j++;
                             }
@@ -1591,7 +1610,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange =  new ChangeSummaryImpl.Change(
                                     prop, value, false, i - currentIndex);
                                 currentIndex = i;
-                                lastChange.next = newChange;
+                                lastChange.next2 = newChange;
                                 lastChange = newChange;
                             }
                             i++;
@@ -1604,7 +1623,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                             ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                 prop, value, false, i - currentIndex);
                             currentIndex = i;
-                            lastChange.next = newChange;
+                            lastChange.next2 = newChange;
                             lastChange = newChange;
                             i++;
                         }
@@ -1615,7 +1634,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                     oldProp, oldValues.get(j), true, i - currentIndex);
                                 currentIndex = i;
-                                lastChange.next = newChange;
+                                lastChange.next2 = newChange;
                                 lastChange = newChange;
                                 oldProp = ++j >= oldProperties.size() ? MARKER_PROPERTY :
                                     oldProperties.get(j);
@@ -1627,7 +1646,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                 ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                                     prop, value, false, i - currentIndex);
                                 currentIndex = i;
-                                lastChange.next = newChange;
+                                lastChange.next2 = newChange;
                                 lastChange = newChange;
                                 i++;
                                 if ( prop!=null && !prop.getType().isDataType())
@@ -1635,10 +1654,10 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                                     ic.add(newChange);
                                     ip.add(prop);
                                 }
-                                if (i >= newSequence.size())
+                                if (i >= newStore.storeSequenceSize())
                                     break;
-                                prop = newSequence.getPropertyXML(i);
-                                value = newSequence.getValue(i);
+                                prop = newStore.storeSequenceGetPropertyXML(i);
+                                value = newStore.storeSequenceGetValue(i);
                             }
                             if (j < oldValues.size() && value == oldValues.get(j))
                             {
@@ -1661,11 +1680,10 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                     ChangeSummaryImpl.Change newChange = new ChangeSummaryImpl.Change(
                         oldProp, oldValues.get(j), true, i - currentIndex);
                     currentIndex = i;
-                    lastChange.next = newChange;
+                    lastChange.next2 = newChange;
                     lastChange = newChange;
                     j++;
                 }
-                chgs[0] = chgs[0].next;
             }
         }
         // Resolve all the references found in deleted objects
@@ -1764,7 +1782,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
             }
             else
             {
-                ChangeSummaryImpl.Change change = chgs[0];
+                ChangeSummaryImpl.Change change = ChangeSummaryImpl.getFirstSequenceChange(chgs);
                 boolean alreadyInserted = false;
                 while (change != null)
                 {
@@ -1773,7 +1791,7 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                         alreadyInserted = true;
                         break;
                     }
-                    change = change.next;
+                    change = change.next2;
                 }
                 if (alreadyInserted)
                     continue;
@@ -1796,9 +1814,9 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
     {
         if (isSequence)
         {
-            SequenceXML s = parent.getSequenceXML();
-            for (int i = 0; i < s.size(); i++)
-                if (value == s.getValue(i))
+            Store s = ((DataObjectImpl) parent).getStore();
+            for (int i = 0; i < s.storeSequenceSize(); i++)
+                if (value == s.storeSequenceGetValue(i))
                     return i;
             return -2; // Error
         }
@@ -1895,11 +1913,11 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
         return null;
     }
 
-    private PropertyXML findAttributePropertyByName(SequenceXML s, String uri, String name)
+    private PropertyXML findAttributePropertyByName(Store s, String uri, String name)
     {
-        for (int i = 0; i < s.size(); i++)
+        for (int i = 0; i < s.storeSequenceSize(); i++)
         {
-            PropertyXML prop = s.getPropertyXML(i);
+            PropertyXML prop = s.storeSequenceGetPropertyXML(i);
             if ( prop!=null /*ie text*/ && !prop.isXMLElement() &&
                 prop.getXMLName().equals(name) &&
                 (uri.length() == 0 ? prop.getXMLNamespaceURI() == null :
@@ -1961,12 +1979,12 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
         {
         case BuiltInTypeSystem.TYPECODE_OBJECT:
             if (dObject.getSequence() != null)
-                return dObject.getSequence().getValue(0);
+                return ((DataObjectImpl) dObject).getStore().storeSequenceGetValue(0);
             else
                 return dObject.get(0);
         case BuiltInTypeSystem.TYPECODE_STRING:
             if (dObject.getSequence() != null)
-                return dObject.getSequence().getValue(0);
+                return ((DataObjectImpl) dObject).getStore().storeSequenceGetValue(0);
             else
                 return null;
         default:
@@ -1979,8 +1997,9 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
         TypeXML type = prop.getTypeXML();
         if (type.getTypeCode() == BuiltInTypeSystem.TYPECODE_DATAOBJECT)
             return prop;
-        else if (dataObject.getSequence() != null && dataObject.getSequence().size() == 1 &&
-                dataObject.getSequence().getProperty(0) == null /*ie is text*/)
+        else if (dataObject.getSequence() != null &&
+            ((DataObjectImpl) dataObject).getStore().storeSequenceSize() == 1 &&
+            dataObject.getSequence().getProperty(0) == null /*ie is text*/)
             return prop;
         else
             return getDataFactoryImpl().getRootProperty(prop.getXMLNamespaceURI(),
@@ -2084,11 +2103,11 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
     {
         final int conversion = getConversionMethod(prop, newProp);
 
-        SequenceXML seq = parent.getSequenceXML();
-        for (int i = 0; i < seq.size(); i++)
-            if (seq.getPropertyXML(i) == prop)
+        Store store = ((DataObjectImpl) parent).getStore();
+        for (int i = 0; i < store.storeSequenceSize(); i++)
+            if (store.storeSequenceGetPropertyXML(i) == prop)
             {
-                Object value = seq.getValue(i);
+                Object value = store.storeSequenceGetValue(i);
                 Object newValue = value;
                 switch (conversion)
                 {
@@ -2102,8 +2121,8 @@ public class PlainChangeSummaryUnmarshaller extends Unmarshaller implements Chan
                         newValue = convertObjectToDataObject(value);
                     break;
                 }
-                seq.remove(i);
-                seq.add(i, newProp, newValue); // prefix as well somehow
+                store.storeSequenceUnset(i);
+                store.storeSequenceAddNew(i, newProp, newValue, null, newProp); // prefix as well somehow
                 // TODO(this is N-square, we now need a reverse map so we can
                 // replace those values which have to be == with the ones in the doc
                 for (int j = 0; j < oldValues.size(); j++)

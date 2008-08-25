@@ -42,6 +42,7 @@ public class TypeHelperTest extends BaseTest
     {
         
         TestSuite suite = new TestSuite();
+        suite.addTest(new TypeHelperTest("testGetBuiltInType"));
         suite.addTest(new TypeHelperTest("testGetType"));
         suite.addTest(new TypeHelperTest("testGetType1"));
         suite.addTest(new TypeHelperTest("testDefine"));
@@ -108,6 +109,68 @@ public class TypeHelperTest extends BaseTest
         Type t = typeHelper.getType(c);
         assertNotNull(t);
         System.out.println(t);
+    }
+
+    private void _testGetType(Class c, String uri, String name)
+    {
+        Type t = typeHelper.getType(c);
+        assertNotNull(t);
+        System.out.println(t);
+        assertEquals(uri, t.getURI());
+        assertEquals(name, t.getName());
+    }
+
+    /* test that TypeHelper.getType(Class) returns a built-in type
+       for classes that are instance classes of built-in types;
+       as opposed to a user-defined type with the same instance class */
+    public void testGetBuiltInType()
+    {
+        _testGetType(boolean.class, "commonj.sdo", "Boolean");
+        _testGetType(byte.class, "commonj.sdo", "Byte");
+        Type bytesType = typeHelper.getType("commonj.sdo", "Bytes");
+        Class byteArrayClass = bytesType.getInstanceClass();
+        System.out.println("byte array class is: " + byteArrayClass);
+        _testGetType(byteArrayClass, "commonj.sdo", "Bytes");
+        _testGetType(char.class, "commonj.sdo", "Character");
+        _testGetType(java.util.Date.class, "commonj.sdo", "Date");
+        _testGetType(String.class, "commonj.sdo", "String");
+        _testGetType(java.math.BigDecimal.class, "commonj.sdo", "Decimal");
+        _testGetType(double.class, "commonj.sdo", "Double");
+        _testGetType(float.class, "commonj.sdo", "Float");
+        _testGetType(int.class, "commonj.sdo", "Int");
+        _testGetType(java.math.BigInteger.class, "commonj.sdo", "Integer");
+        _testGetType(long.class, "commonj.sdo", "Long");
+        _testGetType(Object.class, "commonj.sdo", "Object");
+        _testGetType(short.class, "commonj.sdo", "Short");
+        Type stringsType = typeHelper.getType("commonj.sdo", "Strings");
+        Class listOfStringClass = stringsType.getInstanceClass();
+        System.out.println("list of string has class: " + listOfStringClass);
+        _testGetType(listOfStringClass, "commonj.sdo", "Strings");
+
+        _testGetType(Boolean.class, "commonj.sdo/java", "BooleanObject");
+        _testGetType(Byte.class, "commonj.sdo/java", "ByteObject");
+        _testGetType(Character.class, "commonj.sdo/java", "CharacterObject");
+        _testGetType(Double.class, "commonj.sdo/java", "DoubleObject");
+        _testGetType(Float.class, "commonj.sdo/java", "FloatObject");
+        _testGetType(Integer.class, "commonj.sdo/java", "IntObject");
+        _testGetType(Long.class, "commonj.sdo/java", "LongObject");
+        _testGetType(Short.class, "commonj.sdo/java", "ShortObject");
+
+        // user-defined type with instance class int.class
+        Type t1 = typeHelper.getType("http://sdo/test/instanceclass1", "a1");
+        assertNotNull(t1);
+        assertEquals(int.class, t1.getInstanceClass());
+        _testGetType(int.class, "commonj.sdo", "Int");
+        // user-defined type with instance class java.math.BigInteger
+        Type t3 = typeHelper.getType("http://sdo/test/instanceclass1", "a3");
+        assertNotNull(t3);
+        assertEquals(java.math.BigInteger.class, t3.getInstanceClass());
+        _testGetType(java.math.BigInteger.class, "commonj.sdo", "Integer");
+        // user-defined type with instance class Short.class
+        Type t4 = typeHelper.getType("http://sdo/test/instanceclass1", "a4");
+        assertNotNull(t4);
+        assertEquals(java.lang.Short.class, t4.getInstanceClass());
+        _testGetType(Short.class, "commonj.sdo/java", "ShortObject");
     }
 
     public void testGetType()

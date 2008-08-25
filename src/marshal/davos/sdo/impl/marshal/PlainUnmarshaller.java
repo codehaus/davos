@@ -30,6 +30,7 @@ import davos.sdo.impl.data.DataFactoryImpl;
 import davos.sdo.impl.data.DataObjectGeneral;
 import davos.sdo.impl.data.Store;
 import davos.sdo.impl.data.ChangeSummaryImpl;
+import davos.sdo.impl.data.DataObjectImpl;
 import davos.sdo.impl.type.BuiltInTypeSystem;
 import davos.sdo.impl.type.PropertyImpl;
 import davos.sdo.impl.xpath.XPath;
@@ -525,8 +526,10 @@ public class PlainUnmarshaller extends Unmarshaller implements ReferenceResolver
             containmentProperty != null)
         if (containmentProperty.isDynamic() && !containmentProperty.isGlobal())
         {
-            SequenceXML seq = _current.getSequenceXML();
-            if (_nilled || (seq.size() == 1 && seq.getProperty(0) == null /* ie is text */))
+            //SequenceXML seq = _current.getSequenceXML();
+            //if (_nilled || (seq.size() == 1 && seq.getProperty(0) == null /* ie is text */))
+            DataObjectImpl dObjImpl = (DataObjectImpl)_current;
+            if (_nilled || (dObjImpl.getStore().storeSequenceSize() == 1 && dObjImpl.getStore().storeSequenceGetPropertyXML(0) == null /* ie is text */))
             {
                 // We have a candidate for turning into a simple type
                 fixOnDemandPropertyDataObjectToObject(containmentProperty, container, _current,

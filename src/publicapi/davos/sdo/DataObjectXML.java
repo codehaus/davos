@@ -30,9 +30,6 @@ public interface DataObjectXML
     ListXMLIterator getUnsequencedXML();
     ListXMLIterator getListXMLIterator(PropertyXML property);
 
-    // todo cezar remove after radu changes the marshaller to use the ListXMLIterator
-    String getXMLPrefix(int index);
-
     DataObjectXML createDataObjectXML(PropertyXML propertyXML, String prefix, PropertyXML substitution);
     DataObjectXML createDataObjectXML(PropertyXML propertyXML, TypeXML typeXML,
         String prefix, PropertyXML substitution);

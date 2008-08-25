@@ -1596,13 +1596,38 @@ public class ChangeSummaryTest extends DataTest
         assertTrue(c.isDeleted(phone2));
         assertTrue(c.isDeleted(phone3));
 
-        // only deleted employee shows up in the change list as deleted
+        // deleted employee and descendant data objects 
+        // show up in the change list as deleted
         changeList = (List<DataObject>)c.getChangedDataObjects();
-        assertEquals(2, changeList.size());
+        assertEquals(2 + 5, changeList.size());
+        // employee
         i = find(employeeType, changeList, 0);
         assertTrue(i >= 0);
         employee = changeList.get(i);
         assertTrue(c.isDeleted(employee));
+        // addresses
+        i = find(addressType, changeList, 0);
+        assertTrue(i >= 0);
+        address = changeList.get(i);
+        assertTrue(c.isDeleted(address));
+        int j = find(addressType, changeList, i + 1);
+        assertTrue(j > i);
+        address = changeList.get(j);
+        assertTrue(c.isDeleted(address));
+        // phones
+        i = find(phoneType, changeList, 0);
+        assertTrue(i >= 0);
+        phone = changeList.get(i);
+        assertTrue(c.isDeleted(phone));
+        j = find(phoneType, changeList, i + 1);
+        assertTrue(j > i);
+        phone = changeList.get(j);
+        assertTrue(c.isDeleted(phone));
+        int k = find(phoneType, changeList, j + 1);
+        assertTrue(k > j);
+        phone = changeList.get(k);
+        assertTrue(c.isDeleted(phone));
+        // employees (parent of employee)
         i = find(employeesType, changeList, 0);
         assertTrue(i >= 0);
         DataObject employees = changeList.get(i);
@@ -1684,9 +1709,9 @@ public class ChangeSummaryTest extends DataTest
         assertTrue(c.isDeleted(employee1));
         assertTrue(c.isDeleted(employee2));
         assertTrue(c.isDeleted(employee3));
-        // .. but employees do not show up in change list
+        // department and employees show up in change list as deleted
         changeList = (List<DataObject>)c.getChangedDataObjects();
-        assertEquals(2, changeList.size());
+        assertEquals(2 + 3, changeList.size());
         i = find(departmentType, changeList, 0);
         assertTrue(i >= 0);
         c1 = changeList.get(i);
@@ -1695,6 +1720,18 @@ public class ChangeSummaryTest extends DataTest
         assertTrue(i >= 0);
         c2 = changeList.get(i);
         assertTrue(c.isModified(c2));
+        int j1 = find(employeeType, changeList, 0);
+        assertTrue(j1 >= 0);
+        DataObject e1 = changeList.get(j1);
+        assertTrue(c.isDeleted(e1));
+        int j2 = find(employeeType, changeList, j1 + 1);
+        assertTrue(j2 > j1);
+        DataObject e2 = changeList.get(j2);
+        assertTrue(c.isDeleted(e2));
+        int j3 = find(employeeType, changeList, j2 + 1);
+        assertTrue(j3 > j2);
+        DataObject e3 = changeList.get(j3);
+        assertTrue(c.isDeleted(e3));
 
         xmlHelper.save(company.getRootObject(), "commonj.sdo", "datagraph", System.out);
         System.out.println();
@@ -1862,6 +1899,7 @@ public class ChangeSummaryTest extends DataTest
         String NS = "http://www.example.com/choice";
         Type itemsType = typeHelper.getType(NS, "ItemsType");
         Type shirtType = typeHelper.getType(NS, "ShirtType");
+        Type sizeType = typeHelper.getType(NS, "ShirtSize");
         DataObject newShirt = dataFactory.create(shirtType);
         newShirt.set("color", "pink");
         DataObject shirtSize = newShirt.createDataObject("size");
@@ -1882,13 +1920,15 @@ public class ChangeSummaryTest extends DataTest
 
         List<DataObject> changeList = (List<DataObject>)c.getChangedDataObjects();
         assertNotNull(changeList);
-        assertEquals(3, changeList.size());
+        assertEquals(4, changeList.size());
         int i1 = find(itemsType, changeList, 0);
         assertTrue(i1 >= 0);
         int i2 = find(shirtType, changeList, 0);
         assertTrue(i2 >= 0);
         int i3 = find(shirtType, changeList, i2 + 1);
         assertTrue(i3 > i2);
+        int i4 = find(sizeType, changeList, 0);
+        assertTrue(i4 >= 0);
         
         DataObject c2 = (DataObject)changeList.get(i2);
         DataObject c3 = (DataObject)changeList.get(i3);        
@@ -1905,6 +1945,8 @@ public class ChangeSummaryTest extends DataTest
             assertTrue(c.isModified(c3));
             assertEquals(shirt, c3);
         }
+        DataObject c4 = (DataObject)changeList.get(i4);
+        assertTrue(c.isCreated(c4));
 
         saveDataGraph(items.getDataGraph(), new File(dir, "items_dg.xml"));
         compareXMLFiles(getResourceFile("data", "items_dg.xml"), 

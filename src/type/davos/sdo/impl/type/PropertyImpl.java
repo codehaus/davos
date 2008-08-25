@@ -207,14 +207,14 @@ public class PropertyImpl
                             continue;
                         else
                         {   // they are different
-                            if (type.isDataType() && type.isDataType())
+                            if (type.isDataType() && itemType.isDataType())
                                 type = BuiltInTypeSystem.OBJECT;
-                            else
+                            else // at least one is not data type, i.e., is a data object
                                 type = BuiltInTypeSystem.DATAOBJECT;
                         }
 
                         if (type==BuiltInTypeSystem.DATAOBJECT)
-                            break;      // most general break the for loop
+                            break; // most general, so break the for loop
                     }
                 }
             }

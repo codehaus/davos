@@ -64,7 +64,8 @@ public class EqualityHelperImpl implements EqualityHelper
         if (dataObject1.getType() != dataObject2.getType())
             return false;
 
-        if (dataObject1.getType().isSequenced())
+        boolean sequenced = dataObject1.getType().isSequenced();
+        if (sequenced)
         {
             // Compare using the sequences
             SequenceXML seq1 = (SequenceXML) dataObject1.getSequence();
@@ -106,61 +107,64 @@ public class EqualityHelperImpl implements EqualityHelper
             // One of the sequences is at the end, check that the other is too
             return i >= size1 && j >= size2;
         }
-        else
+        // Compare "static" properties first
+        List properties = dataObject1.getType().getProperties();
+        for (Object o : properties)
         {
-            // Compare "static" properties first
-            List properties = dataObject1.getType().getProperties();
-            for (Object o : properties)
-            {
-                PropertyXML p = (PropertyXML) o;
-                Object o1 = dataObject1.get(p);
-                Object o2 = dataObject2.get(p);
-                if (!objectEquals(o1, o2, p, deep, ctx))
-                    return false;
-            }
-            // Now compare "open-content" properties
-            // This is tricky because we can have different objects representing
-            // "equal" properties
-            // The algorithm:
-            // 1. put open-content properties from dataObject2 in a list
-            //    (this could be optimized by using a map of lists, since we can
-            //    maybe have the same property show up multiple times)
-            // 2. for each propery in the list of open-content properties on dataObject1
-            // 2.1. search for the first property in the list that is "equal" to it
-            // 2.2. remove that property from the list
-            // 2.3. compare the respective Objects
-            List instanceProperties = dataObject2.getInstanceProperties();
-            int size = properties.size();
-            List<PropertyXML> list = new ArrayList<PropertyXML>(instanceProperties.size() - size);
-            for (Iterator it = instanceProperties.listIterator(size); it.hasNext(); )
-                list.add((PropertyXML) it.next());
-            instanceProperties = dataObject1.getInstanceProperties();
-            outer:
-            for (Iterator it = instanceProperties.listIterator(size); it.hasNext(); )
-            {
-                PropertyXML p = (PropertyXML) it.next();
-                for (ListIterator<PropertyXML> lit = list.listIterator(); lit.hasNext(); )
-                {
-                    PropertyXML p2 = lit.next();
-                    if (propertyEquals(p, p2))
-                    {
-                        if (!objectEquals(dataObject1.get(p), dataObject2.get(p2), p, deep, ctx))
-                            return false;
-                        lit.remove();
-                        continue outer;
-                    }
-                }
-                // If we got here, it means that we were not able to find a
-                // matching property for 'p'
-                return false;
-            }
-            // If we got here, it means that all properties in dataObject1 were
-            // matched by a corresponding property on dataObject2 and the corresponding
-            // values were equal; not bad, make sure that there aren't properties left
-            // in the list
-            if (list.size() > 0)
+            PropertyXML p = (PropertyXML) o;
+            Object o1 = dataObject1.get(p);
+            Object o2 = dataObject2.get(p);
+            if (!(p.isXMLElement() && sequenced) && !objectEquals(o1, o2, p, deep, ctx))
                 return false;
         }
+        // Now compare "open-content" properties
+        // This is tricky because we can have different objects representing
+        // "equal" properties
+        // The algorithm:
+        // 1. put open-content properties from dataObject2 in a list
+        //    (this could be optimized by using a map of lists, since we can
+        //    maybe have the same property show up multiple times)
+        // 2. for each propery in the list of open-content properties on dataObject1
+        // 2.1. search for the first property in the list that is "equal" to it
+        // 2.2. remove that property from the list
+        // 2.3. compare the respective Objects
+        List instanceProperties = dataObject2.getInstanceProperties();
+        int size = properties.size();
+        List<PropertyXML> list = new ArrayList<PropertyXML>(instanceProperties.size() - size);
+        for (Iterator it = instanceProperties.listIterator(size); it.hasNext(); )
+        {
+            PropertyXML p = (PropertyXML) it.next();
+            if (!(p.isXMLElement() && sequenced))
+                list.add(p);
+        }
+        instanceProperties = dataObject1.getInstanceProperties();
+        outer:
+        for (Iterator it = instanceProperties.listIterator(size); it.hasNext(); )
+        {
+            PropertyXML p = (PropertyXML) it.next();
+            if (p.isXMLElement() && sequenced)
+                continue;
+            for (ListIterator<PropertyXML> lit = list.listIterator(); lit.hasNext(); )
+            {
+                PropertyXML p2 = lit.next();
+                if (propertyEquals(p, p2))
+                {
+                    if (!objectEquals(dataObject1.get(p), dataObject2.get(p2), p, deep, ctx))
+                        return false;
+                    lit.remove();
+                    continue outer;
+                }
+            }
+            // If we got here, it means that we were not able to find a
+            // matching property for 'p'
+            return false;
+        }
+        // If we got here, it means that all properties in dataObject1 were
+        // matched by a corresponding property on dataObject2 and the corresponding
+        // values were equal; not bad, make sure that there aren't properties left
+        // in the list
+        if (list.size() > 0)
+            return false;
         return ctx == null || ctx.registerObjectEquals(dataObject1, dataObject2);
     }
 

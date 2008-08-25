@@ -626,7 +626,9 @@ public class DataHelperImpl
         GDateBuilder gdb = new GDateBuilder(date);
         gdb.normalizeToTimeZone(0);
         gdb.setBuiltinTypeCode(SchemaType.BTC_G_DAY);
-        return gdb.canonicalString();
+        String s = gdb.canonicalString();
+        int k = s.lastIndexOf('Z');
+        return ((k > -1) ? s.substring(0, k) : s);
     }
 
     public static String _toMonth(Date date)
@@ -635,7 +637,10 @@ public class DataHelperImpl
         GDateBuilder gdb = new GDateBuilder(date);
         gdb.normalizeToTimeZone(0);
         gdb.setBuiltinTypeCode(SchemaType.BTC_G_MONTH);
-        return gdb.canonicalString();
+        //return gdb.canonicalString();
+        String s = gdb.canonicalString();
+        int k = s.lastIndexOf('Z');
+        return ((k > -1) ? s.substring(0, k) : s);
     }
 
     public static String _toMonthDay(Date date)
@@ -644,7 +649,10 @@ public class DataHelperImpl
         GDateBuilder gdb = new GDateBuilder(date);
         gdb.normalizeToTimeZone(0);
         gdb.setBuiltinTypeCode(SchemaType.BTC_G_MONTH_DAY);
-        return gdb.canonicalString();
+        //return gdb.canonicalString();
+        String s = gdb.canonicalString();
+        int k = s.lastIndexOf('Z');
+        return ((k > -1) ? s.substring(0, k) : s);
     }
 
     public static String _toYear(Date date)
@@ -653,7 +661,10 @@ public class DataHelperImpl
         GDateBuilder gdb = new GDateBuilder(date);
         gdb.normalizeToTimeZone(0);
         gdb.setBuiltinTypeCode(SchemaType.BTC_G_YEAR);
-        return gdb.canonicalString();
+        //return gdb.canonicalString();
+        String s = gdb.canonicalString();
+        int k = s.lastIndexOf('Z');
+        return ((k > -1) ? s.substring(0, k) : s);
     }
 
     public static String _toYearMonth(Date date)
@@ -662,7 +673,10 @@ public class DataHelperImpl
         GDateBuilder gdb = new GDateBuilder(date);
         gdb.normalizeToTimeZone(0);
         gdb.setBuiltinTypeCode(SchemaType.BTC_G_YEAR_MONTH);
-        return gdb.canonicalString();
+        //return gdb.canonicalString();
+        String s = gdb.canonicalString();
+        int k = s.lastIndexOf('Z');
+        return ((k > -1) ? s.substring(0, k) : s);
     }
 
     public static String _toYearMonthDay(Date date)
@@ -671,7 +685,10 @@ public class DataHelperImpl
         GDateBuilder gdb = new GDateBuilder(date);
         gdb.normalizeToTimeZone(0);
         gdb.setBuiltinTypeCode(SchemaType.BTC_DATE);
-        return gdb.canonicalString();
+        //return gdb.canonicalString();
+        String s = gdb.canonicalString();
+        int k = s.lastIndexOf('Z');
+        return ((k > -1) ? s.substring(0, k) : s);
     }
 
     public static Date _toDate(String dateString)

@@ -26,6 +26,8 @@ import davos.sdo.SequenceXML;
 import davos.sdo.DataObjectXML;
 import davos.sdo.Options;
 import davos.sdo.impl.data.ChangeSummaryImpl;
+import davos.sdo.impl.data.Store;
+import davos.sdo.impl.data.DataObjectImpl;
 import davos.sdo.impl.data.ChangeSummaryImpl.Change;
 import davos.sdo.impl.common.Common;
 import davos.sdo.impl.common.Names;
@@ -155,21 +157,14 @@ public class PlainChangeSummaryMarshaller extends Marshaller
         if (nodeId == null)
             throw new IllegalStateException("The computed path cannot be null at this time");
         _h.attr(Names.URI_SDO, ChangeSummaryImpl.ATTR_REF, null, nodeId);
-        if (objectXML.getSequence() == null)
-        {
-            boolean wasIndentIncremented2 = false;
-            if (_prettyPrint)
-            {
-                wasIndentIncremented2 = incrementIndent();
-                _helper.setCurrentIndent(_currentIndent);
-            }
-            // First, we need to build the value of the "unset" attribute
-            StringBuilder sb = new StringBuilder();
-            for (Change c : changes)
+        // First, we need to build the value of the "unset" attribute
+        StringBuilder sb = new StringBuilder();
+        for (Change c : changes)
             for (; c != null; c = c.next)
             {
                 Property p = c.getProperty();
-                if (!c.isSet() && (p.getType().isDataType() || !p.isContainment()))
+                if (!c.isSet() && (p.getType().isDataType() || !p.isContainment()) &&
+                    p != ChangeSummaryImpl.SEQUENCE)
                 {
                     // This needs to be represented as an entry in the unset list
                     // Problem: we can have both an element and an attribute with the same
@@ -179,19 +174,19 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                     sb.append(value).append(' ');
                 }
             }
-            if (sb.length() > 0)
-            {
-                _h.attr(Names.URI_SDO, ChangeSummaryImpl.ATTR_UNSET, null,
-                    sb.substring(0, sb.length() - 1));
-            }
-            boolean hasSimpleContent = objectXML.getTypeXML().isSimpleContent();
-            Change simpleContentChange = null;
-            // Second, we need to find attributes
-            for (Change c : changes)
+        if (sb.length() > 0)
+        {
+            _h.attr(Names.URI_SDO, ChangeSummaryImpl.ATTR_UNSET, null,
+                sb.substring(0, sb.length() - 1));
+        }
+        boolean hasSimpleContent = objectXML.getTypeXML().isSimpleContent();
+        Change simpleContentChange = null;
+        // Second, we need to find attributes
+        for (Change c : changes)
             for (; c != null; c = c.next)
             {
                 Property p = c.getProperty();
-                if (!(p instanceof PropertyXML) || !c.isSet())
+                if (p == ChangeSummaryImpl.SEQUENCE || !(p instanceof PropertyXML) || !c.isSet())
                     continue;
                 PropertyXML pxml = (PropertyXML) p;
                 if (!pxml.isXMLElement())
@@ -203,6 +198,8 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                         _helper.marshalAttributeProperty((PropertyXML) p, value, null, objectXML);
                     }
             }
+        if (objectXML.getSequence() == null)
+        {
             if (simpleContentChange != null)
             {
                 Object value = simpleContentChange.getValue(); 
@@ -224,6 +221,12 @@ public class PlainChangeSummaryMarshaller extends Marshaller
             }
             // Now we marshal the elements
             boolean hadElements = false;
+            boolean wasIndentIncremented2 = false;
+            if (_prettyPrint)
+            {
+                wasIndentIncremented2 = incrementIndent();
+                _helper.setCurrentIndent(_currentIndent);
+            }
             // Marshal them in the order in which they appear in the type declaration
             ChangeIterator cit = new ChangeIterator(objectXML, changes);
             Change c;
@@ -394,24 +397,32 @@ public class PlainChangeSummaryMarshaller extends Marshaller
             // deleted elements and we only serialize references for
             // the unchanged elements
             // We don't pretty print here
-            SequenceXML s = (SequenceXML) objectXML.getSequence();
+            Store s = ((DataObjectImpl) objectXML).getStore();
             // Use the Sequence to populate the children
             // First, look for changes on attributes and serialize those
-            for (Change c = changes[0]; c != null; c = c.next)
+            StringBuilder unsetString = new StringBuilder();
+            for (Change c = ChangeSummaryImpl.getFirstSequenceChange(changes); c !=null; c=c.next2)
             {
                 PropertyXML p = (PropertyXML) c.getProperty();
-                if ( p != null /*ie text*/ && !p.isXMLElement() && c.isSet())
-                {
-                    Object value = c.getValue();
-                    _helper.marshalAttributeProperty(p, value, null, objectXML);
-                }
+                if ( p != null /*ie text*/ && !p.isXMLElement())
+                    if (c.isSet())
+                    {
+                        Object value = c.getValue();
+                        _helper.marshalAttributeProperty(p, value, null, objectXML);
+                    }
+                    else
+                        unsetString.append(XmlPath.getName(p, _h.getNamespaceStack())).append(' ');
             }
-            Change change = changes[0];
+            if (unsetString.length() > 0)
+                _h.attr(Names.URI_SDO, ChangeSummaryImpl.ATTR_UNSET, null,
+                    unsetString.substring(0, unsetString.length() - 1));
+
+            Change change = ChangeSummaryImpl.getFirstSequenceChange(changes);
             int currentArrayPos = change.getArrayPos();
             HashMap<QName, IntegerHolder> elementCount =
                 new HashMap<QName, IntegerHolder>();
             // Now process elements/text
-            for (int i = 0; i < s.size(); i++)
+            for (int i = 0; i < s.storeSequenceSize(); i++)
             {
                 if (change != null && i == currentArrayPos)
                 {
@@ -456,8 +467,9 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                         {
                             // Insert
                             // don't output anything
-                            String xmlName = s.getPropertyXML(i).getXMLName();
-                            QName q = new QName(s.getPropertyXML(i).getXMLNamespaceURI(), xmlName);
+                            String xmlName = s.storeSequenceGetPropertyXML(i).getXMLName();
+                            QName q = new QName(s.storeSequenceGetPropertyXML(i).
+                                getXMLNamespaceURI(), xmlName);
                             IntegerHolder ih = elementCount.get(q);
                             if (ih == null)
                                 elementCount.put(q, new IntegerHolder(1));
@@ -470,7 +482,7 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                         // Attribute: already handled
                         i--;
                     }
-                    change = change.next;
+                    change = change.next2;
                     if (change != null)
                         currentArrayPos += change.getArrayPos();
                 }
@@ -478,42 +490,42 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                 {
                     // No change in this position, include the original
                     // element/text
-                    PropertyXML p = s.getPropertyXML(i);
+                    PropertyXML p = s.storeSequenceGetPropertyXML(i);
 
                     if ( p == null /*ie is text*/ )
                     {
                         // We still need to output the text, because we
                         // have no way of referring to the original text
-                        _h.text((String) s.getValue(i));
+                        _h.text((String) s.storeSequenceGetValue(i));
                     }
                     else if ( p!= null /*ie text*/ && p.isXMLElement())
                     {
                         if (!p.getType().isDataType() && !p.isContainment())
                         {
-                            _helper.marshalSimple(getNodeReference((DataObjectXML) s.getValue(i),
+                            _helper.marshalSimple(getNodeReference((DataObjectXML) s.storeSequenceGetValue(i),
                                 _h.getNamespaceStack()),
                                 p.getXMLNamespaceURI(), p.getXMLName(),
-                                s.getPrefixXML(i), null, p.getSchemaTypeCode(), false);
+                                s.storeSequenceGetXMLPrefix(i), null, p.getSchemaTypeCode(), false);
                         }
                         else
                         {
                             // We need to build a reference to the element
                             QName q = new QName(p.getXMLNamespaceURI(), p.getXMLName());
                             String ref = null;
-                            if (s.getValue(i) instanceof DataObject)
+                            if (s.storeSequenceGetValue(i) instanceof DataObject)
                             {
-                                DataObjectXML valueObject = (DataObjectXML) s.getValue(i);
+                                DataObjectXML valueObject = (DataObjectXML) s.storeSequenceGetValue(i);
                                 ref = getNodeReference(valueObject, _h.getNamespaceStack());
                             }
                             if (ref == null)
                             {
-                                StringBuilder sb = new StringBuilder(rb.getPath(objectXML,
+                                StringBuilder pathString = new StringBuilder(rb.getPath(objectXML,
                                     rootObject, _h.getNamespaceStack()));
-                                sb.append(ChangeSummaryImpl.PATH_SEPARATOR);
+                                pathString.append(ChangeSummaryImpl.PATH_SEPARATOR);
                                 String prefix = _h.getNamespaceStack().ensureMapping(p.getXMLNamespaceURI(), null, false, false);
                                 if (prefix != null)
-                                    sb.append(prefix).append(':');
-                                sb.append(p.getXMLName());
+                                    pathString.append(prefix).append(':');
+                                pathString.append(p.getXMLName());
                                 IntegerHolder ih = elementCount.get(q);
                                 if (ih == null)
                                 {
@@ -525,7 +537,7 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                                     ih.incrementValue();
                                 }
                                 marshalElementWithReference(p.getXMLNamespaceURI(),
-                                    p.getXMLName(), sb.append('[').append(ih.getValue()).
+                                    p.getXMLName(), pathString.append('[').append(ih.getValue()).
                                         append(']').toString());
                             }
                             else
@@ -585,7 +597,7 @@ public class PlainChangeSummaryMarshaller extends Marshaller
                 {
                     // Attribute: already handled
                 }
-                change = change.next;
+                change = change.next2;
             }
         }
         _h.endElement();

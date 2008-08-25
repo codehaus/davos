@@ -92,6 +92,102 @@ public class CopyHelperImpl implements CopyHelper
         // When copying opposite properties the two ends are copied separately, so we need to
         // disable automatic setting of bidirectional properties
         dest.setOppositeIgnore(true);
+        List props = src.getInstanceProperties();
+        int size = props.size();
+        boolean sequenced = seq != null;
+        for (int i = 0; i < size; i++)
+        {
+            PropertyXML p = (PropertyXML) props.get(i);
+            if (!src.isSet(p))
+                continue;
+            Object value = src.get(p);
+            Type t = p.getTypeXML();
+            boolean attr = !p.isXMLElement();
+            if (t == BuiltInTypeSystem.CHANGESUMMARYTYPE)
+            {
+                if (deepCopy && !sequenced)
+                {
+                    // Properties of type ChangeSummary get initialized when the object is created
+                    ChangeSummaryImpl newCS = (ChangeSummaryImpl) dest.get(p);
+                    copyChangeSummary((ChangeSummaryImpl) value, newCS, ctx);
+                    // If the src ChangeSummary has logging on, we need to set logging to on on the
+                    // copy ChangeSummary as well, but only after the copy is finished
+                    if (((ChangeSummaryImpl) value).isLogging())
+                        cs = newCS;
+                }
+            }
+            else if (t.isDataType())
+            {
+                if (attr || !sequenced)
+                {
+                    if (!p.isReadOnly())
+                        dest.set(p, copySimpleValue(value));
+                    else
+                        dest.getStore().storeSet(p, copySimpleValue(value));
+                }
+            }
+            else if (!deepCopy)
+                ;
+            else if (p.isContainment())
+            {
+                if (!sequenced)
+                    if (p.isMany())
+                    {
+                        List<DataObjectXML> list = (List<DataObjectXML>) value;
+                        List<DataObjectXML> result = new ArrayList<DataObjectXML>(list.size());
+                        for (DataObjectXML object : list)
+                        {
+                            DataObjectImpl copy = ctx.copyObject(object, dest, p);
+                            result.add(copy);
+                        }
+                        if (!p.isReadOnly())
+                            dest.setList(p, result);
+                        else
+                            dest.getStore().storeSet(p, result);
+                    }
+                    else
+                    {
+                        DataObjectXML object = (DataObjectXML) value;
+                        DataObjectImpl copy = ctx.copyObject(object, dest, p);
+                        if (!p.isReadOnly())
+                            dest.setDataObject(p, copy);
+                        else
+                            dest.getStore().storeSet(p, copy);
+                    }
+            }
+            else
+            {
+                if (attr || !sequenced)
+                    if (p.isMany())
+                    {
+                        List<DataObject> list = new ArrayList<DataObject>();
+                        for (Object o : (List) value)
+                        {
+                            DataObjectXML referred = (DataObjectXML) o;
+                            DataObject copy = ctx.copyReference(referred, p.getOppositeXML() != null);
+                            if (copy != null) // Doesn't make sense to include null refs in the list
+                                list.add(copy);
+                        }
+                        if (!p.isReadOnly())
+                            dest.setList(p, list);
+                        else
+                            dest.getStore().storeSet(p, list);
+                    }
+                    else
+                    {
+                        DataObjectXML referred = (DataObjectXML) value;
+                        DataObject copy = ctx.copyReference(referred, p.getOppositeXML() != null);
+                        if (copy != null || p.isNullable())
+                        {
+                            if (!p.isReadOnly())
+                                dest.setDataObject(p, copy);
+                            else
+                                dest.getStore().storeSet(p, copy);
+                        }
+                        // Otherwise, don't bother to try to set it
+                    }
+            }
+        }
         if (seq != null)
         {
             // Use the Sequence to populate the children
@@ -192,95 +288,6 @@ public class CopyHelperImpl implements CopyHelper
         }
         else
         {
-            List props = src.getInstanceProperties();
-            int size = props.size();
-            for (int i = 0; i < size; i++)
-            {
-                PropertyXML p = (PropertyXML) props.get(i);
-                if (!src.isSet(p))
-                    continue;
-                Object value = src.get(p);
-                Type t = p.getTypeXML();
-                if (t == BuiltInTypeSystem.CHANGESUMMARYTYPE)
-                {
-                    if (deepCopy)
-                    {
-                        // Properties of type ChangeSummary get initialized when the object is created
-                        ChangeSummaryImpl newCS = (ChangeSummaryImpl) dest.get(p);
-                        copyChangeSummary((ChangeSummaryImpl) value, newCS, ctx);
-                        // If the src ChangeSummary has logging on, we need to set logging to on on the
-                        // copy ChangeSummary as well, but only after the copy is finished
-                        if (((ChangeSummaryImpl) value).isLogging())
-                            cs = newCS;
-                    }
-                }
-                else if (t.isDataType())
-                {
-                    if (!p.isReadOnly())
-                        dest.set(p, copySimpleValue(value));
-                    else
-                        dest.getStore().storeSet(p, copySimpleValue(value));
-                }
-                else if (!deepCopy)
-                    ;
-                else if (p.isContainment())
-                {
-                    if (p.isMany())
-                    {
-                        List<DataObjectXML> list = (List<DataObjectXML>) value;
-                        List<DataObjectXML> result = new ArrayList<DataObjectXML>(list.size());
-                        for (DataObjectXML object : list)
-                        {
-                            DataObjectImpl copy = ctx.copyObject(object, dest, p);
-                            result.add(copy);
-                        }
-                        if (!p.isReadOnly())
-                            dest.setList(p, result);
-                        else
-                            dest.getStore().storeSet(p, result);
-                    }
-                    else
-                    {
-                        DataObjectXML object = (DataObjectXML) value;
-                        DataObjectImpl copy = ctx.copyObject(object, dest, p);
-                        if (!p.isReadOnly())
-                            dest.setDataObject(p, copy);
-                        else
-                            dest.getStore().storeSet(p, copy);
-                    }
-                }
-                else
-                {
-                    if (p.isMany())
-                    {
-                        List<DataObject> list = new ArrayList<DataObject>();
-                        for (Object o : (List) value)
-                        {
-                            DataObjectXML referred = (DataObjectXML) o;
-                            DataObject copy = ctx.copyReference(referred, p.getOppositeXML() != null);
-                            if (copy != null) // Doesn't make sense to include null refs in the list
-                                list.add(copy);
-                        }
-                        if (!p.isReadOnly())
-                            dest.setList(p, list);
-                        else
-                            dest.getStore().storeSet(p, list);
-                    }
-                    else
-                    {
-                        DataObjectXML referred = (DataObjectXML) value;
-                        DataObject copy = ctx.copyReference(referred, p.getOppositeXML() != null);
-                        if (copy != null || p.isNullable())
-                        {
-                            if (!p.isReadOnly())
-                                dest.setDataObject(p, copy);
-                            else
-                                dest.getStore().storeSet(p, copy);
-                        }
-                        // Otherwise, don't bother to try to set it
-                    }
-                }
-            }
         }
         if (cs != null)
         {

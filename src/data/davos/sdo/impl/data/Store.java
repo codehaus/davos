@@ -41,7 +41,7 @@ public interface Store
     public boolean     storeAddNew(PropertyXML property, Object value, String prefix, PropertyXML substitution);
 
     /** @return returns true if at least one entry of property exists */
-    public boolean     storeIsSet(Property property);
+    public boolean     storeIsSet(PropertyXML property);
 
     /** Removes all entries of this property */
     public void        storeUnset(PropertyXML property);

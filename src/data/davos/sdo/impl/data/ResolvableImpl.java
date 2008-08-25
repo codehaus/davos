@@ -102,7 +102,8 @@ public class ResolvableImpl
                 uri = prop.getXMLNamespaceURI();
                 name = prop.getXMLName();
             }
-            XMLHelper.INSTANCE.save(_resolvedDataObject, uri, name, gzipper);
+            SDOContext sdoContext = _resolvedDataObject.getSDOContext();
+            sdoContext.getXMLHelper().save(_resolvedDataObject, uri, name, gzipper);
             gzipper.finish();
             break;
 
