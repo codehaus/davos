@@ -119,6 +119,18 @@ public class TypeSystemUnion
         return null;
     }
 
+    public PropertyXML getGlobalPropertyBySdoQName(String uri, String sdoName)
+    {
+        for (int i = 0; i < _typeSystems.size(); i++)
+        {
+            TypeSystem typeSystem = (TypeSystem) _typeSystems.get(i);
+            PropertyXML globalProp = typeSystem.getGlobalPropertyBySdoQName(uri, sdoName);
+            if (globalProp!=null)
+                return globalProp;
+        }
+        return null;
+    }
+
     public SchemaTypeLoader getSchemaTypeLoader()
     {
         // should a type system union be created?

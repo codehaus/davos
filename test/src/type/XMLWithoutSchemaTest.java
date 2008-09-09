@@ -41,8 +41,9 @@ public class XMLWithoutSchemaTest extends BaseTest
     {
         /*
         TestSuite suite = new TestSuite();
-        suite.addTest(new XMLWithoutSchemaTest("testXMLWithNamespace"));
-        suite.addTest(new XMLWithoutSchemaTest("testXMLWithoutNamespace"));
+        //suite.addTest(new XMLWithoutSchemaTest("testXMLWithNamespace"));
+        //suite.addTest(new XMLWithoutSchemaTest("testXMLWithoutNamespace"));
+        suite.addTest(new XMLWithoutSchemaTest("testNamespace"));
         */
         // or
         TestSuite suite = new TestSuite(XMLWithoutSchemaTest.class);
@@ -257,42 +258,36 @@ public class XMLWithoutSchemaTest extends BaseTest
             System.out.println(p.getContainingType().getURI());
             System.out.println(p.getContainingType().getName());
         }
-        Property p = root.getInstanceProperty("b");
-        System.out.println(p.getContainingType().getURI());
-        System.out.println(p.getContainingType().getName());
         assertEquals(2, props.size());
         Type aType = root.getType();
         assertTrue(aType.isSequenced());
         assertTrue(aType.isOpen());
         Sequence aseq = root.getSequence();
-        assertEquals(2, aseq.size());
-        Property b1 = aseq.getProperty(0);
-        assertEquals("b", b1.getName());
+        assertEquals(1, aseq.size());
+        Property b1 = root.getInstanceProperty("b");
         assertFalse(((PropertyXML)b1).isXMLElement());
         assertEquals("", ((PropertyXML)b1).getXMLNamespaceURI());
-        //assertEquals(T_STRING, b1.getType());
         checkAttribute(b1);
-        Object b1val = aseq.getValue(0);
+        Object b1val = root.get(b1);
         assertTrue(b1val instanceof String);
         assertEquals("1", b1val);
-        Property b2 = aseq.getProperty(1);
+        Property b2 = aseq.getProperty(0);
         assertEquals("b", b2.getName());
         assertEquals("xxx", ((PropertyXML)b2).getXMLNamespaceURI());
         assertEquals("xxx", b2.getContainingType().getURI());
         assertEquals(T_DATAOBJECT, b2.getType());
-        Object b2val = aseq.getValue(1);
+        Object b2val = aseq.getValue(0);
         assertTrue(b2val instanceof DataObject);
         assertEquals(T_BEADATAOBJECT, ((DataObject)b2val).getType());
         Sequence bseq = ((DataObject)b2val).getSequence();
-        assertEquals(1, bseq.size());
-        Property b3 = bseq.getProperty(0);
+        assertNotNull(bseq);
+        assertEquals(0, bseq.size());
+        Property b3 = ((DataObject)b2val).getInstanceProperty("b");
         assertFalse(b3 == b1);
-        assertEquals("b", b3.getName());
         assertFalse(((PropertyXML)b3).isXMLElement());
         assertEquals("", ((PropertyXML)b3).getXMLNamespaceURI());
-        //assertEquals(T_STRING, b3.getType());
         checkAttribute(b1);
-        Object b3val = bseq.getValue(0);
+        Object b3val = ((DataObject)b2val).get(b3);
         assertTrue(b3val instanceof String);
         assertEquals("true", b3val);
     }
@@ -315,37 +310,48 @@ public class XMLWithoutSchemaTest extends BaseTest
         assertTrue(aType.isSequenced());
         assertTrue(aType.isOpen());
         Sequence aseq = root.getSequence();
-        assertEquals(2, aseq.size());
-        Property b1 = aseq.getProperty(0);
-        assertEquals("b", b1.getName());
+        assertEquals(1, aseq.size());
+        Property b1 = root.getInstanceProperty("b");
         assertFalse(((PropertyXML)b1).isXMLElement());
         assertEquals("", ((PropertyXML)b1).getXMLNamespaceURI());
-        //assertEquals(T_STRING, b1.getType());
         checkAttribute(b1);
-        Object b1val = aseq.getValue(0);
+        Object b1val = root.get(b1);
         assertTrue(b1val instanceof String);
         assertEquals("1", b1val);
-        Property b2 = aseq.getProperty(1);
+        Property b2 = aseq.getProperty(0);
         assertEquals("b", b2.getName());
         assertTrue(((PropertyXML)b2).isXMLElement());
         assertEquals("", ((PropertyXML)b2).getXMLNamespaceURI());
         assertNull(b2.getContainingType().getURI());
         assertEquals(T_DATAOBJECT, b2.getType());
-        Object b2val = aseq.getValue(1);
+        Object b2val = aseq.getValue(0);
         assertTrue(b2val instanceof DataObject);
         assertEquals(T_BEADATAOBJECT, ((DataObject)b2val).getType());
         Sequence bseq = ((DataObject)b2val).getSequence();
-        assertEquals(1, bseq.size());
-        Property b3 = bseq.getProperty(0);
+        assertNotNull(bseq);
+        assertEquals(0, bseq.size());
+        Property b3 = ((DataObject)b2val).getInstanceProperty("b");
         assertFalse(b3 == b1);
-        assertEquals("b", b3.getName());
         assertFalse(((PropertyXML)b3).isXMLElement());
         assertEquals("", ((PropertyXML)b3).getXMLNamespaceURI());
-        //assertEquals(T_STRING, b3.getType());
         checkAttribute(b1);
-        Object b3val = bseq.getValue(0);
+        Object b3val = ((DataObject)b2val).get(b3);
         assertTrue(b3val instanceof String);
         assertEquals("true", b3val);        
+    }
+
+    private Property findProperty(List props, String xmlNamespaceURI, String xmlName, boolean isElement)
+    {
+        Property tbr = null;
+        for (Object prop : props)
+        {
+            PropertyXML p = (PropertyXML)prop;
+            if (p.getXMLNamespaceURI().equals(xmlNamespaceURI) &&
+                p.getXMLName().equals(xmlName) &&
+                (p.isXMLElement() == isElement))
+                tbr = p;
+        }
+        return tbr;
     }
 
     public void testNamespace()
@@ -356,71 +362,56 @@ public class XMLWithoutSchemaTest extends BaseTest
             "<ns1:b b=\"true\"/><ns2:b b=\"false\" ns2:b=\"3\"/></ns1:a>";
         XMLDocument doc = xmlHelper.load(xml);
         DataObject root = doc.getRootObject();
-        List props = root.getInstanceProperties();
-        Type aType = root.getType();
         Sequence aseq = root.getSequence();
-        assertEquals(4, aseq.size());
-        Property b1 = aseq.getProperty(0); // attribute b
-        Property b2 = aseq.getProperty(1); // attribute ns2:b
-        Property b3 = aseq.getProperty(2); // element ns1:b
-        Property b4 = aseq.getProperty(3); // element ns2:b
+        assertEquals(2, aseq.size());
+        List props = root.getInstanceProperties();
+        Property b1 = findProperty(props, "", "b", false); // attribute b
+        Property b2 = findProperty(props, "yyy", "b", false); // attribute ns2:b
+        Property b3 = findProperty(props, "xxx", "b", true); // element ns1:b
+        Property b4 = findProperty(props, "yyy", "b", true); // element ns2:b
+        Property b3s = aseq.getProperty(0); // element ns2:b
+        Property b4s = aseq.getProperty(1); // element ns2:b
         assertEquals("b", b1.getName());
         assertEquals("b", b2.getName());
         assertEquals("b", b3.getName());
         assertEquals("b", b4.getName());
-        assertFalse(((PropertyXML)b1).isXMLElement());
-        assertEquals("", ((PropertyXML)b1).getXMLNamespaceURI());
-        assertFalse(((PropertyXML)b2).isXMLElement());
-        assertEquals("yyy", ((PropertyXML)b2).getXMLNamespaceURI());
-        assertTrue(((PropertyXML)b3).isXMLElement());
-        assertEquals("xxx", ((PropertyXML)b3).getXMLNamespaceURI());
-        assertTrue(((PropertyXML)b4).isXMLElement());
-        assertEquals("yyy", ((PropertyXML)b4).getXMLNamespaceURI());
-        Object b1val = aseq.getValue(0); // attribute b
-        Object b2val = aseq.getValue(1); // attribute ns2:b
-        Object b3val = aseq.getValue(2); // element ns1:b
-        Object b4val = aseq.getValue(3); // element ns2:b
+        assertTrue(b3 == b3s);
+        assertTrue(b4 == b4s);
+        Object b1val = root.get(b1); // attribute b
+        Object b2val = root.get(b2); // attribute ns2:b
+        Object b3val = aseq.getValue(0); // element ns1:b
+        Object b4val = aseq.getValue(1); // element ns2:b
         assertTrue(b1val instanceof String);
         assertTrue(b2val instanceof String);
         assertTrue(b3val instanceof DataObject);
         assertTrue(b4val instanceof DataObject);
         assertEquals("1", b1val);
         assertEquals("2", b2val);
+        assertTrue(b3val == root.getList(b3).get(0));
+        assertTrue(b4val == root.getList(b4).get(0));
         // ns1:b element
         Sequence b3seq = ((DataObject)b3val).getSequence();
-        assertEquals(1, b3seq.size());
-        Property b31 = b3seq.getProperty(0);
+        assertEquals(0, b3seq.size());
+        Property b31 = findProperty(((DataObject)b3val).getInstanceProperties(),
+                                    "", "b", false);
         assertEquals("b", b31.getName());
-        assertFalse(((PropertyXML)b31).isXMLElement());
-        assertEquals("", ((PropertyXML)b31).getXMLNamespaceURI());
-        assertEquals("true", b3seq.getValue(0));
+        assertEquals("true", ((DataObject)b3val).get(b31));
         // ns2:b element
         Sequence b4seq = ((DataObject)b4val).getSequence();
-        assertEquals(2, b4seq.size());
-        Property b41 = b4seq.getProperty(0);
+        assertEquals(0, b4seq.size());
+        Property b41 = findProperty(((DataObject)b4val).getInstanceProperties(),
+                                    "", "b", false);
         assertEquals("b", b41.getName());
-        assertFalse(((PropertyXML)b41).isXMLElement());
-        assertEquals("", ((PropertyXML)b41).getXMLNamespaceURI());
-        assertEquals("false", b4seq.getValue(0));
-        Property b42 = b4seq.getProperty(1);
+        assertEquals("false", ((DataObject)b4val).get(b41));
+        Property b42 = findProperty(((DataObject)b4val).getInstanceProperties(),
+                                    "yyy", "b", false);
         assertEquals("b", b42.getName());
-        assertFalse(((PropertyXML)b42).isXMLElement());
-        assertEquals("yyy", ((PropertyXML)b42).getXMLNamespaceURI());
-        assertEquals("3", b4seq.getValue(1));
+        assertEquals("3", ((DataObject)b4val).get(b42));
         // attributes with same namespace in different containers are different
         assertFalse(b31 == b41);
         assertFalse(b1 == b31);
         assertFalse(b1 == b41);
         assertFalse(b2 == b42);
-        // just for kicks, test getting values using properties, not sequence
-        assertEquals("1", root.get(b1));
-        assertEquals("2", root.get(b2));
-        // next two are many-valued properties
-        assertEquals(b3val, root.getList(b3).get(0));
-        assertEquals(b4val, root.getList(b4).get(0));
-        assertEquals("true", ((DataObject)b3val).get(b31));
-        assertEquals("false", ((DataObject)b4val).get(b41));
-        assertEquals("3", ((DataObject)b4val).get(b42));
     }
 
     // element is known

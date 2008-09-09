@@ -71,6 +71,13 @@ public interface BindingSystem
     public PropertyXML loadGlobalPropertyByTopLevelAttrQName(String uri, String attrName);
 
     /**
+     * Returns the global PropertyXML asociated to the SDO QName: uri, sdoName.
+     * <br/>Note: If the property is not in the context, this will trigger loading from
+     *       its associated ResourceLoader.
+     */
+    public PropertyXML loadGlobalPropertyBySdoQName(String uri, String sdoName);
+
+    /**
      * Returns the type associated to the schema type having this uri and name.
      * <br/>Note: This will not work for annonimus schema types since they don't have a name.
      * <br/>Note: If the schema type is not in the context, this will trigger loading from

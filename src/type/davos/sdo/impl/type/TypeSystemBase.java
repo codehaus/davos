@@ -38,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,14 +63,14 @@ public class TypeSystemBase
     private Map<QName, TypeXML> _schemaNameToType = new HashMap<QName, TypeXML>();
     private Map<QName, PropertyXML> _elemQNameToGlobalProperty = new HashMap<QName, PropertyXML>();
     private Map<QName, PropertyXML> _attrQNameToGlobalProperty = new HashMap<QName, PropertyXML>();
+    private Map<QName, PropertyXML> _globalPropertiesBySdoQName = new HashMap<QName, PropertyXML>();
     private SchemaTypeLoader _schemaTypeLoader;
+    private ClassLoader _cl;
 
 
     protected TypeSystemBase()
     {}
 
-    // TODO(radup) Is this the best way to do it or is the classloader available from somwhere else?
-    private ClassLoader _cl;
 
     public void setClassLoader(ClassLoader cl)
     {
@@ -108,6 +109,11 @@ public class TypeSystemBase
             if (_attrQNameToGlobalProperty.get(key) != null)
                 throw new IllegalArgumentException("A global attribute property with this name '" + key + "' already exists in this type system.");
         }
+        for (QName key : tsb._globalPropertiesBySdoQName.keySet())
+        {
+            if (_globalPropertiesBySdoQName.get(key) != null)
+                throw new IllegalArgumentException("A global property with this sdo name '" + key + "' already exists in this type system.");
+        }
         // The checks are done, let's register the types and properties. Two options:
         // 1. Copy the references from the parameter TypeSystem into this one
         // 2. Add a reference to the parameter TypeSystem
@@ -119,6 +125,9 @@ public class TypeSystemBase
             _elemQNameToGlobalProperty.put(entry.getKey(), entry.getValue());
         for (Map.Entry<QName, PropertyXML> entry : tsb._attrQNameToGlobalProperty.entrySet())
             _attrQNameToGlobalProperty.put(entry.getKey(), entry.getValue());
+        for (Map.Entry<QName, PropertyXML> entry : tsb._globalPropertiesBySdoQName.entrySet())
+            _globalPropertiesBySdoQName.put(entry.getKey(), entry.getValue());
+
         // Add the SchemaTypeSystem to the current SchemaTypeLoader
         if (addSTS && tsb.getSchemaTypeLoader() != null)
             _schemaTypeLoader = XmlBeans.typeLoaderUnion(new SchemaTypeLoader[] {_schemaTypeLoader,
@@ -162,18 +171,26 @@ public class TypeSystemBase
         assert globalProperty != null;
         assert globalProperty.isGlobal();
         assert globalProperty.isOpenContent();
+        assert globalProperty.getXMLNamespaceURI()!=null;
 
-        if ( globalProperty.isXMLElement() && _elemQNameToGlobalProperty.get(new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getXMLName())) != null ) 
-            throw new IllegalArgumentException("Duplicate define of global element property: " + globalProperty.getName());
-        else if ( !globalProperty.isXMLElement() && _attrQNameToGlobalProperty.get(new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getXMLName())) != null)
-            throw new IllegalArgumentException("Duplicate define of global attribute property: " + globalProperty.getName());
+        QName globalPropXMLQName = new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getXMLName());
+        QName globalPropSDOQName = new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getName());
 
-        //todo cezar check if a global property already exists with this sdo name (needs one more map - is it worth?)
+        if ( globalProperty.isXMLElement() && _elemQNameToGlobalProperty.get( globalPropXMLQName ) != null )
+            throw new IllegalArgumentException("Duplicate define of global element property: " + globalPropXMLQName);
+        else if ( !globalProperty.isXMLElement() && _attrQNameToGlobalProperty.get(globalPropXMLQName) != null)
+            throw new IllegalArgumentException("Duplicate define of global attribute property: " + globalPropXMLQName);
+
+//        // todo uncomment the following lines when bug is fixed
+//        if ( _globalPropertiesBySdoQName.get(globalPropSDOQName)!=null)
+//            throw new IllegalArgumentException("Duplicate define, a property with the same SDO name already exists: " + globalPropSDOQName);
+//        else
+            _globalPropertiesBySdoQName.put(globalPropSDOQName, globalProperty);
 
         if (globalProperty.isXMLElement())
-            _elemQNameToGlobalProperty.put(new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getXMLName()), globalProperty);
+            _elemQNameToGlobalProperty.put(globalPropXMLQName, globalProperty);
         else
-            _attrQNameToGlobalProperty.put(new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getXMLName()), globalProperty);
+            _attrQNameToGlobalProperty.put(globalPropXMLQName, globalProperty);
     }
 
     protected void addSpecialTypeMapping(String uri, String name, TypeXML type)
@@ -204,6 +221,11 @@ public class TypeSystemBase
     public PropertyXML getGlobalPropertyByTopLevelAttrQName(String uri, String attrName)
     {
         return _attrQNameToGlobalProperty.get(new QName(uri, attrName));
+    }
+
+    public PropertyXML getGlobalPropertyBySdoQName(String uri, String sdoName)
+    {
+        return _globalPropertiesBySdoQName.get(new QName(uri, sdoName));
     }
 
     public TypeXML getTypeBySchemaTypeName(String schemaTypeUri, String schemaTypeLocalName)
@@ -275,6 +297,11 @@ public class TypeSystemBase
         for (QName topLevelAttrQName :_attrQNameToGlobalProperty.keySet())
         {
             String resourceName = getResourceNameForTopLevelAttrQName(topLevelAttrQName);
+            writeIdToResource(filer, resourceName, sdoId);
+        }
+        for (QName globalPropQName :_globalPropertiesBySdoQName.keySet())
+        {
+            String resourceName = getResourceNameForGlobalPropertiesSdoQName(globalPropQName);
             writeIdToResource(filer, resourceName, sdoId);
         }
 
@@ -368,6 +395,12 @@ public class TypeSystemBase
         return readTSIdFromResource(resourceLoader, getResourceNameForTopLevelAttrQName(topLevelAttrQName));
     }
 
+    public String readIdForGlobalPropertySdoQName(ResourceLoader resourceLoader, QName sdoQName)
+        throws IOException
+    {
+        return readTSIdFromResource(resourceLoader, getResourceNameForGlobalPropertiesSdoQName(sdoQName));
+    }
+
     public String readIdForTypeQName(ResourceLoader resourceLoader, QName typeQName)
         throws IOException
     {
@@ -440,9 +473,14 @@ public class TypeSystemBase
         {
             loadTypeSystem(is);
         }
+        catch (StreamCorruptedException e)
+        {
+            throw new RuntimeException("Exception during loading of TypeSystem from: " + resourceName + ". ERROR: " + e.getMessage(), e);
+        }
         catch (IOException e)
         {
-            //System.out.println("  Load TypeSystem from: " + resourceName + ". ERROR.");
+            System.err.println("  Load TypeSystem from: " + resourceName + ". ERROR.");
+            e.printStackTrace();
             return false;
         }
 
@@ -560,7 +598,9 @@ public class TypeSystemBase
                 PropertyXML existingElemGlobalProp = _elemQNameToGlobalProperty.get(elemQName);
                 PropertyXML loadedElemGlobalProp = loadedElemQNameToGlobalProperty.get(elemQName);
                 if (existingElemGlobalProp==null)
-                    _elemQNameToGlobalProperty.put(elemQName, loadedElemGlobalProp);
+                {
+                    addGlobalProperty(loadedElemGlobalProp);
+                }
                 else
                     if (existingElemGlobalProp!=loadedElemGlobalProp)
                         throw new IllegalStateException("Global property already loaded for element name: " + elemQName);
@@ -573,7 +613,7 @@ public class TypeSystemBase
                 PropertyXML existingAttrGlobalProp = _attrQNameToGlobalProperty.get(attrQName);
                 PropertyXML loadedAttrGlobalProp = loadedAttrQNameToGlobalProperty.get(attrQName);
                 if (existingAttrGlobalProp==null)
-                    _attrQNameToGlobalProperty.put(attrQName, loadedAttrQNameToGlobalProperty.get(attrQName));
+                    addGlobalProperty(loadedAttrGlobalProp);
                 else
                     if (existingAttrGlobalProp!=loadedAttrGlobalProp)
                         throw new IllegalStateException("Global property already loaded for attribute name: " + attrQName);
@@ -1271,7 +1311,7 @@ public class TypeSystemBase
                 String baseTypeURI = _stringPool.stringForCode(vdis.readInt());
                 //System.out.println("        e: " + baseTypeName + " @ " + baseTypeURI);
 
-                //todo cezar This has to use the current context to get to its binding system 
+                //todo cezar This has to use the current context to get to its binding system                
                 TypeXML type = SDOContextFactory.getGlobalSDOContext().getBindingSystem().loadTypeByTypeName(baseTypeURI, baseTypeName);
 
                 if (type == null )
@@ -1300,7 +1340,7 @@ public class TypeSystemBase
             vdos.writeInt(_stringPool.codeForString(prop.getName()));
             vdos.writeBoolean(prop.isMany());
             vdos.writeBoolean(prop.isContainment());
-            //vdos.writeInt(codeForType(prop.getContainingTypeXML()));
+
             writeTypeRef(vdos, prop.getContainingTypeXML());
             vdos.writeBoolean(prop.isReadOnly());
             vdos.writeBoolean(prop.isNullable());
@@ -1317,15 +1357,6 @@ public class TypeSystemBase
             // default value
             Object defaultValue = prop.getDefault();
             writeObjectAsByteArray(vdos, defaultValue);
-//
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            ObjectOutputStream oos = new ObjectOutputStream(baos);
-//            oos.writeObject(defaultValue);
-//            oos.flush();
-//
-//            byte[] ba = baos.toByteArray();
-//            vdos.writeInt(ba.length);
-//            vdos.write(ba, 0, ba.length);
 
             // PropertyXML extensions
             vdos.writeInt(_stringPool.codeForString(prop.getXMLName()));
@@ -1375,8 +1406,9 @@ public class TypeSystemBase
             //System.out.println("      name: " + name);
             boolean isMany = vdis.readBoolean();
             boolean isContainment = vdis.readBoolean();
-            //TypeXML containingType = typeForCode(vdis.readInt());
+
             TypeXML containingType = readTypeRef(vdis);
+            //System.out.println("      containingType: " + containingType);
             boolean isReadOnly = vdis.readBoolean();
             boolean isNullable = vdis.readBoolean();
 
@@ -1391,21 +1423,6 @@ public class TypeSystemBase
             }
 
             // default value
-//            int balength = vdis.readInt();
-//            byte[] ba = new byte[balength];
-//
-//            vdis.read(ba, 0, balength);
-//
-//            ObjectInputStream ois = new ObjectInputStream( new ByteArrayInputStream(ba));
-//            Object defaultValue;
-//            try
-//            {
-//                defaultValue = ois.readObject();
-//            }
-//            catch (ClassNotFoundException e)
-//            {
-//                throw new RuntimeException(e);
-//            }
             Object defaultValue = readObjectAsByteArray(vdis);
 
             // PropertyXML extensions
@@ -1505,7 +1522,12 @@ public class TypeSystemBase
             int balength = vdis.readInt();
             byte[] ba = new byte[balength];
 
-            vdis.read(ba, 0, balength);
+            int actualReadBytes = 0;
+            do
+            {
+                actualReadBytes += vdis.read(ba, 0 + actualReadBytes, balength - actualReadBytes);
+            }
+            while(actualReadBytes<balength);
 
             ObjectInputStream ois = new ObjectInputStream( new ByteArrayInputStream(ba));
             try
@@ -1811,6 +1833,12 @@ public class TypeSystemBase
     private String getResourceNameForTopLevelAttrQName(QName topLevelAttrName)
     {
         String hexSafeDir = hexsafedirWithDomain(topLevelAttrName, "xsdattrs");
+        return "metadata/uris/" + hexSafeDir + ".sdotsid";
+    }
+
+    private String getResourceNameForGlobalPropertiesSdoQName(QName globalPropertyQName)
+    {
+        String hexSafeDir = hexsafedirWithDomain(globalPropertyQName, "sdogprops");
         return "metadata/uris/" + hexSafeDir + ".sdotsid";
     }
 

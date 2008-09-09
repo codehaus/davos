@@ -76,6 +76,7 @@ public class BasicTest extends DataTest
         //suite.addTest(new BasicTest("testDate"));
         suite.addTest(new BasicTest("testStrings"));
         suite.addTest(new BasicTest("testSetNull"));
+        suite.addTest(new BasicTest("testDefaultValues"));
         
         suite.addTest(new BasicTest("testSetSimpleListType"));
         suite.addTest(new BasicTest("testSetSimpleListType2"));
@@ -985,6 +986,51 @@ public class BasicTest extends DataTest
         System.out.println(xmlHelper.save(a, BASIC_URI, "a"));
         String exp = getBasicAString("integer0", null);
         assertEquals(exp, xmlHelper.save(a, BASIC_URI, "a"));
+    }
+
+    public void testDefaultValues()
+    {
+        DataObject a = factory.create(BASIC_URI, "A");
+        Property p = a.getInstanceProperty("boolean0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals(false, a.get(p));
+        p = a.getInstanceProperty("byte0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals((byte)0, a.get(p));
+        p = a.getInstanceProperty("double0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals(0.0, a.get(p));
+        p = a.getInstanceProperty("float0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals((float)0.0, a.get(p));
+        p = a.getInstanceProperty("int0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals(0, a.get(p));
+        p = a.getInstanceProperty("long0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals(0l, a.get(p));
+        p = a.getInstanceProperty("short0");
+        assertFalse(a.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals((short)0, a.get(p));
+        DataObject h = factory.create(BASIC_URI, "H");
+        p = h.getInstanceProperty("character");
+        assertFalse(h.isSet(p));
+        assertNull(p.getDefault());
+        assertEquals('\0', h.get(p));
+        //assertEquals((byte)0, h.getByte(p));
+        //assertEquals(0.0, h.getDouble(p));
+        //assertEquals((float)0.0, h.getFloat(p));
+        //assertEquals(0, h.getInt(p));
+        //assertEquals(0l, h.getLong(p));
+        //assertEquals((short)0, h.getShort(p));
+        assertEquals("", h.getString(p));
     }
 
     private static final String simpleListType =

@@ -84,12 +84,7 @@ public class DataFactoryImpl
 
         if (type.isDataType())
         {
-            DataObject wrapperObj = create(BuiltInTypeSystem.WRAPPERTYPE);
-
-            TypeXML typeXML = (TypeXML)type;
-            PropertyXML valueProp = PropertyImpl.createOnDemand("value", false, true, typeXML);
-            wrapperObj.set( valueProp, getDefaultValueForType(typeXML));
-
+            DataObject wrapperObj = create(BuiltInTypeSystem.VALUETYPE);
             return wrapperObj;
         }
 

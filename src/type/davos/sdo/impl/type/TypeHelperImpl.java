@@ -502,20 +502,7 @@ normal rules for serializing a ChangeSummary.
 
     public Property getOpenContentProperty(String uri, String propertyName)
     {
-        // todo cezar This might be a bug, in the case when the property name is not the same as the XML name
-
-        // first try to find them in both element and attribute sets
-        Property ocProp = _sdoContext.getTypeSystem().getGlobalPropertyByTopLevelElemQName(uri, propertyName);
-        if ( ocProp==null )
-            ocProp = _sdoContext.getTypeSystem().getGlobalPropertyByTopLevelAttrQName(uri, propertyName);
-
-        // not found try to load them
-        if ( ocProp==null )
-            ocProp = _sdoContext.getBindingSystem().loadGlobalPropertyByTopLevelElemQName(uri, propertyName);
-        if ( ocProp == null )
-            ocProp = _sdoContext.getBindingSystem().loadGlobalPropertyByTopLevelAttrQName(uri, propertyName);
-
-        return ocProp;
+        return _sdoContext.getBindingSystem().loadGlobalPropertyBySdoQName(uri, propertyName);
     }
 
     public Property defineOpenContentProperty(String uri, DataObject propertyDef)

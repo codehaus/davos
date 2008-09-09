@@ -56,6 +56,7 @@ public abstract class BindingSystemBase
     private LRUCacheMap<QName, QName> _sdoTypeNamesNotFound;
     private LRUCacheMap<QName, QName> _elemQNamesNotFound;
     private LRUCacheMap<QName, QName> _attrQNamesNotFound;
+    private LRUCacheMap<QName, QName> _globalPropSdoQNamesNotFound;
     private LRUCacheMap<QName, QName> _schemaTypeQNamesNotFound;
 
     protected BindingSystemBase(SDOContext sdoContext, ResourceLoader resourceLoader, TypeSystem typeSystem)
@@ -66,6 +67,7 @@ public abstract class BindingSystemBase
         _sdoTypeNamesNotFound = new LRUCacheMap<QName, QName>(200);
         _elemQNamesNotFound = new LRUCacheMap<QName, QName>(200);
         _attrQNamesNotFound = new LRUCacheMap<QName, QName>(200);
+        _globalPropSdoQNamesNotFound = new LRUCacheMap<QName, QName>(200);
         _schemaTypeQNamesNotFound = new LRUCacheMap<QName, QName>(200);
     }
 
@@ -237,6 +239,35 @@ public abstract class BindingSystemBase
         return globalProperty;
     }
 
+    public PropertyXML loadGlobalPropertyBySdoQName(String uri, String sdoName)
+    {
+        PropertyXML globalProperty = getTypeSystem().getGlobalPropertyBySdoQName(uri, sdoName);
+        if (globalProperty==null)
+        {
+            QName qname = new QName(uri, sdoName);
+            if (_globalPropSdoQNamesNotFound.containsValue(qname))
+                return null; //don't try to load it, it will not be found
+
+            synchronized(this)
+            {
+                globalProperty = getTypeSystem().getGlobalPropertyBySdoQName(uri, sdoName);
+                if (globalProperty!=null)
+                    return globalProperty; // loaded by another thread
+
+                //not loaded yet, load it up
+                //System.out.println("  loadFromGlobalPropertySdoQName: " + sdoName + " @ "+ uri);
+                if (!loadFromGlobalPropertySdoQName(uri, sdoName))
+                {
+                    // not found put it in the notFoundCache
+                    _globalPropSdoQNamesNotFound.put(qname, qname);
+                    return null;
+                }
+            }
+            globalProperty = getTypeSystem().getGlobalPropertyBySdoQName(uri, sdoName);
+        }
+        return globalProperty;
+    }
+
     public TypeXML loadTypeBySchemaTypeName(String uri, String localName)
     {
         TypeXML type = getTypeSystem().getTypeBySchemaTypeName(uri, localName);
@@ -322,6 +353,30 @@ public abstract class BindingSystemBase
         try
         {
             String id = ts.readIdForTopLevelAttrQName(_resourceLoader, new QName(uri, localName));
+            if (id==null)
+                return false;  //todo can this case be optimized? Map of unsuccesful uris
+
+            if (!ts.loadTypeSystemFromId(_resourceLoader, id))
+                return false;
+
+            if (!loadBindingSystemWithId(id))
+                return false;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return true;
+    }
+
+    protected boolean loadFromGlobalPropertySdoQName(String uri, String sdoName)
+    {
+        TypeSystemBase ts = (TypeSystemBase)getTypeSystem();
+
+        try
+        {
+            String id = ts.readIdForGlobalPropertySdoQName(_resourceLoader, new QName(uri, sdoName));
             if (id==null)
                 return false;  //todo can this case be optimized? Map of unsuccesful uris
 

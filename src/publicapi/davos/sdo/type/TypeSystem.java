@@ -74,9 +74,13 @@ public interface TypeSystem
      */
     public TypeXML getTypeBySchemaTypeName(String schemaTypeUri, String schemaTypeLocalName);
 
-    //public PropertyXML getGlobalPropertyXML(String uri, String sdoName);
-    //public PropertyXML getGlobalElement(String uri, String schemaElementName);
-    //public PropertyXML getGlobalAttribute(String uri, String shemaAttributeName);
+    /**
+     * Returns the global PropertyXML asociated to the SDO QName: uri, sdoName.
+     * Note: This method does not load the type system from the classpath, use
+     *       davos.sdo.binding.BindingSystem#loadGlobalPropertyBySdoQName(String, String)
+     * @see davos.sdo.binding.BindingSystem#loadGlobalPropertyBySdoQName(String, String)
+     */
+    public PropertyXML getGlobalPropertyBySdoQName(String uri, String sdoName);
 
     /**
      * @return The SchemaTypeSystem associated to this SDO TypeSystem

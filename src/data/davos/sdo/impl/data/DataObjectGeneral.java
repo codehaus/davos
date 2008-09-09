@@ -435,7 +435,7 @@ public class DataObjectGeneral
                 {
                     findNext();
                     if ( _dogIndex == NOT_AVAILABLE )
-                        throw new IndexOutOfBoundsException("Index: " + _index + ", Size: " + size(_dataObjGen, _property));
+                        throw new IndexOutOfBoundsException("index: " + _index + ", size: " + size(_dataObjGen, _property));
                 }
             }
         }
@@ -449,7 +449,7 @@ public class DataObjectGeneral
     public PropertyXML storeSequenceGetPropertyXML(int sequenceIndex)
     {
         if( sequenceIndex >= _size || sequenceIndex<0 )
-            throw new IndexOutOfBoundsException("size: " + _size + " sequnceIndex: " + sequenceIndex );
+            throw new IndexOutOfBoundsException("index: " + sequenceIndex + ", size: " + _size);
 
         // can return null for mixed content text values
         return _properties[sequenceIndex];
@@ -458,7 +458,7 @@ public class DataObjectGeneral
     public Object storeSequenceGetValue(int sequenceIndex)
     {
         if( sequenceIndex >= _size || sequenceIndex<0 )
-            throw new IndexOutOfBoundsException("size: " + _size + " sequnceIndex: " + sequenceIndex );
+            throw new IndexOutOfBoundsException("index: " + sequenceIndex + ", size: " + _size);
 
         return _values[sequenceIndex];
     }
@@ -872,7 +872,7 @@ public class DataObjectGeneral
             throw new IllegalArgumentException("Property '" + property + "' does not allow null values.'");
 
         if(sequenceIndex >_size || sequenceIndex <0)
-            throw new IndexOutOfBoundsException("Index: " + sequenceIndex + " size: " + _size);
+            throw new IndexOutOfBoundsException("index: " + sequenceIndex + ", size: " + _size);
 
         checkPropertyForAdd(getTypeXML(), property);
 
@@ -948,7 +948,7 @@ public class DataObjectGeneral
     public void storeSequenceSet(int sequenceIndex, Object value)
     {
         if (sequenceIndex>=_size || sequenceIndex<0)
-            throw new IndexOutOfBoundsException("Sequence index: " + sequenceIndex + " size: " + _size);
+            throw new IndexOutOfBoundsException("index: " + sequenceIndex + ", size: " + _size);
 
         PropertyXML property = _properties[sequenceIndex];
         // check read-only
@@ -1162,7 +1162,7 @@ public class DataObjectGeneral
     public void storeSequenceUnset(int sequenceIndex)
     {
         if (sequenceIndex>=_size || sequenceIndex<0)
-            throw new IndexOutOfBoundsException("Sequence index: " + sequenceIndex + " size: " + _size);
+            throw new IndexOutOfBoundsException("index: " + sequenceIndex + ", size: " + _size);
 
         PropertyXML property = _properties[sequenceIndex];
         if (property != null && property.isReadOnly())
@@ -1250,7 +1250,14 @@ public class DataObjectGeneral
 
         public PropertyXML getPropertyXML(int index)
         {
-            return _dataObject.storeSequenceGetPropertyXML(findStoreIndex(index));
+            try
+            {
+                return _dataObject.storeSequenceGetPropertyXML(findStoreIndex(index));
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
+            }
         }
 
         public String getPrefixXML(int index)
@@ -1265,23 +1272,37 @@ public class DataObjectGeneral
 
         public Object getValue(int index)
         {
-            return _dataObject.storeSequenceGetValue(findStoreIndex(index));
+            try
+            {
+                return _dataObject.storeSequenceGetValue(findStoreIndex(index));
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
+            }
         }
 
         public Object setValue(int index, Object value)
         {
             PropertyXML prop = getPropertyXML(index);
             int storeIndex = findStoreIndex(index);
-            Object oldValue = _dataObject.storeSequenceGetValue(storeIndex);
-            PropertyXML oldProp = _dataObject.storeSequenceGetPropertyXML(storeIndex);
-            unsetOppositePropertySingle(_dataObject, oldProp, oldValue);
-
-            checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
-            if (_dataObject.storeSequenceSize()==0)
-                _dataObject.storeSequenceAddNew(0, prop, value, null, null);
-            else
-                _dataObject.storeSequenceSet(storeIndex, value);
-            setOppositeProperty(_dataObject, prop, value, null);
+            Object oldValue = null;
+            try
+            {
+                oldValue = _dataObject.storeSequenceGetValue(storeIndex);
+                PropertyXML oldProp = _dataObject.storeSequenceGetPropertyXML(storeIndex);
+                unsetOppositePropertySingle(_dataObject, oldProp, oldValue);
+                checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
+                if (_dataObject.storeSequenceSize()==0)
+                    _dataObject.storeSequenceAddNew(0, prop, value, null, null);
+                else
+                    _dataObject.storeSequenceSet(storeIndex, value);
+                setOppositeProperty(_dataObject, prop, value, null);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
+            }
             return  oldValue;
         }
 
@@ -1327,10 +1348,17 @@ public class DataObjectGeneral
 
         public void add(int index, Property property, Object value)
         {
-            PropertyXML prop = PropertyImpl.getPropertyXML(property);
-            checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
-            _dataObject.storeSequenceAddNew(findStoreIndex(index), prop, value, null, prop);
-            setOppositeProperty(_dataObject, prop, value, null);
+            try
+            {
+                PropertyXML prop = PropertyImpl.getPropertyXML(property);
+                checkOppositeUniqueObjectConstraint(_dataObject, prop, value);
+                _dataObject.storeSequenceAddNew(findStoreIndex(index), prop, value, null, prop);
+                setOppositeProperty(_dataObject, prop, value, null);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
+            }
         }
 
         public void remove(int index)
@@ -1345,15 +1373,22 @@ public class DataObjectGeneral
         {
             int size = _dataObject._size;
             if (toIndex<0 || toIndex>=size || fromIndex<0 || fromIndex>=size)
-                throw new IndexOutOfBoundsException("toIndex: " + toIndex + " fromIndex: " + fromIndex + " size: " + size);
+                throw new IndexOutOfBoundsException("toIndex: " + toIndex + ", fromIndex: " + fromIndex + ", size: " + size());
 
             _dataObject._version++;
-            PropertyXML prop = _dataObject.storeSequenceGetPropertyXML(findStoreIndex(fromIndex));
-            Object value = _dataObject.storeSequenceGetValue(findStoreIndex(fromIndex));
-            String prefix = _dataObject.storeSequenceGetXMLPrefix(findStoreIndex(fromIndex));
+            try
+            {
+                PropertyXML prop = _dataObject.storeSequenceGetPropertyXML(findStoreIndex(fromIndex));
+                Object value = _dataObject.storeSequenceGetValue(findStoreIndex(fromIndex));
+                String prefix = _dataObject.storeSequenceGetXMLPrefix(findStoreIndex(fromIndex));
 
-            _dataObject.storeSequenceUnset(findStoreIndex(fromIndex));
-            _dataObject.storeSequenceAddNew(findStoreIndex(toIndex), prop, value, prefix, prop);
+                _dataObject.storeSequenceUnset(findStoreIndex(fromIndex));
+                _dataObject.storeSequenceAddNew(findStoreIndex(toIndex), prop, value, prefix, prop);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new IndexOutOfBoundsException("toIndex: " + toIndex + ", fromIndex: " + fromIndex + ", size: " + size());
+            }
         }
 
         public void addText(String text)
@@ -1363,7 +1398,14 @@ public class DataObjectGeneral
 
         public void addText(int index, String text)
         {
-            _dataObject.storeSequenceAddNew(findStoreIndex(index), null, text, null, null);
+            try
+            {
+                _dataObject.storeSequenceAddNew(findStoreIndex(index), null, text, null, null);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
+            }
         }
 
         /**
@@ -1383,14 +1425,14 @@ public class DataObjectGeneral
         }
 
         /**
-         * Converts seqIndex into storeIndex by skiping attribute properties entries
-         * Note:  inneficient elem seq implementation, but less destructive at this point 
+         * Converts seqIndex into storeIndex by skipping attribute properties entries
+         * Note:  inefficient elem seq implementation, but less destructive at this point 
          */
         private int findStoreIndex(int seqIndex)
         {
             int storeSize = _dataObject.storeSequenceSize();
             if ( seqIndex<0 || seqIndex > storeSize )
-                throw new IllegalArgumentException("Index out of bounds.");
+                throw new IndexOutOfBoundsException();
 
             int storeIdx = 0;
             int seqIdx = 0;

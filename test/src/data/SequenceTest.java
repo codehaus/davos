@@ -315,13 +315,10 @@ public class SequenceTest extends DataTest
         assertTrue(ct1 == seq.getValue(11));
         assertTrue(ct1.getType().isSequenced());
         Sequence ct1seq = ct1.getSequence();
-        assertEquals(2, ct1seq.size());
+        assertEquals(1, ct1seq.size());
         assertEquals("example", ct1.get("text"));
-        assertEquals("text", ct1seq.getProperty(0).getName());
-        assertEquals(stringType, ct1seq.getProperty(0).getType());
-        assertEquals("example", ct1seq.getValue(0));
-        _testText(ct1seq.getProperty(1));
-        assertEquals("simple content", ct1seq.getValue(1));
+        _testText(ct1seq.getProperty(0));
+        assertEquals("simple content", ct1seq.getValue(0));
 
         p = seq.getProperty(13);
         assertEquals("ct2", p.getName());
@@ -330,17 +327,14 @@ public class SequenceTest extends DataTest
         assertTrue(ct2 == seq.getValue(13));
         assertTrue(ct2.getType().isSequenced());
         Sequence ct2seq = ct2.getSequence();
-        assertEquals(4, ct2seq.size());
+        assertEquals(3, ct2seq.size());
         assertEquals("mixed", ct2.get("content"));
-        assertEquals("content", ct2seq.getProperty(0).getName());
-        assertEquals(stringType, ct1seq.getProperty(0).getType());
-        assertEquals("mixed", ct2seq.getValue(0));
-        _testText(ct2seq.getProperty(1));
-        assertEquals("this ", ct2seq.getValue(1));
-        assertEquals("b", ct2seq.getProperty(2).getName());
-        assertEquals("content", ct2seq.getValue(2));
-        _testText(ct2seq.getProperty(3));
-        assertEquals(" is mixed", ct2seq.getValue(3));
+        _testText(ct2seq.getProperty(0));
+        assertEquals("this ", ct2seq.getValue(0));
+        assertEquals("b", ct2seq.getProperty(1).getName());
+        assertEquals("content", ct2seq.getValue(1));
+        _testText(ct2seq.getProperty(2));
+        assertEquals(" is mixed", ct2seq.getValue(2));
     }
 
     private void _testShirt(Sequence seq, int i)
@@ -790,7 +784,7 @@ public class SequenceTest extends DataTest
         "<b>bob</b><d>1.2</d><c>c1</c><a>10</a><c>c2</c><d>2.3</d>" +
         "</seq:root>";
     private static final String TEST_XML3 =
-        "<seq:root y=\"yes\" x=\"true\" xmlns:seq=\"http://sdo/test/sequenced\">" +
+        "<seq:root x=\"true\" y=\"yes\" xmlns:seq=\"http://sdo/test/sequenced\">" +
         "<b>barb</b><d>1.2</d><c>c1</c><a>10</a><c>c2</c><d>2.3</d>" +
         "</seq:root>";
 
@@ -812,46 +806,39 @@ public class SequenceTest extends DataTest
 
         Sequence seq = root.getSequence();
         assertNotNull(seq);
-        assertEquals(8, seq.size());
+        assertEquals(6, seq.size());
         assertEquals("b", seq.getProperty(0).getName());
         assertEquals("d", seq.getProperty(1).getName());
         assertEquals("c", seq.getProperty(2).getName());
         assertEquals("a", seq.getProperty(3).getName());
         assertEquals("c", seq.getProperty(4).getName());
-        assertEquals("y", seq.getProperty(5).getName());
-        assertEquals("x", seq.getProperty(6).getName());
-        assertEquals("d", seq.getProperty(7).getName());
+        assertEquals("d", seq.getProperty(5).getName());
         assertEquals("bob", seq.getValue(0));
         assertEquals(new Double(1.2), seq.getValue(1));
         assertEquals("c1", seq.getValue(2));
         assertEquals(new Integer(10), seq.getValue(3));
         assertEquals("c2", seq.getValue(4));
-        assertEquals("yes", seq.getValue(5));
-        assertEquals(Boolean.TRUE, seq.getValue(6));
-        assertEquals(new Double(2.3), seq.getValue(7));
+        assertEquals(new Double(2.3), seq.getValue(5));
 
-        // when marshalled, the sequence is preserved as best as we can
-        // but the attributes have to be together, before the elements
+        // when marshalled, the sequence of elements is preserved
         String s = xmlHelper.save(root, "http://sdo/test/sequenced", "root");
         System.out.println(s);
-        assertEquals(TEST_XML2, s);
+        assertEquals(TEST_XML1, s);
 
-        // consequently, when the sequenced datd object is unmarshalled back,
-        // the sequence is different
-        DataObject root2 = xmlHelper.load(TEST_XML2).getRootObject();
-        assertFalse(equalityHelper.equal(root, root2));
-        assertFalse(equalityHelper.equalShallow(root, root2));
+        // when the sequenced data object is unmarshalled back,
+        // the sequence is the same
+        DataObject root2 = xmlHelper.load(TEST_XML1).getRootObject();
+        assertTrue(equalityHelper.equal(root, root2));
+        assertTrue(equalityHelper.equalShallow(root, root2));
         Sequence seq2 = root2.getSequence();
         assertNotNull(seq2);
-        assertEquals(8, seq2.size());
-        assertEquals("y", seq2.getProperty(0).getName());
-        assertEquals("x", seq2.getProperty(1).getName());
-        assertEquals("b", seq2.getProperty(2).getName());
-        assertEquals("d", seq2.getProperty(3).getName());
+        assertEquals(6, seq2.size());
+        assertEquals("b", seq2.getProperty(0).getName());
+        assertEquals("d", seq2.getProperty(1).getName());
+        assertEquals("c", seq2.getProperty(2).getName());
+        assertEquals("a", seq2.getProperty(3).getName());
         assertEquals("c", seq2.getProperty(4).getName());
-        assertEquals("a", seq2.getProperty(5).getName());
-        assertEquals("c", seq2.getProperty(6).getName());
-        assertEquals("d", seq2.getProperty(7).getName());
+        assertEquals("d", seq2.getProperty(5).getName());
     }
 
     /* test to verify that equality of sequenced data objects take
@@ -861,8 +848,8 @@ public class SequenceTest extends DataTest
         System.out.println("testPlacementOfAttributes()");
         DataObject root1 = xmlHelper.load(TEST_XML1).getRootObject();
         DataObject root2 = xmlHelper.load(TEST_XML2).getRootObject();
-        assertFalse(equalityHelper.equal(root1, root2));
-        assertFalse(equalityHelper.equalShallow(root1, root2));
+        assertTrue(equalityHelper.equal(root1, root2));
+        assertTrue(equalityHelper.equalShallow(root1, root2));
     }
 
     /* test to verify that using the List interface for a many-valued property,
@@ -877,18 +864,16 @@ public class SequenceTest extends DataTest
         cList.add(1, "c1b");
         System.out.println(xmlHelper.save(root, "http://sdo/test/sequenced", "root"));
         Sequence seq = root.getSequence();
-        assertEquals(9, seq.size());
-        assertEquals("x", seq.getProperty(0).getName());
-        assertEquals("y", seq.getProperty(1).getName());
-        assertEquals("b", seq.getProperty(2).getName());
-        assertEquals("d", seq.getProperty(3).getName());
+        assertEquals(7, seq.size());
+        assertEquals("b", seq.getProperty(0).getName());
+        assertEquals("d", seq.getProperty(1).getName());
+        assertEquals("c", seq.getProperty(2).getName());
+        assertEquals("a", seq.getProperty(3).getName());
         assertEquals("c", seq.getProperty(4).getName());
-        assertEquals("a", seq.getProperty(5).getName());
-        assertEquals("c", seq.getProperty(6).getName());
-        assertEquals("c", seq.getProperty(7).getName());
-        assertEquals("d", seq.getProperty(8).getName());
-        assertEquals("c1b", seq.getValue(6));
-        assertEquals("c2", seq.getValue(7));
+        assertEquals("c", seq.getProperty(5).getName());
+        assertEquals("d", seq.getProperty(6).getName());
+        assertEquals("c1b", seq.getValue(4));
+        assertEquals("c2", seq.getValue(5));
     }
 
     /* set already set single-value property directly -
@@ -896,20 +881,18 @@ public class SequenceTest extends DataTest
     public void testSetInPlace()
     {
         System.out.println("testSetInPlace()");
-        DataObject root = xmlHelper.load(TEST_XML2).getRootObject();
+        DataObject root = xmlHelper.load(TEST_XML1).getRootObject();
         root.set("b", "barb");
         Sequence seq = root.getSequence();
         assertNotNull(seq);
-        assertEquals(8, seq.size());
-        assertEquals("y", seq.getProperty(0).getName());
-        assertEquals("x", seq.getProperty(1).getName());
-        assertEquals("b", seq.getProperty(2).getName());
-        assertEquals("barb", seq.getValue(2));
-        assertEquals("d", seq.getProperty(3).getName());
+        assertEquals(6, seq.size());
+        assertEquals("b", seq.getProperty(0).getName());
+        assertEquals("barb", seq.getValue(0));
+        assertEquals("d", seq.getProperty(1).getName());
+        assertEquals("c", seq.getProperty(2).getName());
+        assertEquals("a", seq.getProperty(3).getName());
         assertEquals("c", seq.getProperty(4).getName());
-        assertEquals("a", seq.getProperty(5).getName());
-        assertEquals("c", seq.getProperty(6).getName());
-        assertEquals("d", seq.getProperty(7).getName());
+        assertEquals("d", seq.getProperty(5).getName());
         String s = xmlHelper.save(root, "http://sdo/test/sequenced", "root");
         System.out.println(s);
         assertEquals(TEST_XML3, s);
@@ -1153,7 +1136,38 @@ public class SequenceTest extends DataTest
         //System.out.println(((DataObject)seq.getValue(0)).get("color"));
         assertEquals(shirt4, seq.getValue(0));
     }
-
+    /*
+    public void testIndex() throws Exception
+    {
+        System.out.println("testIndex()");
+        DataObject items = getRootDataObject("data", "items.xml");
+        assertTrue(items.getType().isSequenced());
+        Sequence seq = items.getSequence();
+        assertEquals(3, seq.size());
+        Property prop1 = seq.getProperty(0);
+        DataObject item1 = (DataObject)seq.getValue(0);
+        Property prop2 = seq.getProperty(1);
+        DataObject item2 = (DataObject)seq.getValue(1);
+        Property prop3 = seq.getProperty(2);
+        DataObject item3 = (DataObject)seq.getValue(2);
+        seq.remove(2);
+        seq.remove(1);
+        seq.remove(0);
+        assertEquals(0, seq.size());
+        seq.add(prop2, item2);
+        seq.add(1, prop1, item1);
+        assertEquals(2, seq.size());
+        seq.move(0, 1);
+        //seq.move(2, 1);
+        //seq.remove(2);
+        seq.addText(2, "asdf");
+        System.out.println(seq.getValue(2));
+        String s = xmlHelper.save(items, "http://www.example.com/choice", "items");
+        System.out.println(s);
+        //System.out.println(seq.getValue(3));
+        seq.setValue(3, item3);
+    }
+    */
     public void testIndexOutOfBounds() throws Exception
     {
         System.out.println("testIndexOutOfBounds()");
