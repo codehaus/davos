@@ -105,11 +105,12 @@ public class CopyHelperImpl implements CopyHelper
             boolean attr = !p.isXMLElement();
             if (t == BuiltInTypeSystem.CHANGESUMMARYTYPE)
             {
-                if (deepCopy && !sequenced)
+                if (!sequenced)
                 {
                     // Properties of type ChangeSummary get initialized when the object is created
                     ChangeSummaryImpl newCS = (ChangeSummaryImpl) dest.get(p);
-                    copyChangeSummary((ChangeSummaryImpl) value, newCS, ctx);
+                    if (deepCopy)
+                        copyChangeSummary((ChangeSummaryImpl) value, newCS, ctx);
                     // If the src ChangeSummary has logging on, we need to set logging to on on the
                     // copy ChangeSummary as well, but only after the copy is finished
                     if (((ChangeSummaryImpl) value).isLogging())
@@ -205,16 +206,14 @@ public class CopyHelperImpl implements CopyHelper
                 Type t = p.getTypeXML();
                 if (t == BuiltInTypeSystem.CHANGESUMMARYTYPE)
                 {
+                    // Properties of type ChangeSummary get initialized when the object is created
+                    ChangeSummaryImpl newCS = (ChangeSummaryImpl) dest.get(p);
                     if (deepCopy)
-                    {
-                        // Properties of type ChangeSummary get initialized when the object is created
-                        ChangeSummaryImpl newCS = (ChangeSummaryImpl) dest.get(p);
                         copyChangeSummary((ChangeSummaryImpl) seq.getValue(i), newCS, ctx);
-                        // If the src ChangeSummary has logging on, we need to set logging to on on the
-                        // copy ChangeSummary as well, but only after the copy is finished
-                        if (((ChangeSummaryImpl) seq.getValue(i)).isLogging())
-                            cs = newCS;
-                    }
+                    // If the src ChangeSummary has logging on, we need to set logging to on on the
+                    // copy ChangeSummary as well, but only after the copy is finished
+                    if (((ChangeSummaryImpl) seq.getValue(i)).isLogging())
+                        cs = newCS;
                 }
                 else if (t.isDataType())
                 {

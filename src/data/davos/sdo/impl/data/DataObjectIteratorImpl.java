@@ -23,6 +23,7 @@ import davos.sdo.DataObjectXML;
 import davos.sdo.ListXMLIterator;
 import davos.sdo.PropertyXML;
 import davos.sdo.SequenceXML;
+import davos.sdo.impl.type.BuiltInTypeSystem;
 
 public class DataObjectIteratorImpl implements DataObjectIterator
 {
@@ -264,6 +265,9 @@ public class DataObjectIteratorImpl implements DataObjectIterator
         else
         {
             PropertyXML property = store.storeSequenceGetSubstitution(storeIndex);
+            if (property != null &&
+                BuiltInTypeSystem.CHANGESUMMARYTYPE.equals(property.getTypeXML()))
+                property = store.storeSequenceGetSubstitution(++storeIndex);
             Object value = store.storeSequenceGetValue(storeIndex);
             result = new Change(property);
             result.setValue(value);
@@ -317,6 +321,8 @@ public class DataObjectIteratorImpl implements DataObjectIterator
         while (propertyIterator.hasNext())
         {
             currentProperty = propertyIterator.next();
+            if (BuiltInTypeSystem.CHANGESUMMARYTYPE.equals(currentProperty.getTypeXML()))
+                continue;
             change = findCurrentChange();
             offset = 0;
             // If the property is not set (or set to an empty array for multivalued properties)

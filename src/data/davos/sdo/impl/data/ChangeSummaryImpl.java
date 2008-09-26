@@ -983,19 +983,47 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
             Change lastChange = getcreateSequenceChange(chgs); // the sentinel
             Change change = lastChange.next2;
             int currentIndex = 0;
-            boolean added = false;
+            boolean logged = false;
             while(change != null)
             {
                 currentIndex += change.getArrayPos();
-                if (arrayIndex == currentIndex && prop == change.getProperty())
+                if (arrayIndex == currentIndex)
                 {
                     Change change2 = change.next2;
-                    if (!change.isSet() || change2 != null && prop == change2.getProperty() &&
-                            change2.getArrayPos() == 0 && !change2.isSet() &&
-                            wasSet && !delete)
+                    if (!change.isSet() || change2 != null && change.getProperty() == change2.getProperty() &&
+                            change2.getArrayPos() == 0 && !change2.isSet())
                     {
-                        // We have already a modification for this index
-                        added = true;
+                        // We already have a modification for this index
+                        logged = true;
+                        if (delete)
+                        {
+                            if (!change.isSet())
+                            {
+                                // Deletion of a value that had been added previously
+                                // Remove the change
+                                lastChange.next2 = change.next2;
+                                // Because we have removed a value previously in the sequence
+                                // we need to decrement the index of the next change
+                                if (change.next2 != null)
+                                    change.next2.arrayPos--;
+                            }
+                            else // !change2.isSet()
+                            {
+                                // A value that had been modified is now deleted
+                                // Remove the "new value" part of the change
+                                change.next2 = change2.next2;
+                                // Because we have removed a value previously in the sequence
+                                // we need to decrement the index of the next change
+                                if (change2.next2 != null)
+                                    change2.next2.arrayPos--;
+                            }
+                        }
+                        else if (!wasSet)
+                        {
+                            // Insertion of a new value before the previously inserted value
+                            // at this index
+                            logged = false;
+                        }
                         break;
                     }
                 }
@@ -1007,7 +1035,7 @@ public class ChangeSummaryImpl implements ChangeSummary, ChangeSummaryXML
                 lastChange = change;
                 change = change.next2;
             }
-            if (!added)
+            if (!logged)
             {
                 Change newChange2 = null;
                 if (wasSet && !delete)

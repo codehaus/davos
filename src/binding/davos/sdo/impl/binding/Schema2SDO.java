@@ -97,6 +97,7 @@ public final class Schema2SDO
     /*package*/static final int DEFAULT_TYPE_NAMING = Options.NAMES_COMPOSITE;
     private static final char TYPE_NAME_SEPARATOR_ELEMENT = '$';
     private static final char TYPE_NAME_SEPARATOR_ATTRIBUTE = '@';
+    private static final String ATTRIBUTE_SUFFIX = "_attr";
 
     private static class Name
     {
@@ -594,15 +595,20 @@ public final class Schema2SDO
         }
 
         // Resolve all SDO types
+        // Unfortunately, we need an extra pass for attributes because in case of a global element
+        // and global attribute with the same name, the global element must win
         for (SchemaType type : allSeenTypes)
         {
             if (type.isDocumentType())
                 addGlobalElementMapping(type);
             else if (type.isAttributeType())
-                addGlobalAttributeMapping(type);
+                continue;
             else
                 resolveSDOType(type);
         }
+        for (SchemaType type : allSeenTypes)
+            if (type.isAttributeType())
+                addGlobalAttributeMapping(type);
 
         resolveOppositeProperties();
         resolveSubstitutions();
@@ -1412,8 +1418,18 @@ public final class Schema2SDO
         boolean many;
         boolean containment;
 
-        theName = pickSDOPropertyName(new HashSet<String>(),
-            sProp.getName().getLocalPart(), getSDOConfiguredName(sProp), t, sProp.isAttribute());
+        String configuredName = getSDOConfiguredName(sProp);
+        theName = pickSDOPropertyName(new HashSet(), sProp.getName().getLocalPart(),
+            configuredName, t, sProp.isAttribute());
+        // Here we want to detect the case of a global attribute with the same name as a global
+        // element; because the elements are computed first and because we can't have two elements
+        // with the same QName, if we find a duplicate at this point it means that the current
+        // property is an attribute
+        PropertyXML existingProp =
+            result.getGlobalPropertyBySdoQName(sProp.getName().getNamespaceURI(), theName);
+        if (existingProp != null && existingProp.isXMLElement() && sProp.isAttribute() &&
+            configuredName == null)
+            theName = theName + ATTRIBUTE_SUFFIX;
         QName dataTypeName = getSDOConfiguredDataType(sProp);
         if (dataTypeName != null)
         {
@@ -2337,7 +2353,7 @@ public final class Schema2SDO
         else
             uniqName = sdoName;
         if (attr && usedNames.contains(uniqName))
-            uniqName = uniqName + "_attr";
+            uniqName = uniqName + ATTRIBUTE_SUFFIX;
         while (usedNames.contains(uniqName))
         {
             index++;

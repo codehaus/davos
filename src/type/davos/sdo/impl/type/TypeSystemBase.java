@@ -181,10 +181,9 @@ public class TypeSystemBase
         else if ( !globalProperty.isXMLElement() && _attrQNameToGlobalProperty.get(globalPropXMLQName) != null)
             throw new IllegalArgumentException("Duplicate define of global attribute property: " + globalPropXMLQName);
 
-//        // todo uncomment the following lines when bug is fixed
-//        if ( _globalPropertiesBySdoQName.get(globalPropSDOQName)!=null)
-//            throw new IllegalArgumentException("Duplicate define, a property with the same SDO name already exists: " + globalPropSDOQName);
-//        else
+        if ( _globalPropertiesBySdoQName.get(globalPropSDOQName)!=null)
+            throw new IllegalArgumentException("Duplicate define, a property with the same SDO name already exists: " + globalPropSDOQName);
+        else
             _globalPropertiesBySdoQName.put(globalPropSDOQName, globalProperty);
 
         if (globalProperty.isXMLElement())

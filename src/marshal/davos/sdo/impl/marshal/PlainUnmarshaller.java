@@ -437,21 +437,26 @@ public class PlainUnmarshaller extends Unmarshaller implements ReferenceResolver
                         _idrefObjects.add(container);
                         _idrefProperties.add(_currentProp);
                         List valueAsList = (List) value;
-                        List<XPath> xpathList = new ArrayList<XPath>();
-                        _idrefValues.add(xpathList);
-                        for (int i = 0; i < valueAsList.size(); i++)
+                        if (_currentSchemaTypeCode == SchemaType.BTC_IDREFS)
+                            _idrefValues.add(valueAsList);
+                        else
                         {
-                            String path = (String) valueAsList.get(i);
-                            if (path.startsWith(Names.FRAGMENT))
-                                path = path.substring(Names.FRAGMENT.length());
-                            try
+                            List<XPath> xpathList = new ArrayList<XPath>();
+                            _idrefValues.add(xpathList);
+                            for (int i = 0; i < valueAsList.size(); i++)
                             {
-                                xpathList.add(XPath.compile(path, _nsHandler));
-                            }
-                            catch (XPathCompileException xpce)
-                            {
-                                throw new SDOUnmarshalException(SDOError.messageForCodeAndLocation(
-                                    "unmarshal.xpath.compile", _locator, path, xpce.getMessage()));
+                                String path = (String) valueAsList.get(i);
+                                if (path.startsWith(Names.FRAGMENT))
+                                    path = path.substring(Names.FRAGMENT.length());
+                                try
+                                {
+                                    xpathList.add(XPath.compile(path, _nsHandler));
+                                }
+                                catch (XPathCompileException xpce)
+                                {
+                                    throw new SDOUnmarshalException(SDOError.messageForCodeAndLocation(
+                                        "unmarshal.xpath.compile", _locator, path, xpce.getMessage()));
+                                }
                             }
                         }
                     }
@@ -469,9 +474,14 @@ public class PlainUnmarshaller extends Unmarshaller implements ReferenceResolver
                         _idrefProperties.add(_currentProp);
                         String path = (String) value;
                         XPath xpath;
-                        // We need to special-case the a property of type javax.sdo.Type because
-                        // they are in fact ids ina very strange way
+                        // We need to special-case the properties of type javax.sdo.Type because
+                        // they are in fact idrefs in a very strange way
                         if (type == BuiltInTypeSystem.TYPE)
+                            _idrefValues.add(path);
+                        // Even thought the Schema spec discourages use of type IDREF(S) for
+                        // elements, we allow it during compilation, so therefore we must support
+                        // it at runtime also
+                        else if (_currentSchemaTypeCode == SchemaType.BTC_IDREF)
                             _idrefValues.add(path);
                         else
                         {

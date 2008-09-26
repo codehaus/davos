@@ -414,6 +414,9 @@ public class TypeImpl
         if (this == BuiltInTypeSystem.OBJECT)
             return typeXml.isDataType();
 
+        if (this == BuiltInTypeSystem.DATAOBJECT)
+            return !typeXml.isDataType();
+
         List<Type> baseTypes = new ArrayList<Type>();
         baseTypes.addAll((List<Type>)typeXml.getBaseTypes());
 

@@ -276,13 +276,17 @@ public class BuiltInTypeSystem
         BYTES = t_bytes;
 
         TypeImpl t_character = TypeImpl.create();
-        st = null;
+        // In sdoModel.xsd, each predefined SDO data type has a Schema type that it maps to
+        // Each such defined Schema type has as base a built-in Schema type
+        // We use the built-in Schema types directly because they are more useful in practice
+        // (Can be understood by non-SDO aware processors)
+        st = builtinSchemaTypeSystem.findType(new QName(Names.URI_XSD, "string"));
         t_character.init("Character", Names.URI_SDO, TYPECODE_CHARACTER, char.class, true, false, false, false, false, false,
             Common.EMPTY_TYPEXML_LIST, Common.EMPTY_PROPERTYXML_LIST, Common.EMPTY_STRING_LIST, st, bits);
         CHARACTER = t_character;
 
         TypeImpl t_date = TypeImpl.create();
-        st = builtinSchemaTypeSystem.findType(new QName(Names.URI_SDO, "Date"));
+        st = builtinSchemaTypeSystem.findType(new QName(Names.URI_XSD, "dateTime"));
         t_date.init("Date", Names.URI_SDO, TYPECODE_DATE, java.util.Date.class, true, false, false, false, false, false,
             Common.EMPTY_TYPEXML_LIST, Common.EMPTY_PROPERTYXML_LIST, Common.EMPTY_STRING_LIST, st, bits);
         DATE = t_date;

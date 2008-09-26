@@ -2409,35 +2409,14 @@ public abstract class DataObjectImpl
         {
             if (oldValue!=null)
             {
-                if ( !prop.isMany() )
-                {
-                    if ( oppositeProp.isNullable() )
-                        ((Store)oldValue).storeSet(oppositeProp, newValue /*i.e. null*/);
-                    else
-                        ((Store)oldValue).storeUnset(oppositeProp);
-                }
-                else
-                {
-                    // this is the case when the entire list is to be set to null
-                    // need to null or unset all objests' oposite properties pointing to parent
-                    List<DataObjectXML> listOfPropValues = (List<DataObjectXML>)oldValue;
-                    for ( DataObjectXML itemInListOfPropValues : listOfPropValues )
-                    {
-                        if (itemInListOfPropValues == null )
-                            continue;
-                        
-                        // and since prop.isMany(), oppositeProp must be !isMany() so we can just set or unset it directly
-                        assert !oppositeProp.isMany(); 
-                        if ( oppositeProp.isNullable() )
-                            ((Store)itemInListOfPropValues).storeSet(oppositeProp, newValue /*i.e. null*/);
-                        else
-                            ((Store)itemInListOfPropValues).storeUnset(oppositeProp);
-                    }
-                }
+                unsetNonContainmentOpposite(prop, newValue, oldValue, oppositeProp);
             }
         }
         else
         {
+            if ( oldValue!=null && !prop.isContainment() )
+                unsetNonContainmentOpposite(prop, newValue, oldValue, oppositeProp);
+
             Store valueStore = (Store) newValue;
             if ( oppositeProp.isContainment() && oppositeProp.isMany() )
             {
@@ -2447,6 +2426,7 @@ public abstract class DataObjectImpl
                 valueStore.storeAddNew(oppositeProp, parent);
             }
             else
+            {
                 if (!oppositeProp.isMany())
                     valueStore.storeSet(oppositeProp, parent);
                 else
@@ -2457,19 +2437,50 @@ public abstract class DataObjectImpl
                     else
                         valueStore.storeAddNew(oppositeProp, parent);
                 }
+            }
 
             assert assertOppositeProperties((Store)parent, prop, valueStore) : "Opposite property not set corectly.";
         }
     }
 
+    private void unsetNonContainmentOpposite(PropertyXML prop, Object newValue, Object oldValue, PropertyXML oppositeProp)
+    {
+        // need to unset the oldValue before setting the new one
+        // if oldValue is null doesn't need unset
+        // if prop.isContainment() is unset by the containment code
+        if ( !prop.isMany() )
+            if ( oppositeProp.isNullable() )
+                ((Store)oldValue).storeSet(oppositeProp, null);
+            else
+                ((Store)oldValue).storeUnset(oppositeProp);
+        else
+        {
+            // this is the case when the entire list is to be set to null or
+            // unset all objests' oposite properties pointing to parent
+            List<DataObjectXML> listOfPropValues = (List<DataObjectXML>)oldValue;
+            for ( DataObjectXML itemInListOfPropValues : listOfPropValues )
+            {
+                if (itemInListOfPropValues == null )
+                    continue;
+
+                // and since prop.isMany(), oppositeProp must be !isMany() so we can just set or unset it directly
+                assert !oppositeProp.isMany();
+                if ( oppositeProp.isNullable() )
+                    ((Store)itemInListOfPropValues).storeSet(oppositeProp, newValue /*i.e. null*/);
+                else
+                    ((Store)itemInListOfPropValues).storeUnset(oppositeProp);
+            }
+        }
+    }
+
     /**
-     * Only if newValue is null and prop has opposite prop returns the old object
+     * Only if prop has opposite prop returns the old object
      * else null
      */
     private Object getOldValueForOppositeSet(PropertyXML propXml, Object newValue)
     {
-        if (newValue != null)
-            return null;
+        //if (newValue != null)
+        //    return null;
 
         if ( propXml.getOppositeXML() == null )
             return null;
