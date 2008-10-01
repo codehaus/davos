@@ -712,7 +712,20 @@ public class DataHelperImpl
         try
         {
             GDateBuilder gdb = new GDateBuilder(dateString);
-            return gdb.getCalendar();
+            XmlCalendar cal = gdb.getCalendar();
+            // Work around the XMLBeans bug whereby if the fractional seconds part has more than
+            // 3 digits it is rounded to 3 digits instead of truncated
+            BigDecimal fractionalSeconds = gdb.getFraction();
+            if (fractionalSeconds != null &&
+                fractionalSeconds.doubleValue() != 0 &&
+                fractionalSeconds.scale() > 3)
+            {
+                int millis = fractionalSeconds.setScale(3, BigDecimal.ROUND_DOWN).unscaledValue().
+                    intValue();
+                if (millis != cal.get(Calendar.MILLISECOND))
+                    cal.set(Calendar.MILLISECOND, millis);
+            }
+            return cal;
         }
         catch (IllegalArgumentException iae)
         {
