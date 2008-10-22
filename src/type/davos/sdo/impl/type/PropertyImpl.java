@@ -221,6 +221,37 @@ public class PropertyImpl
         }
         else
         {
+            // unwrap, change type from Integer to int (fix for TSK issue)
+            Class classOfValue = value.getClass();
+            if (Integer.class == classOfValue )
+            {
+                value = ((Integer)value).intValue();
+            }
+            else if (Boolean.class == classOfValue )
+            {
+                value = ((Boolean)value).booleanValue();
+            }
+            else if (Byte.class == classOfValue )
+            {
+                value = ((Byte)value).byteValue();
+            }
+            else if (Double.class == classOfValue )
+            {
+                value = ((Double)value).doubleValue();
+            }
+            else if (Float.class == classOfValue )
+            {
+                value = ((Float)value).floatValue();
+            }
+            else if (Long.class == classOfValue )
+            {
+                value = ((Long)value).longValue();
+            }
+            else if (Character.class == classOfValue )
+            {
+                value = ((Character)value).charValue();
+            }
+
             type = bsys.getType(value.getClass());
             if (type==null)
             {

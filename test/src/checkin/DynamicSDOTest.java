@@ -71,6 +71,7 @@ public class DynamicSDOTest extends BaseTest
     }
 
     private static final String CUST_URI = "http://www.example.com/customer";
+    private static final String CUST_URI2 = "http://www.example.com/customer2";
     private static final String SIMPLE_URI = "http://www.example.com/simple2";
     private static final String TEST_URI = "http://sdo/test/dynamic";
     private static final String CUST_XML =
@@ -735,4 +736,83 @@ public class DynamicSDOTest extends BaseTest
         Sequence seq = dobj.getSequence();
         assert "Adam".equals( seq.getValue(0) );
     }
+
+    public void testTypeHelperDefineBaseDObj()
+    {
+        TypeHelper types = TypeHelper.INSTANCE;
+        Type intType = types.getType("commonj.sdo", "Int");
+        Type stringType = types.getType("commonj.sdo", "String");
+
+        // create a new Type for Customers
+        DataObject idObjectTypeDescriptor = DataFactory.INSTANCE.create("commonj.sdo", "Type");
+        idObjectTypeDescriptor.set("uri", CUST_URI2);
+        idObjectTypeDescriptor.set("name", "IdObject");
+//        idObjectTypeDescriptor.setBoolean("dataType", false);
+//        idObjectTypeDescriptor.setBoolean("open", false);
+//        idObjectTypeDescriptor.setBoolean("sequenced", false);
+//        idObjectTypeDescriptor.setBoolean("abstract", false);
+
+        // create a customer number property
+        DataObject custNumProperty = idObjectTypeDescriptor.createDataObject("property");
+        custNumProperty.set("name", "id");
+        custNumProperty.set("type", intType);
+        custNumProperty.setBoolean("many", false);
+//        custNumProperty.setBoolean("containment", false);
+//        custNumProperty.setBoolean("readOnly", false);
+//        custNumProperty.set("default", null);
+
+        DataObject customerTypeDescriptor = DataFactory.INSTANCE.create("commonj.sdo", "Type");
+        customerTypeDescriptor.set("uri", CUST_URI2);
+        customerTypeDescriptor.set("name", "Customer");
+//        customerTypeDescriptor.setBoolean("dataType", false);
+//        customerTypeDescriptor.setBoolean("open", false);
+//        customerTypeDescriptor.setBoolean("sequenced", false);
+//        customerTypeDescriptor.setBoolean("abstract", false);
+        customerTypeDescriptor.set("baseType", idObjectTypeDescriptor);
+
+
+        // create a first name property
+        DataObject firstNameProperty = customerTypeDescriptor.createDataObject("property");
+        firstNameProperty.set("name", "firstName");
+        firstNameProperty.set("type", stringType);
+//        firstNameProperty.setBoolean("many", false);
+//        firstNameProperty.setBoolean("containment", false);
+//        firstNameProperty.setBoolean("readOnly", false);
+//        firstNameProperty.set("default", null);
+
+        // create a last name property
+        DataObject lastNameProperty = customerTypeDescriptor.createDataObject("property");
+        lastNameProperty.set("name", "lastName");
+        lastNameProperty.set("type", stringType);
+//        lastNameProperty.setBoolean("many", false);
+//        lastNameProperty.setBoolean("containment", false);
+//        lastNameProperty.setBoolean("readOnly", false);
+//        lastNameProperty.set("default", null);
+
+        // now define the Customer type so that customers can be made
+        //System.out.println("Printig dataObject customerTypeDescriptor:");
+        //printDO(customerTypeDescriptor);
+
+        Type t = types.define(customerTypeDescriptor);
+        //((TypeImpl)t).dump();
+
+        assertEquals("Customer", t.getName());
+        assertEquals(CUST_URI2, t.getURI());
+
+        Property idProp = t.getProperty("id");
+        assertTrue( idProp!= null );
+        assertEquals("id", idProp.getName() );
+        assertEquals( intType, idProp.getType() );
+
+        List baseTypes = t.getBaseTypes();
+        assertEquals(1, baseTypes.size());
+
+        Type baseType = (Type)baseTypes.get(0);
+        assertEquals("IdObject", baseType.getName());
+        assertEquals(CUST_URI2, baseType.getURI());
+
+        Property idPropFromBase = t.getProperty("id");
+        assertTrue( idProp == idPropFromBase );
+    }
+
 }

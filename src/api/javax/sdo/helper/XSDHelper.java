@@ -31,7 +31,15 @@ public interface XSDHelper
    * @return the local name as declared in the XSD.
    */
   String getLocalName(Property property);
-  
+
+  /**
+   * Returns the namespace URI as declared in the XSD. If the XSD has
+   * no namespace URI, then <code>""</code> is returned.
+   * @param type to return namespace URI for.
+   * @return the namespace URI as declared in the XSD.
+   */
+  String getNamespaceURI(Type type);
+
   /**
    * Returns the namespace URI as declared in the XSD. If the XSD has
    * no namespace URI, then <code>""</code> is returned.

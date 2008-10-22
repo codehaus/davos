@@ -94,11 +94,7 @@ public class SaxSaver extends Saver
         if (validate)
         {
             SchemaTypeLoader tl = sdoctx.getTypeSystem().getSchemaTypeLoader();
-            // We need to set the VALIDATE_TREAT_LAX_AS_SKIP option because the ChangeSummaryType
-            // is declared as having lax validation, but of course the prototypes of modified objects
-            // won't validate their Schemas (because of the sdo:ref attribute if nothing else)
-            // We need to change the datagraph.xsd Schema
-            SaxValidator v = new SaxValidator(_h, _nsstack, tl, new SDOExceptionListener(true));
+            SaxValidator v = new SaxValidator(_h, _nsstack, tl, new SDOValidationErrorListener(true));
             _h = v;
         }
     }

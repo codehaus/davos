@@ -171,7 +171,7 @@ public class TypeSystemBase
         assert globalProperty != null;
         assert globalProperty.isGlobal();
         assert globalProperty.isOpenContent();
-        assert globalProperty.getXMLNamespaceURI()!=null;
+        // globalProperty.getXMLNamespaceURI() can be null;
 
         QName globalPropXMLQName = new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getXMLName());
         QName globalPropSDOQName = new QName(globalProperty.getXMLNamespaceURI(), globalProperty.getName());

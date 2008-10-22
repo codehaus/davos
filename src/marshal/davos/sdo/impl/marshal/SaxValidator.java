@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
 
 import davos.sdo.SDOError;
+import davos.sdo.SDOGlobalElementNotFoundException;
 import davos.sdo.impl.common.Names;
 
 import javax.xml.namespace.NamespaceContext;
@@ -143,8 +144,9 @@ class SaxValidator implements ContentHandler
             QName globalElName = new QName(uri, localName);
             SchemaType t = _stl.findDocumentType(globalElName);
             if (t == null)
-                _errorListener.add(SDOError.messageForCode("validation.globalelement",
-                    globalElName.toString()));
+                throw new SDOGlobalElementNotFoundException(
+                    SDOError.messageForCode("validation.globalelement", globalElName.toString()),
+                    globalElName);
             else
             {
                 _validator = new Validator(t, null, _stl, null, _errorListener);

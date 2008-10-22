@@ -112,7 +112,7 @@ class PlainMarshaller extends Marshaller implements ReferenceBuilder
         Object simpleValue = null;
         TypeXML simpleType = null;
         if (actualType.getTypeCode() == BuiltInTypeSystem.TYPECODE_WRAPPERTYPE ||
-                actualType.getTypeCode() == BuiltInTypeSystem.TYPECODE_VALUETYPE)
+            actualType.getTypeCode() == BuiltInTypeSystem.TYPECODE_VALUETYPE)
         {
             // This is a wrapper for a simpleType value, so we treat it specially, by first
             // unwrapping the value
@@ -480,6 +480,11 @@ class PlainMarshaller extends Marshaller implements ReferenceBuilder
                             indent);
                     else
                     {
+                        // We need to account for the fact that, for XML marshalling, if the xsi:type
+                        // is going to be one of the SDO built-in Object wrapper types (sdo:IntObject,
+                        // sdo:FloatObject etc) we actually want the Schema type associated to the
+                        // "unwrapped" type (sdo:Int, sdo:Float respectively)
+                        simpleValueType = unbox(simpleValueType);
                         String xsiTypeName = null, xsiTypeUri = null;
                         int schemaTypeCode = p.getSchemaTypeCode();
                         QName qname = getXsiTypeName(simpleValueType);
@@ -755,12 +760,36 @@ class PlainMarshaller extends Marshaller implements ReferenceBuilder
         return idref;
     }
 
-    private QName getXsiTypeName(TypeXML sdoType)
+    private static QName getXsiTypeName(TypeXML sdoType)
     {
         QName result = sdoType.getXMLSchemaTypeName();
         if (result == null)
             result = new QName(sdoType.getURI(), sdoType.getName());
         return result;
+    }
+
+    private static TypeXML unbox(TypeXML type)
+    {
+        switch (type.getTypeCode())
+        {
+            case BuiltInTypeSystem.TYPECODE_BOOLEANOBJECT:
+                return BuiltInTypeSystem.BOOLEAN;
+            case BuiltInTypeSystem.TYPECODE_BYTEOBJECT:
+                return BuiltInTypeSystem.BYTE;
+            case BuiltInTypeSystem.TYPECODE_CHARACTEROBJECT:
+                return BuiltInTypeSystem.CHARACTER;
+            case BuiltInTypeSystem.TYPECODE_FLOATOBJECT:
+                return BuiltInTypeSystem.FLOAT;
+            case BuiltInTypeSystem.TYPECODE_INTOBJECT:
+                return BuiltInTypeSystem.INT;
+            case BuiltInTypeSystem.TYPECODE_SHORTOBJECT:
+                return BuiltInTypeSystem.SHORT;
+            case BuiltInTypeSystem.TYPECODE_DOUBLEOBJECT:
+                return BuiltInTypeSystem.DOUBLE;
+            case BuiltInTypeSystem.TYPECODE_LONGOBJECT:
+                return BuiltInTypeSystem.LONG;
+        }
+        return type;
     }
 
     private String getIdrefs(PropertyXML p, Object value,

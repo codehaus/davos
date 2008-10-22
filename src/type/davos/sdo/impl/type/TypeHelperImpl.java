@@ -49,6 +49,11 @@ public class TypeHelperImpl
 
     public Type getType(String uri, String typeName)
     {
+        return getTypeXML(uri, typeName);
+    }
+
+    public TypeXML getTypeXML(String uri, String typeName)
+    {
         return _sdoContext.getBindingSystem().loadTypeByTypeName(uri, typeName);
     }
 
@@ -70,6 +75,7 @@ public class TypeHelperImpl
     public List /*Type*/ define(List /*DataObject*/ types)
     {
         List<DataObject> typesToBeDefined = new ArrayList<DataObject>();
+        List<TypeImpl> typesToBeImutable = new ArrayList<TypeImpl>();
         List<Type> typesDefined = new ArrayList<Type>();
 
         typesToBeDefined.addAll((List<DataObject>)types);
@@ -112,6 +118,8 @@ public class TypeHelperImpl
 
                 TypeImpl type = namesToTypes.get(new QName(typeUri, typeName));
 
+                List<TypeXML> baseTypes = findBaseTypes(obj.getList(BuiltInTypeSystem.P_TYPE_BASETYPE), namesToTypes, typesToBeDefined);
+
                 List<PropertyXML> declaredProps = new ArrayList<PropertyXML>();
                 type.init(obj.getString(BuiltInTypeSystem.P_TYPE_NAME),
                     obj.getString(BuiltInTypeSystem.P_TYPE_URI),
@@ -123,7 +131,7 @@ public class TypeHelperImpl
                     obj.getBoolean(BuiltInTypeSystem.P_TYPE_ABSTRACT),
                     false,
                     obj.getBoolean(BuiltInTypeSystem.P_TYPE_SEQUENCED),
-                    (List<TypeXML>)obj.getList(BuiltInTypeSystem.P_TYPE_BASETYPE),
+                    baseTypes,
                     declaredProps,
                     (List<String>)obj.getList(BuiltInTypeSystem.P_TYPE_ALIASNAME),
                     null,
@@ -158,19 +166,21 @@ public class TypeHelperImpl
                     }
                 }
 
-                type.makeImmutable();
-
-                checkConstraints(type);
-
                 TypeXML existingType = typeSystem.getTypeXML(typeUri, typeName);
                 if (existingType==null)
                 {
-                    ((TypeSystemBase)typeSystem).addTypeMapping(type);
-
+                    typesToBeImutable.add(type);
                     typesDefined.add(type);
                 }
                 else
                     typesDefined.add(existingType);
+            }
+
+            for ( TypeImpl type : typesToBeImutable )
+            {
+                ((TypeSystemBase)typeSystem).addTypeMapping(type);
+                type.makeImmutable();
+                checkConstraints(type);
             }
         }
         
@@ -310,6 +320,57 @@ public class TypeHelperImpl
         
         declaredProps.add(declaredProp);
         //System.out.println("\t   " + (propContainment ? "" : "REF") + "  of containingType: " + propTypeName + " @ " + propTypeUri + (propOpposite != null ? " \t Oppo: " + propOpposite : ""));
+    }
+
+    private List<TypeXML> findBaseTypes(List baseTypeDefinitions, Map<QName, TypeImpl> namesToTypes, List<DataObject> typesToBeDefined)
+    {
+        List<TypeXML> baseTypes = new ArrayList<TypeXML>(baseTypeDefinitions.size());
+        for (Object baseTypeDefinition : baseTypeDefinitions)
+        {
+            if ( baseTypeDefinition instanceof TypeXML )
+            {
+                baseTypes.add( (TypeXML)baseTypeDefinition );
+            }
+            else if (baseTypeDefinition instanceof Type)
+            {
+                throw new IllegalArgumentException("Other type implementations not supported");
+            }
+            else if ( baseTypeDefinition instanceof DataObject )
+            {
+                DataObject baseTypeDefObject = (DataObject)baseTypeDefinition;
+                String uriBaseType = baseTypeDefObject.getString(BuiltInTypeSystem.P_TYPE_URI);
+                String nameBaseType = baseTypeDefObject.getString(BuiltInTypeSystem.P_TYPE_NAME);
+
+                // first check if already defined
+                TypeXML baseType = getTypeXML( uriBaseType, nameBaseType);
+                if (baseType!=null)
+                {
+                    baseTypes.add( baseType );
+                }
+                else
+                {
+                    // not defined yet, must create and put it in the list of types to be defined
+                    QName baseTypeDefinitionQname = new QName(uriBaseType, nameBaseType);
+
+                    TypeImpl baseTypeImpl = namesToTypes.get(baseTypeDefinitionQname);
+                    if ( baseTypeImpl == null )
+                    {
+                        baseTypeImpl = TypeImpl.create();
+                        namesToTypes.put(baseTypeDefinitionQname, baseTypeImpl);
+                        typesToBeDefined.add(baseTypeDefObject);
+                    }
+
+                    baseType = baseTypeImpl;
+                    baseTypes.add( baseType );
+                }
+            }
+            else
+            {
+                throw new IllegalArgumentException("Unknown object as base type.");
+            }
+        }
+
+        return baseTypes;
     }
 
     private static class PropertyKey

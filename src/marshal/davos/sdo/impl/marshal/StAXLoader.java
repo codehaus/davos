@@ -399,7 +399,7 @@ public class StAXLoader extends NamespaceSupportDelegator
             org.apache.xmlbeans.impl.validator.ValidatingXMLStreamReader validator = 
                 new org.apache.xmlbeans.impl.validator.ValidatingXMLStreamReader();
             SchemaTypeLoader tl = sdoCtx.getTypeSystem().getSchemaTypeLoader(); 
-            validator.init(xsr, true, null, tl, null, new SDOExceptionListener(marshal));
+            validator.init(xsr, true, null, tl, null, new SDOValidationErrorListener(marshal));
             xsr = validator;
         }
         return xsr;

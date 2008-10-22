@@ -93,6 +93,17 @@ public class XSDHelperImpl
         return property.getName();
     }
 
+    public String getNamespaceURI(Type type)
+    {
+        String uri = type.getURI();
+        // The convention is (due to backwards compatibility) that type.getURI() returns 'null' for
+        // types without URI, while XSDHelper.getNamespaceURI(Type) returns ""
+        if (uri == null)
+            return davos.sdo.impl.common.Common.EMPTY_STRING;
+        else
+            return uri;
+    }
+
     public String getNamespaceURI(Property property)
     {
         if (property instanceof PropertyXML)

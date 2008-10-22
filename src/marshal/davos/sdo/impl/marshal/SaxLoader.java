@@ -423,11 +423,7 @@ NamespaceHandler
         if (validate)
         {
             SchemaTypeLoader tl = sdoctx.getTypeSystem().getSchemaTypeLoader();
-            // We need to set the VALIDATE_TREAT_LAX_AS_SKIP option because the ChangeSummaryType
-            // is declared as having lax validation, but of course the prototypes of modified objects
-            // won't validate their Schemas (because of the sdo:ref attribute if nothing else)
-            // We need to change the datagraph.xsd Schema
-            SaxValidator v = new SaxValidator(this, this, tl, new SDOExceptionListener(false));
+            SaxValidator v = new SaxValidator(this, this, tl, new SDOValidationErrorListener(false));
             _xr.setContentHandler(v);
         }
         else

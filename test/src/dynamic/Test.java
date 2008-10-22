@@ -62,31 +62,19 @@ import org.apache.xmlbeans.impl.store.Path;
 import org.apache.xmlbeans.impl.util.XsTypeConverter;
 import org.apache.xmlbeans.impl.values.XmlObjectBase;
 import org.apache.xmlbeans.impl.xb.xsdschema.SchemaDocument;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.Externalizable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.ByteArrayInputStream;
-import java.io.Reader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Writer;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -177,7 +165,9 @@ public class Test
         //testSdoTsLoad();
         //testXbCDATA();
         //testXbPath();
-        testComplexElementWithSimpleContent();
+        //testComplexElementWithSimpleContent();
+        //testTypeHelperDefineBaseDObj();
+        testSerializeBug();
     }
 
     static void createAndTraverse()
@@ -3122,25 +3112,30 @@ public class Test
     }
 
     static void testXbCDATA()
-            throws XmlException
+            throws XmlException, ParserConfigurationException, IOException, SAXException
     {
         String xmlText = /*"<a>\n" +
                 "<a><![CDATA[cdata text]]></a>\n" +
                 "<b><![CDATA[cdata text]]> regular text</b>\n" +
                 "<c>text <![CDATA[cdata text]]></c>\n" +
                 "</a>"; */
-                "<ns1:MarksAndNumber xmlns:ns1='ns1'>\n" +
-                        " <![CDATA[\n" +
-                        "\n" +
-                        "\"NOT AVAILABLE\"\n" +
-                        "!@#$!@#$!@#$$%^&$&*&*()&()&()L:|OP{}O}{<>?\n" +
-                        "\n" +
-                        "  ]]>\n" +
-                        " </ns1:MarksAndNumber>";
+//                "<ns1:MarksAndNumber xmlns:ns1='ns1'>\n" +
+//                        " <![CDATA[\n" +
+//                        "\n" +
+//                        "\"NOT AVAILABLE\"\n" +
+//                        "!@#$!@#$!@#$$%^&$&*&*()&()&()L:|OP{}O}{<>?\n" +
+//                        "\n" +
+//                        "  ]]>\n" +
+//                        " </ns1:MarksAndNumber>";
+                "<STYLE type=\"text/css\">\n" +
+                        "    <!--\n" +
+                        "     h4 { font-family: Times New Roman; color: #0000FF; text-align: center }\n" +
+                        "    -->\n" +
+                        "  </STYLE>";
         System.out.println(xmlText);
 
         XmlOptions opts = new XmlOptions();
-        //opts.setUseCDataBookmarks();
+        opts.setUseCDataBookmarks();
         
         XmlObject xo = XmlObject.Factory.parse( xmlText , opts);
 
@@ -3149,6 +3144,25 @@ public class Test
 
         opts.setSavePrettyPrint();
         System.out.println("xo2:\n" + xo.xmlText(opts));
+
+
+        // Step 1: create a DocumentBuilderFactory
+        DocumentBuilderFactory dbf =
+         DocumentBuilderFactory.newInstance();
+
+       // Step 2: create a DocumentBuilder
+        DocumentBuilder db = dbf.newDocumentBuilder();
+
+        Document doc = db.parse(new InputSource(new StringReader(xmlText)));
+
+        xo = XmlObject.Factory.parse( doc , opts);
+
+        System.out.println("dom1:\n" + xo.xmlText());
+        System.out.println("\n");
+
+        opts.setSavePrettyPrint();
+        System.out.println("dom2:\n" + xo.xmlText(opts));
+
     }
 
     static void testXbPath()
@@ -3198,5 +3212,105 @@ public class Test
 
         Sequence seq = dobj.getSequence();
         assert "Adam".equals( seq.getValue(0) );
-  }
+    }
+
+
+    public static void testTypeHelperDefineBaseDObj()
+    {
+        TypeHelper types = TypeHelper.INSTANCE;
+        Type intType = types.getType("commonj.sdo", "Int");
+        Type stringType = types.getType("commonj.sdo", "String");
+
+        // create a new Type for Customers
+        DataObject idObjectTypeDescriptor = DataFactory.INSTANCE.create("commonj.sdo", "Type");
+        idObjectTypeDescriptor.set("uri", CUST_URI);
+        idObjectTypeDescriptor.set("name", "IdObject");
+//        idObjectTypeDescriptor.setBoolean("dataType", false);
+//        idObjectTypeDescriptor.setBoolean("open", false);
+//        idObjectTypeDescriptor.setBoolean("sequenced", false);
+//        idObjectTypeDescriptor.setBoolean("abstract", false);
+
+        // create a customer number property
+        DataObject custNumProperty = idObjectTypeDescriptor.createDataObject("property");
+        custNumProperty.set("name", "id");
+        custNumProperty.set("type", intType);
+        custNumProperty.setBoolean("many", false);
+//        custNumProperty.setBoolean("containment", false);
+//        custNumProperty.setBoolean("readOnly", false);
+//        custNumProperty.set("default", null);
+
+        DataObject customerTypeDescriptor = DataFactory.INSTANCE.create("commonj.sdo", "Type");
+        customerTypeDescriptor.set("uri", CUST_URI);
+        customerTypeDescriptor.set("name", "Customer");
+//        customerTypeDescriptor.setBoolean("dataType", false);
+//        customerTypeDescriptor.setBoolean("open", false);
+//        customerTypeDescriptor.setBoolean("sequenced", false);
+//        customerTypeDescriptor.setBoolean("abstract", false);
+        customerTypeDescriptor.set("baseType", idObjectTypeDescriptor);
+
+
+        // create a first name property
+        DataObject firstNameProperty = customerTypeDescriptor.createDataObject("property");
+        firstNameProperty.set("name", "firstName");
+        firstNameProperty.set("type", stringType);
+//        firstNameProperty.setBoolean("many", false);
+//        firstNameProperty.setBoolean("containment", false);
+//        firstNameProperty.setBoolean("readOnly", false);
+//        firstNameProperty.set("default", null);
+
+        // create a last name property
+        DataObject lastNameProperty = customerTypeDescriptor.createDataObject("property");
+        lastNameProperty.set("name", "lastName");
+        lastNameProperty.set("type", stringType);
+//        lastNameProperty.setBoolean("many", false);
+//        lastNameProperty.setBoolean("containment", false);
+//        lastNameProperty.setBoolean("readOnly", false);
+//        lastNameProperty.set("default", null);
+
+        // now define the Customer type so that customers can be made
+        System.out.println("Printig dataObject customerTypeDescriptor:");
+        printDO(customerTypeDescriptor);
+
+        Type t = types.define(customerTypeDescriptor);
+        ((TypeImpl)t).dump();
+    }
+
+    private static void testSerializeBug()
+            throws IOException, ClassNotFoundException
+    {
+        String xml = "<sdo:datagraph " +
+                "xmlns:sdo='javax.sdo'><changeSummary><cus:CUSTOMER sdo:ref='#/sdo:d" +
+                "atagraph/cus:CUSTOMER[1]' " +
+                "xmlns:cus='ld:Retail/CUSTOMER'><SSN>1223500003469</SSN></cus:CUSTOMER></ch" +
+                "angeSummary><cus:CUSTOMER " +
+                "xmlns:cus='ld:Retail/CUSTOMER'><CUSTOMER_ID>7</CUSTOMER_ID><FIRST_NAME>Tim" +
+                "</FIRST_NAME><LAST_NAME>Floyd</LAST_NAME><CUSTOMER_SINCE>2001-10-01</CUSTOMER_SINCE><EMAIL_ADDRESS>J" +
+                "OHN_7@yahoo.com</EMAIL_ADDRESS><TELEPHONE_NUMBER>2062616409</TELEPHONE_NUMBER><SSN>1223500859906</SS" +
+                "N><BIRTH_DAY>1955-09-24</BIRTH_DAY><DEFAULT_SHIP_METHOD>GROUND</DEFAULT_SHIP_METHOD><EMAIL_NOTIFICAT" +
+                "ION>1</EMAIL_NOTIFICATION><NEWS_LETTTER>0</NEWS_LETTTER><ONLINE_STATEMENT>1</ONLINE_STATEMENT><LOGIN" +
+                "_ID>Tim</LOGIN_ID></cus:CUSTOMER></sdo:datagraph>";
+        XMLDocument doc = XMLHelper.INSTANCE.load(xml);
+        DataObject dobj = doc.getRootObject();
+
+        Writer w = new StringWriter();
+        XMLHelper.INSTANCE.save(doc, w, null);
+        System.out.println("Before serialization: " + w.toString());
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        List pl = dobj.getInstanceProperties();
+        Property custProp = (Property)pl.get(3);
+        DataObject dobj2 = dobj.getDataObject(custProp);
+        oos.writeObject(dobj2);
+        oos.close();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        DataObject cust = (DataObject)ois.readObject();
+        DataObject root = cust.getRootObject();
+        String uri = XSDHelper.INSTANCE.getNamespaceURI(root.getContainmentProperty());
+        String local = XSDHelper.INSTANCE.getLocalName(root.getContainmentProperty());
+        System.out.print  ("\n\nAfter serialization:  ");
+        XMLHelper.INSTANCE.save( root, uri, local, System.out);
+    }
 }

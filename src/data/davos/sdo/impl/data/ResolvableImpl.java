@@ -90,7 +90,7 @@ public class ResolvableImpl
 //            System.out.println(" is root.");
             out.writeByte(BYTE_ROOT);
             GZIPOutputStream gzipper = new GZIPOutputStream(new OutputStreamOverObjectOutput(out));
-            PropertyXML prop = (PropertyXML) _resolvedDataObject.getContainmentProperty();
+            PropertyXML prop = _resolvedDataObject.getContainmentPropertyXML();
             String uri, name;
             if (prop == null)
             {
@@ -105,6 +105,9 @@ public class ResolvableImpl
             SDOContext sdoContext = _resolvedDataObject.getSDOContext();
             sdoContext.getXMLHelper().save(_resolvedDataObject, uri, name, gzipper);
             gzipper.finish();
+            //System.out.println("Debug: root serialization: ");
+            //sdoContext.getXMLHelper().save(_resolvedDataObject, uri, name, System.out);
+            //out.flush();            
             break;
 
         case BYTE_DATAGRAPH:

@@ -82,16 +82,17 @@ public class DataFactoryImpl
         if (type.isAbstract())
             throw new IllegalArgumentException("The type " + type.getName() + "@" + type.getURI() + " is an abstract type and it cannot be instantiated.");
 
+        TypeXML typeXML = _sdoContext.getTypeSystem().getTypeXML(type);
         if (type.isDataType())
         {
-            DataObject wrapperObj = create(BuiltInTypeSystem.VALUETYPE);
+            DataObject wrapperObj = create(BuiltInTypeSystem.WRAPPERTYPE);
             return wrapperObj;
         }
 
         DataGraphImpl dataGraph = null;
         if (type == BuiltInTypeSystem.DATAGRAPHTYPE)
             dataGraph = new DataGraphImpl(_sdoContext);
-        DataObject root = create(_sdoContext.getTypeSystem().getTypeXML(type), dataGraph);
+        DataObject root = create(typeXML, dataGraph);
         if (dataGraph != null)
             dataGraph.setRootObject(root);
         return root;
