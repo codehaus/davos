@@ -37,7 +37,6 @@ import java.util.Arrays;
 
 import davos.sdo.TypeXML;
 import davos.sdo.SDOContext;
-import davos.sdo.impl.type.TypeImpl;
 import davos.sdo.impl.type.BuiltInTypeSystem;
 
 /**
@@ -483,22 +482,7 @@ public class DataHelperImpl
             }
             if ( value instanceof List)
             {
-                //TypeXML typeXML = TypeImpl.getTypeXML(type);
-                if (BuiltInTypeSystem.STRINGS.isInstance(value))
-                {
-                    List<String> strings = ((List<String>)value);
-                    if (strings.size() == 0) return null;
-                    String res = "";
-                    for (int i = 0; i < strings.size(); i++)
-                    {
-                        if (i>0)
-                            res += " ";
-                        String s = strings.get(i);
-                        res += (s == null ? "" : s);
-                    }
-                    return res;
-                }
-                else return ((List)value).toString();
+                return _toString((List)value);
             }
         }
         else if (instClass.isAssignableFrom(byte[].class))
@@ -591,6 +575,32 @@ public class DataHelperImpl
             return null;
 
         return convert(property.getType(), value);
+    }
+
+    public static String _toString(List l)
+    {
+        if (l.size() == 0) return null;
+        String res = "";
+        for (int i = 0; i < l.size(); i++)
+        {
+            if (i > 0)
+                res += " ";
+            Object o = l.get(i);
+            if (o == null) { /* skip */ }
+            else if (o instanceof Character)
+            {
+                Character c = (Character)o;
+                if (c.charValue() != '\0') // '\0' converts to ""
+                    res += c.toString();
+            }
+            else if (o instanceof byte[])
+                res += HexBin.bytesToString((byte[])o);
+            else if (o instanceof Date)
+                res += _toDateTime((Date)o);
+            else // all other types use toString()
+                res += o.toString();
+        }
+        return res;
     }
 
     public static String _toDateTime(Date date)

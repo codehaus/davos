@@ -5,8 +5,8 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xmlns:sdo="commonj.sdo"
-  xmlns:sdoXML="commonj.sdo/xml"
-  xmlns:sdoJava="commonj.sdo/java"
+  xmlns:sdox="commonj.sdo/xml"
+  xmlns:sdoj="commonj.sdo/java"
   elementFormDefault="qualified"
   xsi:schemaLocation="commonj.sdo/xml sdoXML.xsd
                   commonj.sdo/java sdoJava.xsd"> 
@@ -37,7 +37,7 @@
   <xsd:sequence>
     <xsd:element name="baseType" type="sdo:URI" 
       minOccurs="0" maxOccurs="unbounded"
-      sdoXML:propertyType="sdo:Type" />
+      sdox:propertyType="sdo:Type" />
     <xsd:element name="property" type="sdo:Property" 
       minOccurs="0" maxOccurs="unbounded" />
     <xsd:element name="aliasName" type="sdo:String"
@@ -45,7 +45,7 @@
     <xsd:any namespace="##other" processContents="lax" 
       minOccurs="0" maxOccurs="unbounded" />
   </xsd:sequence>
-  <xsd:attribute name="name" type="xsd:ID" sdoXML:dataType="sdo:String"/>
+  <xsd:attribute name="name" type="xsd:ID" sdox:dataType="sdo:String"/>
   <xsd:attribute name="uri" type="sdo:URI"/>
   <xsd:attribute name="dataType" type="sdo:Boolean"/>
   <xsd:attribute name="open" type="sdo:Boolean"/>
@@ -66,8 +66,8 @@
   <xsd:attribute name="containment" type="sdo:Boolean"/>
   <xsd:attribute name="default" type="sdo:String"/>
   <xsd:attribute name="readOnly" type="sdo:Boolean"/>
-  <xsd:attribute name="type" type="sdo:URI" sdoXML:propertyType="sdo:Type"/>
-  <xsd:attribute name="opposite" type="sdo:URI" sdoXML:propertyType="sdo:Property"/>
+  <xsd:attribute name="type" type="sdo:URI" sdox:propertyType="sdo:Type"/>
+  <xsd:attribute name="opposite" type="sdo:URI" sdox:propertyType="sdo:Property"/>
   <xsd:attribute name="nullable" type="sdo:Boolean"/>
   <xsd:anyAttribute namespace="##any" processContents="lax"/>
 </xsd:complexType>
@@ -89,71 +89,71 @@
 -->
 
 <!-- Data Types -->
-<xsd:simpleType name="Boolean" sdoJava:instanceClass="boolean">
+<xsd:simpleType name="Boolean" sdoj:instanceClass="boolean">
   <xsd:restriction base="xsd:boolean"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Byte" sdoJava:instanceClass="byte">
+<xsd:simpleType name="Byte" sdoj:instanceClass="byte">
   <xsd:restriction base="xsd:byte"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Bytes" sdoJava:instanceClass="byte[]">
+<xsd:simpleType name="Bytes" sdoj:instanceClass="byte[]">
   <xsd:restriction base="xsd:hexBinary"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Character" sdoJava:instanceClass="char">
+<xsd:simpleType name="Character" sdoj:instanceClass="char">
   <xsd:restriction base="xsd:string"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Date" sdoJava:instanceClass="java.util.Date">
+<xsd:simpleType name="Date" sdoj:instanceClass="java.util.Date">
   <xsd:restriction base="xsd:dateTime"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="DateTime" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="DateTime" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:dateTime"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Day" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="Day" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:gDay"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Decimal" sdoJava:instanceClass="java.math.BigDecimal">
+<xsd:simpleType name="Decimal" sdoj:instanceClass="java.math.BigDecimal">
   <xsd:restriction base="xsd:decimal"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Double" sdoJava:instanceClass="double">
+<xsd:simpleType name="Double" sdoj:instanceClass="double">
   <xsd:restriction base="xsd:double"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Duration" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="Duration" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:duration"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Float" sdoJava:instanceClass="float">
+<xsd:simpleType name="Float" sdoj:instanceClass="float">
   <xsd:restriction base="xsd:float"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Int" sdoJava:instanceClass="int">
+<xsd:simpleType name="Int" sdoj:instanceClass="int">
   <xsd:restriction base="xsd:int"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Integer" sdoJava:instanceClass="java.math.BigInteger">
+<xsd:simpleType name="Integer" sdoj:instanceClass="java.math.BigInteger">
   <xsd:restriction base="xsd:integer"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Long"  sdoJava:instanceClass="long">
+<xsd:simpleType name="Long"  sdoj:instanceClass="long">
   <xsd:restriction base="xsd:long"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Month" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="Month" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:gMonth"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="MonthDay" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="MonthDay" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:gMonthDay"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Object"  sdoJava:instanceClass="java.lang.Object">
+<xsd:simpleType name="Object"  sdoj:instanceClass="java.lang.Object">
   <!-- Only the schema for schemas is allowed to restrict anySimpleType.
          <xsd:restriction base="xsd:anySimpleType"/>
        The equivalent declaration is a union of the predefined XSD data types.
@@ -167,35 +167,35 @@
     xsd:time xsd:token xsd:unsignedByte xsd:unsignedInt xsd:unsignedLong xsd:unsignedShort"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Short" sdoJava:instanceClass="short">
+<xsd:simpleType name="Short" sdoj:instanceClass="short">
   <xsd:restriction base="xsd:short"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="String" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="String" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:string"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Strings" sdoJava:instanceClass="java.util.List">
+<xsd:simpleType name="Strings" sdoj:instanceClass="java.util.List">
   <xsd:restriction base="xsd:string"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Time" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="Time" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:time"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="Year" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="Year" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:gYear"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="YearMonth" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="YearMonth" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:gYearMonth"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="YearMonthDay" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="YearMonthDay" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:date"/>
 </xsd:simpleType>
 
-<xsd:simpleType name="URI" sdoJava:instanceClass="java.lang.String">
+<xsd:simpleType name="URI" sdoj:instanceClass="java.lang.String">
   <xsd:restriction base="xsd:anyURI"/>
 </xsd:simpleType>
 

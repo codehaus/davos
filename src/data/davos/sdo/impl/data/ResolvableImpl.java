@@ -27,6 +27,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.WeakHashMap;
+import java.lang.ref.SoftReference;
 
 import davos.sdo.impl.util.XmlPath;
 import davos.sdo.impl.common.Names;
@@ -42,6 +46,8 @@ import davos.sdo.SDOContextFactory;
 public class ResolvableImpl
     implements ExternalizableDelegator.Resolvable
 {
+    private static Map<ClassLoader, SoftReference<SDOContext>> DEFAULT_SDOCONTEXTS = new WeakHashMap<ClassLoader, SoftReference<SDOContext>>();
+
     private static final byte BYTE_PATH_REQUIRED = 0;
     private static final byte BYTE_ROOT = 1;
     private static final byte BYTE_DATAGRAPH = 2;
@@ -175,10 +181,22 @@ public class ResolvableImpl
         }
 
         // if user didn't set a ThreadLocal context,
+        // try to find if one was created, if not
         // a new context is created based on the current thread context classloader.
-        sdoContext = SDOContextFactory.createNewSDOContext(Thread.currentThread().getContextClassLoader());
-        SDOContextFactory.setThreadLocalSDOContext(sdoContext);
-
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        
+        SoftReference<SDOContext> softSdoContext = DEFAULT_SDOCONTEXTS.get(contextClassLoader);
+        if (softSdoContext!=null)
+        {
+            sdoContext = softSdoContext.get();
+        }
+        else
+        {
+            sdoContext = SDOContextFactory.createNewSDOContext(contextClassLoader);
+            //don't set the context on thread local, keep it weakly in a static map keyed on Classloaders
+            DEFAULT_SDOCONTEXTS.put(contextClassLoader , new SoftReference<SDOContext>(sdoContext));
+        }
+        
         return sdoContext;
     }
 

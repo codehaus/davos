@@ -70,6 +70,7 @@ public class DataTypeConversionTest extends DataObjectTest
         suite.addTest(new DataTypeConversionTest("testIntegerConversion"));
         suite.addTest(new DataTypeConversionTest("testDateConversion"));
         suite.addTest(new DataTypeConversionTest("testStringsConversion"));
+        suite.addTest(new DataTypeConversionTest("testListConversion"));
         
         suite.addTest(new DataTypeConversionTest("testDurationConversion"));
         suite.addTest(new DataTypeConversionTest("testDateTimeConversion"));
@@ -141,7 +142,8 @@ public class DataTypeConversionTest extends DataObjectTest
           {"Year", "String", String.class, "year", YEAR_P_I},
           {"YearMonth", "String", String.class, "yearMonth", YEARMONTH_P_I},
           {"YearMonthDay", "String", String.class, "yearMonthDay", YEARMONTHDAY_P_I},
-          {"Strings", "List", List.class, "strings", STRINGS_P_I}
+          {"Strings", "List", List.class, "strings", STRINGS_P_I},
+          {"Object", "List", List.class, "object", OBJECT_P_I}
         };
 
     static Map typeMap = new HashMap();
@@ -1096,6 +1098,52 @@ public class DataTypeConversionTest extends DataObjectTest
         fromStringsToString.convert(dobj, strings4, null);
         fromStringsToString.convert(dobj, strings5, "");
         fromStringsToString.convert(dobj, strings6, "a  b  c");
+    }
+
+    public void testListConversion() throws Exception
+    {
+        System.out.println("List to String");
+        ConversionTest fromListToString = new ConversionTestA("Object", "String");
+
+        DataObject dobj = createDataObject();
+        List list1 = new ArrayList(); // [] -> null
+        List list2 = new ArrayList(); // [""] -> ""
+        list2.add("");
+        List list3 = new ArrayList(); // ["", ""] -> "" + " " + "" = " "
+        list3.add("");
+        list3.add("");
+        List list4 = new ArrayList(); // for items: null -> ""
+        list4.add(null);
+        List list5 = new ArrayList(); // for items: '\0' -> ""
+        list5.add('\0');
+        List list6 = new ArrayList();
+        list6.add("a");
+        list6.add(1);
+        list6.add(3.14);
+        list6.add(new Date(0));
+        list6.add(1000000000000L);
+        list6.add("z");
+        List list7 = new ArrayList();
+        list7.add('c');
+        list7.add(new byte[] {0, 1, 2, 3, 10, 11, 12, 16});
+        list7.add('\0');
+        list7.add("zzz");
+        List list8 = new ArrayList();
+        list8.add("a");
+        list8.add(null);
+        list8.add("b");
+        list8.add('\0');
+        list8.add('c');
+        list8.add("");
+
+        fromListToString.convert(dobj, list1, null);
+        fromListToString.convert(dobj, list2, "");
+        fromListToString.convert(dobj, list3, " ");
+        fromListToString.convert(dobj, list4, "");
+        fromListToString.convert(dobj, list5, "");
+        fromListToString.convert(dobj, list6, "a 1 3.14 1970-01-01T00:00:00Z 1000000000000 z");
+        fromListToString.convert(dobj, list7, "c 000102030A0B0C10  zzz");
+        fromListToString.convert(dobj, list8, "a  b  c ");
     }
 
     private void checkDate(Date date, int[] fields, int[] values)

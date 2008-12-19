@@ -191,7 +191,7 @@ public class PropertyImpl
                     type = BuiltInTypeSystem.DATAOBJECT;
                 else
                 {
-                    type = bsys.getType(firstItem.getClass());
+                    type = bsys.getType(bigToSmallClassConvert(firstItem.getClass()));
                     for (int i = 1; i < list.size(); i++)
                     {
                         Object item = list.get(i);
@@ -200,7 +200,7 @@ public class PropertyImpl
                             itemType = BuiltInTypeSystem.DATAOBJECT;
                         else
                         {
-                            itemType = bsys.getType(item.getClass());
+                            itemType = bsys.getType(bigToSmallClassConvert(item.getClass()));
                         }
 
                         if (type==itemType)
@@ -223,36 +223,9 @@ public class PropertyImpl
         {
             // unwrap, change type from Integer to int (fix for TSK issue)
             Class classOfValue = value.getClass();
-            if (Integer.class == classOfValue )
-            {
-                value = ((Integer)value).intValue();
-            }
-            else if (Boolean.class == classOfValue )
-            {
-                value = ((Boolean)value).booleanValue();
-            }
-            else if (Byte.class == classOfValue )
-            {
-                value = ((Byte)value).byteValue();
-            }
-            else if (Double.class == classOfValue )
-            {
-                value = ((Double)value).doubleValue();
-            }
-            else if (Float.class == classOfValue )
-            {
-                value = ((Float)value).floatValue();
-            }
-            else if (Long.class == classOfValue )
-            {
-                value = ((Long)value).longValue();
-            }
-            else if (Character.class == classOfValue )
-            {
-                value = ((Character)value).charValue();
-            }
+            classOfValue = bigToSmallClassConvert(classOfValue);
 
-            type = bsys.getType(value.getClass());
+            type = bsys.getType(classOfValue);
             if (type==null)
             {
                 if (value instanceof DataObjectXML)
@@ -275,6 +248,40 @@ public class PropertyImpl
 
 
         return createOnDemand(name, isMany, isContainment, type);
+    }
+
+    private static Class bigToSmallClassConvert(Class classOfValue)
+    {
+        if (Integer.class == classOfValue )
+        {
+            classOfValue = int.class;
+        }
+        else if (Boolean.class == classOfValue )
+        {
+            classOfValue = boolean.class;
+        }
+        else if (Byte.class == classOfValue )
+        {
+            classOfValue = byte.class;
+        }
+        else if (Double.class == classOfValue )
+        {
+            classOfValue = double.class;
+        }
+        else if (Float.class == classOfValue )
+        {
+            classOfValue = float.class;
+        }
+        else if (Long.class == classOfValue )
+        {
+            classOfValue = long.class;
+        }
+        else if (Character.class == classOfValue )
+        {
+            classOfValue = char.class;
+        }
+
+        return classOfValue;
     }
 
     public static PropertyXML createOnDemand(String name, boolean isMany, boolean isContainment, TypeXML type)

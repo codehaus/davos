@@ -19,6 +19,7 @@ import javax.sdo.impl.HelperProvider;
 import org.apache.xmlbeans.SchemaTypeLoader;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.ref.SoftReference;
 
 /**
  * @author Cezar Andrei (cezar dot andrei at gmail dot com)
@@ -26,6 +27,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class SDOContextFactory
 {
+    private static String SDOCONTEXTIMPL = "davos.sdo.impl.context.SDOContextImpl";
+
     /**
      * Creates an SDOContext that will use the given classLoader to load up precompiled types and properties.
      */
@@ -33,7 +36,7 @@ public class SDOContextFactory
     {
         try
         {
-            Class classSDOContextImpl = Class.forName("javax.sdo.impl.HelperProviderImpl$SDOContextImpl");
+            Class classSDOContextImpl = Class.forName(SDOCONTEXTIMPL);
             return (SDOContext)classSDOContextImpl.getMethod("newInstance", ClassLoader.class).
                            invoke(null, classLoader);
 
@@ -63,7 +66,7 @@ public class SDOContextFactory
     {
         try
         {
-            Class classSDOContextImpl = Class.forName("javax.sdo.impl.HelperProviderImpl$SDOContextImpl");
+            Class classSDOContextImpl = Class.forName(SDOCONTEXTIMPL);
             return (SDOContext)classSDOContextImpl.getMethod("newInstance", ClassLoader.class).
                            invoke(null, (ClassLoader)null);
 
@@ -105,10 +108,9 @@ public class SDOContextFactory
     {
         try
         {
-            Class classSDOContextImpl = Class.forName("javax.sdo.impl.HelperProviderImpl$SDOContextForSchemaTypeLoader");
+            Class classSDOContextImpl = Class.forName(SDOCONTEXTIMPL + "$SDOContextForSchemaTypeLoader");
             return (SDOContext)classSDOContextImpl.getMethod("newInstance", SchemaTypeLoader.class, Object.class).
                            invoke(null, schemaTypeLoader, options);
-
         }
         catch (ClassNotFoundException e)
         {
@@ -138,11 +140,12 @@ public class SDOContextFactory
     }
 
     /** SDOContext reference on ThreadLocal - it's user settable/gettable */
-    private static ThreadLocal<SDOContext> THREADLOCAL_SDOContext = new ThreadLocal<SDOContext>()
+    private static ThreadLocal<SoftReference<SDOContext>> THREADLOCAL_SDOContext =
+            new ThreadLocal<SoftReference<SDOContext>>()
     {
-        protected synchronized SDOContext initialValue()
+        protected synchronized SoftReference<SDOContext> initialValue()
         {
-            return null;
+            return new SoftReference<SDOContext>(null);
         }
     };
 
@@ -153,7 +156,7 @@ public class SDOContextFactory
      */
     public static SDOContext getThreadLocalSDOContext()
     {
-        return THREADLOCAL_SDOContext.get();
+        return THREADLOCAL_SDOContext.get().get();
     }
 
     /**
@@ -162,6 +165,6 @@ public class SDOContextFactory
      */
     public static void setThreadLocalSDOContext(SDOContext sdoContext)
     {
-        THREADLOCAL_SDOContext.set(sdoContext);
+        THREADLOCAL_SDOContext.set(new SoftReference<SDOContext>(sdoContext));
     }
 }

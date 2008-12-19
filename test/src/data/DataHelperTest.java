@@ -14,6 +14,8 @@
  */
 package data;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Date;
@@ -23,6 +25,8 @@ import java.util.SimpleTimeZone;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import javax.sdo.Type;
+import javax.sdo.helper.TypeHelper;
 import javax.sdo.helper.DataHelper;
 
 //import org.apache.xmlbeans.GDate;
@@ -65,6 +69,7 @@ public class DataHelperTest extends BaseTest
         suite.addTest(new DataHelperTest("testDateToYear"));
         suite.addTest(new DataHelperTest("testDateToYearMonth"));
         suite.addTest(new DataHelperTest("testDateToYearMonthDay"));
+        suite.addTest(new DataHelperTest("testListToString"));
         
         // or
         //TestSuite suite = new TestSuite(DataHelperTest.class);
@@ -76,6 +81,7 @@ public class DataHelperTest extends BaseTest
         junit.textui.TestRunner.run(suite());
     }
 
+    private static TypeHelper typeHelper = context.getTypeHelper();
     private static DataHelper dataHelper = context.getDataHelper();
     private static final TimeZone tz0 = TimeZone.getTimeZone("GMT");
     private static TimeZone tz1 = 
@@ -1102,4 +1108,17 @@ public class DataHelperTest extends BaseTest
         assertEquals(exp + "Z", fromc);
     }
 
+    public void testListToString()
+    {
+        System.out.println("list to string");
+        Type t = typeHelper.getType(String.class);
+        assertEquals("commonj.sdo", t.getURI());
+        assertEquals("String", t.getName());
+        String exp = null;
+        Object act = dataHelper.convert(t, null);
+        assertEquals(exp, act);
+        List l = new ArrayList();
+        act = dataHelper.convert(t, l);
+        assertEquals(exp, act);
+    }
 }

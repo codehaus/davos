@@ -20,6 +20,7 @@
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="lib.dir" value="${build.dir}/lib"/>
     <property name="ar.dir" value="${build.dir}/ar"/>
+    <property name="doc.dir" value="${build.dir}/javadoc"/>
     <property name="external.lib.dir" value="external/lib"/>
 
     <property name="debug" value="true"/>
@@ -67,6 +68,10 @@
         <delete dir="${ar.dir}"/>
     </target>
 
+    <target name="clean.doc">
+        <delete dir="${doc.dir}"/>
+    </target>
+
     <!-- initial setup and utility targets -->
     <target name="java_version">
         <echo message="${ant.java.version}"/>
@@ -88,6 +93,13 @@
         <echo message="Extracting xbean.jar and jsr173_1.0_api.jar into ${lib.dir}"/>
         <copy file="${external.lib.dir}/xbean.jar" todir="${lib.dir}"/>
         <copy file="${external.lib.dir}/jsr173_1.0_api.jar" todir="${lib.dir}"/>
+    </target>
+
+    <target name="gendoc" depends="dirs">
+        <mkdir dir="${doc.dir}"/>
+        <javadoc destdir="${doc.dir}">
+            <fileset dir="${src.dir}/api"/>
+        </javadoc>
     </target>
 
     <target name="compile" depends="build">
@@ -246,8 +258,26 @@
             toDir="${classes.dir}/binding/davos/sdo/impl/binding/wsdl"/>
     </target>
 
-    <target name="provider.classes" depends="dirs, api.classes, helpers.classes, type.classes, data.classes,
+    <target name="context.classes" depends="dirs, api.classes, helpers.classes, type.classes, data.classes,
         marshal.classes, publicapi.classes, binding.classes, type.classes">
+        <mkdir dir="${classes.dir}/context"/>
+        <javac srcdir="${src.dir}/context" destdir="${classes.dir}/context" debug="${debug}">
+            <classpath id="context.compile.path">
+                <pathelement location="${classes.dir}/api"/>
+                <pathelement location="${classes.dir}/helpers"/>
+                <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/data"/>
+                <pathelement location="${classes.dir}/marshal"/>
+                <pathelement location="${classes.dir}/publicapi"/>
+                <pathelement location="${classes.dir}/binding"/>
+                <pathelement location="${classes.dir}/type"/>
+                <path refid="xbean.classpath"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="provider.classes" depends="dirs, api.classes, helpers.classes, type.classes, data.classes,
+        marshal.classes, publicapi.classes, binding.classes, type.classes, context.classes">
         <mkdir dir="${classes.dir}/provider"/>
         <javac srcdir="${src.dir}/provider" destdir="${classes.dir}/provider" debug="${debug}">
             <classpath id="provider.compile.path">
@@ -259,6 +289,7 @@
                 <pathelement location="${classes.dir}/publicapi"/>
                 <pathelement location="${classes.dir}/binding"/>
                 <pathelement location="${classes.dir}/type"/>
+                <pathelement location="${classes.dir}/context"/>
                 <path refid="xbean.classpath"/>
             </classpath>
         </javac>
@@ -302,7 +333,7 @@
 
     <target name="sdo_jar" depends="extract.xbean.jars, api.classes, publicapi.classes,
         path.classes, xpath.classes, common.classes, helpers.classes, marshal.classes,
-        provider.classes, type.classes, binding.classes, schemas.compile, version" >
+        provider.classes, type.classes, binding.classes, schemas.compile, context.classes, version" >
 
         <mkdir dir="${ar.dir}"/>
 
@@ -325,6 +356,7 @@
             <fileset dir="${classes.dir}/marshal" />
             <fileset dir="${classes.dir}/ant" />
             <fileset dir="${classes.dir}/schemas"/>
+            <fileset dir="${classes.dir}/context"/>
             <manifest>
                 <section name="${manifest.name}">
                     <attribute name="Comment" value="${manifest.vendor} Version ${version.full}"/>

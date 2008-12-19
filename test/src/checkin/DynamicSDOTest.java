@@ -452,7 +452,7 @@ public class DynamicSDOTest extends BaseTest
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
             assertTrue(e instanceof IllegalArgumentException);
             String msg = e.getMessage();
             assertTrue((msg.indexOf("Circular containment") >= 0) ||
@@ -723,86 +723,57 @@ public class DynamicSDOTest extends BaseTest
     public void testComplexElementWithSimpleContent() 
     {
         String xml = "<root><name lang=\"en_US\">Adam</name></root>";
-        XMLDocument doc = XMLHelper.INSTANCE.load( xml );
+        XMLDocument doc = xmlHelper.load(xml);
         DataObject root = doc.getRootObject();
         Property nameProperty = root.getInstanceProperty( "name" );
 
-        assert "commonj.sdo".equals( nameProperty.getType().getURI() );
-        assert "DataObject".equals( nameProperty.getType().getName() );
+        assertEquals("commonj.sdo", nameProperty.getType().getURI());
+        assertEquals("DataObject", nameProperty.getType().getName());
 
-        DataObject dobj = root.getDataObject( "name.0" );
-        assert "en_US".equals( dobj.getString( "lang" ) );
+        DataObject dobj = root.getDataObject("name.0");
+        assertEquals("en_US", dobj.getString("lang"));
 
         Sequence seq = dobj.getSequence();
-        assert "Adam".equals( seq.getValue(0) );
+        assertEquals("Adam", seq.getValue(0));
     }
 
-    public void testTypeHelperDefineBaseDObj()
+    /** define base type dynamically and define extended type using
+        the base type data object
+    */
+    public void testDynamicBaseType1()
     {
-        TypeHelper types = TypeHelper.INSTANCE;
-        Type intType = types.getType("commonj.sdo", "Int");
-        Type stringType = types.getType("commonj.sdo", "String");
+        Type intType = typeHelper.getType("commonj.sdo", "Int");
+        Type stringType = typeHelper.getType("commonj.sdo", "String");
 
-        // create a new Type for Customers
-        DataObject idObjectTypeDescriptor = DataFactory.INSTANCE.create("commonj.sdo", "Type");
+        DataObject idObjectTypeDescriptor = factory.create("commonj.sdo", "Type");
         idObjectTypeDescriptor.set("uri", CUST_URI2);
         idObjectTypeDescriptor.set("name", "IdObject");
-//        idObjectTypeDescriptor.setBoolean("dataType", false);
-//        idObjectTypeDescriptor.setBoolean("open", false);
-//        idObjectTypeDescriptor.setBoolean("sequenced", false);
-//        idObjectTypeDescriptor.setBoolean("abstract", false);
+        DataObject idProperty = idObjectTypeDescriptor.createDataObject("property");
+        idProperty.set("name", "id");
+        idProperty.set("type", intType);
+        idProperty.setBoolean("many", false);
 
-        // create a customer number property
-        DataObject custNumProperty = idObjectTypeDescriptor.createDataObject("property");
-        custNumProperty.set("name", "id");
-        custNumProperty.set("type", intType);
-        custNumProperty.setBoolean("many", false);
-//        custNumProperty.setBoolean("containment", false);
-//        custNumProperty.setBoolean("readOnly", false);
-//        custNumProperty.set("default", null);
-
-        DataObject customerTypeDescriptor = DataFactory.INSTANCE.create("commonj.sdo", "Type");
+        DataObject customerTypeDescriptor = factory.create("commonj.sdo", "Type");
         customerTypeDescriptor.set("uri", CUST_URI2);
         customerTypeDescriptor.set("name", "Customer");
-//        customerTypeDescriptor.setBoolean("dataType", false);
-//        customerTypeDescriptor.setBoolean("open", false);
-//        customerTypeDescriptor.setBoolean("sequenced", false);
-//        customerTypeDescriptor.setBoolean("abstract", false);
-        customerTypeDescriptor.set("baseType", idObjectTypeDescriptor);
+        customerTypeDescriptor.set("baseType", idObjectTypeDescriptor); // base type has not been defined in the type system yet
 
-
-        // create a first name property
         DataObject firstNameProperty = customerTypeDescriptor.createDataObject("property");
         firstNameProperty.set("name", "firstName");
         firstNameProperty.set("type", stringType);
-//        firstNameProperty.setBoolean("many", false);
-//        firstNameProperty.setBoolean("containment", false);
-//        firstNameProperty.setBoolean("readOnly", false);
-//        firstNameProperty.set("default", null);
-
-        // create a last name property
         DataObject lastNameProperty = customerTypeDescriptor.createDataObject("property");
         lastNameProperty.set("name", "lastName");
         lastNameProperty.set("type", stringType);
-//        lastNameProperty.setBoolean("many", false);
-//        lastNameProperty.setBoolean("containment", false);
-//        lastNameProperty.setBoolean("readOnly", false);
-//        lastNameProperty.set("default", null);
 
-        // now define the Customer type so that customers can be made
-        //System.out.println("Printig dataObject customerTypeDescriptor:");
-        //printDO(customerTypeDescriptor);
-
-        Type t = types.define(customerTypeDescriptor);
-        //((TypeImpl)t).dump();
+        Type t = typeHelper.define(customerTypeDescriptor);
 
         assertEquals("Customer", t.getName());
         assertEquals(CUST_URI2, t.getURI());
 
         Property idProp = t.getProperty("id");
-        assertTrue( idProp!= null );
-        assertEquals("id", idProp.getName() );
-        assertEquals( intType, idProp.getType() );
+        assertNotNull(idProp);
+        assertEquals("id", idProp.getName());
+        assertEquals(intType, idProp.getType());
 
         List baseTypes = t.getBaseTypes();
         assertEquals(1, baseTypes.size());
@@ -812,7 +783,59 @@ public class DynamicSDOTest extends BaseTest
         assertEquals(CUST_URI2, baseType.getURI());
 
         Property idPropFromBase = t.getProperty("id");
-        assertTrue( idProp == idPropFromBase );
+        assertTrue(idProp == idPropFromBase);
     }
 
+    /** define base type dynamically and use the defined type as a base type
+        in defining an extended type dynamically
+    */
+    public void testDynamicBaseType2()
+    {
+        Type stringType = typeHelper.getType("commonj.sdo", "String");
+        Property xmlElement = typeHelper.getOpenContentProperty("commonj.sdo/xml", "xmlElement");
+
+        DataObject abstractBaseType = factory.create("commonj.sdo", "Type");
+        abstractBaseType.set("uri", TEST_URI);
+        abstractBaseType.set("name", "AbstractName");
+        abstractBaseType.setBoolean("abstract", true);
+        DataObject firstName = abstractBaseType.createDataObject("property");
+        firstName.set("name", "firstName");
+        firstName.set("type", stringType);
+        firstName.setBoolean(xmlElement, true);
+        DataObject lastName = abstractBaseType.createDataObject("property");
+        lastName.set("name", "lastName");
+        lastName.set("type", stringType);
+        lastName.setBoolean(xmlElement, true);
+        Type abstractName = typeHelper.define(abstractBaseType);
+
+        DataObject extendedType = factory.create("commonj.sdo", "Type");
+        extendedType.set("uri", TEST_URI);
+        extendedType.set("name", "ExtendedName");
+        List baseTypes = new ArrayList();
+        baseTypes.add(abstractBaseType);
+        extendedType.setList("baseType", baseTypes);
+        DataObject middleName = extendedType.createDataObject("property");
+        middleName.set("name", "middleName");
+        middleName.set("type", stringType);
+        middleName.setBoolean("nullable", true);
+        DataObject alias = extendedType.createDataObject("property");
+        alias.set("name", "alias");
+        alias.set("type", stringType);
+        alias.setBoolean("nullable", true);
+        Type extendedName = typeHelper.define(extendedType);
+
+        DataObject dobj = factory.create(extendedName);
+        dobj.set("firstName", "John");
+        dobj.set("middleName", "Q");
+        dobj.set("lastName", "Public");
+        dobj.set("alias", null);
+        String xml = 
+            "<dyn:ExtendedName xsi:type=\"dyn:ExtendedName\" " +
+            "xmlns:dyn=\"http://sdo/test/dynamic\" " +
+            "xmlns:xsi=\"" + XSI_URI + "\">" +
+            "<firstName>John</firstName><lastName>Public</lastName>" +
+            "<dyn:middleName>Q</dyn:middleName><dyn:alias xsi:nil=\"true\"/>" +
+            "</dyn:ExtendedName>";
+        assertEquals(xml, xmlHelper.save(dobj, TEST_URI, "ExtendedName"));
+    }
 }

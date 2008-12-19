@@ -594,30 +594,7 @@ public abstract class DataObjectImpl
             return DataHelperImpl._toDateTime((Date)value);
         if ( value instanceof List)
         {
-            // NOTE (w.y.): We want to test if the property is of type STRINGS.
-            // Unfortunately, there does not seem to be a way to determine 
-            // the property (and thus its type) from the path.
-
-            List valueList = (List)value;
-            if (valueList.size() == 0) return null;
-            boolean cce = false;
-            String res = "";
-            try
-            {
-                for (int i = 0; i < valueList.size(); i++)
-                {
-                    if (i>0)
-                        res += " ";
-                    String s = (String)valueList.get(i); // could throw CCE
-                    res += (s == null ? "" : s);
-                }
-            }
-            catch (ClassCastException e)
-            {
-                cce = true;
-            }
-            if (!cce) return res;
-            else return ((List)value).toString();
+            return DataHelperImpl._toString((List)value);
         }
 
         return value.toString(); //(String)value;
@@ -1402,10 +1379,11 @@ public abstract class DataObjectImpl
             return ((Byte)value).toString();
         if ( value instanceof Character)
         {
-            if (((Character)value).charValue() == '\0')
+            Character chValue = (Character)value;
+            if (chValue.charValue() == '\0')
                 return "";
             else
-                return ((Character)value).toString();
+                return (chValue).toString();
         }
         if ( value instanceof Double)
             return ((Double)value).toString();
@@ -1427,31 +1405,7 @@ public abstract class DataObjectImpl
             return DataHelperImpl._toDateTime((Date)value);
         if ( value instanceof List)
         {
-            TypeXML pType = _sdoContext.getTypeSystem().getTypeXML(property.getType());
-            if (BuiltInTypeSystem.STRINGS.isAssignableFrom(pType))
-            {
-                List valueList = ((List)value);
-                if (valueList.size() == 0) return null;
-                String res = "";
-                for (int i = 0; i < valueList.size(); i++)
-                {
-                    if (i>0)
-                        res += " ";
-                    Object s = valueList.get(i);
-                    res += (s == null ? "" : s);
-                }
-                return res;
-            }
-            else
-            {
-                List l = (List) value;
-                switch (l.size())
-                {
-                case 0: return null;
-                case 1: return l.get(0).toString();
-                default: return l.toString();
-                }
-            }
+            return DataHelperImpl._toString((List)value);
         }
 
         return value.toString(); //(String)value;

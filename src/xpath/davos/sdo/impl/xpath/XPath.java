@@ -19,6 +19,7 @@ import davos.sdo.ListXMLIterator;
 import davos.sdo.PropertyXML;
 import davos.sdo.SequenceXML;
 import davos.sdo.SDOError;
+import davos.sdo.SDOException;
 import davos.sdo.impl.common.ChangeSummaryXML;
 import davos.sdo.impl.common.Common;
 import davos.sdo.impl.type.BuiltInTypeSystem;
@@ -1986,7 +1987,14 @@ public class XPath
                     }
                     catch (SimpleValueHelper.SimpleValueException e)
                     {
-                        throw new IllegalStateException(e);
+                        if (e.cause() == SimpleValueHelper.MARSHAL_WRONGINSTANCECLASS)
+                        {
+                           throw new SDOException(SDOError.messageForCode("path.run.simplevalue.typemismatch",
+                               prop.getXMLName(), prop.getXMLNamespaceURI(), prop.getTypeXML().
+                               toString(), value == null ? "null" : value.getClass().getName()));
+                        }
+                        else
+                            throw new IllegalStateException(e);
                     }
                 }
             }

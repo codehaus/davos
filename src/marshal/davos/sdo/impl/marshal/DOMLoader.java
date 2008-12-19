@@ -70,12 +70,42 @@ public class DOMLoader implements Loader
             processElement(rootElement);
         }
         else if (n instanceof Element)
-            processElement((Element) n);
+        {
+            // Gather all namespace definitions from parents of this node
+            Element e = (Element) n;
+            processParent(e);
+            processElement(e);
+        }
         else
             throw new IllegalArgumentException("Can only process Document or Element Nodes: " +
                 n.getClass().getName());
         _m.finish();
         return root;
+    }
+
+    private void processParent(Element e)
+    {
+        Node n = e.getParentNode();
+        if (n.getNodeType() != Node.ELEMENT_NODE)
+            return;
+        e = (Element) n;
+        processParent(e);
+        _ns.pushNamespaceContext();
+        NamedNodeMap attributes = e.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++)
+        {
+            Node attr = attributes.item(i);
+            String qnameAttr = attr.getNodeName();
+
+            if (qnameAttr.startsWith(Names.XMLNS))
+            {
+                String uri = attr.getNodeValue();
+                int colon = qnameAttr.lastIndexOf(':');
+                String prefix = (colon > 0) ? qnameAttr.substring(colon + 1) :
+                    Common.EMPTY_STRING;
+                _ns.declarePrefix(prefix, uri);
+            }
+        }
     }
 
     public void processElement(Element e)

@@ -749,7 +749,8 @@ public class OpenContentTest extends MetaDataTest
         a.set("o", new Integer(100));
         Property p = a.getInstanceProperty("o");
         assertTrue(p.isOpenContent());
-        assertEquals(intObjectType, p.getType()); // would be better if it were intType; but this needs spec amendment/clarification
+        //assertEquals(intObjectType, p.getType()); // would be better if it were intType; but this needs spec amendment/clarification
+        assertEquals(intType, p.getType());
         assertFalse(p.isContainment());
         assertFalse(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
@@ -852,7 +853,8 @@ public class OpenContentTest extends MetaDataTest
         a.set("o", l);
         Property p = a.getInstanceProperty("o");
         assertTrue(p.isOpenContent());
-        assertEquals(intObjectType, p.getType()); // would be better if it were intType; but this needs spec amendment/clarification
+        //assertEquals(intObjectType, p.getType()); // would be better if it were intType; but this needs spec amendment/clarification
+        assertEquals(intType, p.getType());
         assertFalse(p.isContainment());
         assertTrue(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
@@ -1068,7 +1070,8 @@ public class OpenContentTest extends MetaDataTest
         a.set("o", l);
         Property p = a.getInstanceProperty("o");
         assertTrue(p.isOpenContent());
-        assertEquals(intObjectType, p.getType());
+        //assertEquals(intObjectType, p.getType());
+        assertEquals(intType, p.getType());
         assertFalse(p.isContainment());
         assertTrue(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());
@@ -1163,7 +1166,8 @@ public class OpenContentTest extends MetaDataTest
         Property p = root.getInstanceProperty("o");
         assertNotNull(p);
         assertTrue(p.isOpenContent());
-        assertEquals(intObjectType, p.getType());
+        //assertEquals(intObjectType, p.getType());
+        assertEquals(intType, p.getType());
         assertFalse(p.isContainment());
         assertTrue(p.isMany());
         assertNull(((PropertyXML)p).getXMLNamespaceURI());

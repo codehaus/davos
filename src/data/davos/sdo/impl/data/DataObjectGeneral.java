@@ -1195,6 +1195,7 @@ public class DataObjectGeneral
         }
         else
         {
+            // should this object be kept arround?
             List<PropertyXML> l = new ArrayList<PropertyXML>();
             l.addAll(typeProps);
 

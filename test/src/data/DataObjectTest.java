@@ -59,7 +59,7 @@ public class DataObjectTest extends BaseTest
         /*
         TestSuite suite = new TestSuite();
         //suite.addTest(new DataObjectTest("testJavaProperties"));
-        //suite.addTest(new DataObjectTest("testNumberOfProperties"));
+        suite.addTest(new DataObjectTest("testNumberOfProperties"));
         //suite.addTest(new DataObjectTest("testSetStringListByPath"));
         //suite.addTest(new DataObjectTest("testSetStringListByProperty"));
         //suite.addTest(new DataObjectTest("testCustomerByPath"));
@@ -74,7 +74,7 @@ public class DataObjectTest extends BaseTest
         //suite.addTest(new DataObjectTest("testStringsToString"));
         //suite.addTest(new DataObjectTest("testDay"));
         //suite.addTest(new DataObjectTest("testTime"));
-        suite.addTest(new DataObjectTest("testDate"));
+        //suite.addTest(new DataObjectTest("testDate"));
         */
         // or
         TestSuite suite = new TestSuite(DataObjectTest.class);
@@ -107,7 +107,7 @@ public class DataObjectTest extends BaseTest
     static Type longType = typeHelper.getType("commonj.sdo", "Long");
     static Type monthType = typeHelper.getType("commonj.sdo", "Month");
     static Type monthDayType = typeHelper.getType("commonj.sdo", "MonthDay");
-    //static Type objectType = typeHelper.getType("commonj.sdo", "Object");
+    static Type objectType = typeHelper.getType("commonj.sdo", "Object");
     static Type shortType = typeHelper.getType("commonj.sdo", "Short");
     static Type stringType = typeHelper.getType("commonj.sdo", "String");
     static Type stringsType = typeHelper.getType("commonj.sdo", "Strings");
@@ -150,6 +150,7 @@ public class DataObjectTest extends BaseTest
     protected static final int YEAR_P_I = 21;
     protected static final int YEARMONTH_P_I = 22;
     protected static final int YEARMONTHDAY_P_I = 23;
+    protected static final int OBJECT_P_I = 24;
     protected static Type basic_t;
     protected static Type basic_t2;
     protected static Type basic_java_t;
@@ -252,6 +253,11 @@ public class DataObjectTest extends BaseTest
         yearMonthDayProperty.set("name", "yearMonthDay");
         yearMonthDayProperty.set("type", yearMonthDayType);
         yearMonthDayProperty.set("nullable", true);
+        DataObject objectProperty = prototype.createDataObject("property");
+        objectProperty.set("name", "object");
+        objectProperty.set("type", objectType);
+        objectProperty.set("nullable", true);
+        objectProperty.set("many", true);
 
         basic_t = typeHelper.define(prototype);
 
@@ -508,11 +514,11 @@ public class DataObjectTest extends BaseTest
         List instanceProps = dobj.getInstanceProperties();
         System.out.println("number of instance properties: " +
                            instanceProps.size());
-        assertEquals(24, instanceProps.size());
+        assertEquals(25, instanceProps.size());
         Type t = dobj.getType();
         List props = t.getProperties();
         System.out.println("number of properties: " + props.size());
-        assertEquals(24, props.size());
+        assertEquals(25, props.size());
 
         for (int i = 0; i < instanceProps.size(); i++)
         {
@@ -546,6 +552,12 @@ public class DataObjectTest extends BaseTest
             else if (p.getType().getInstanceClass() != null && 
                      p.getType().getInstanceClass().equals(long.class))
                 assertEquals((long)0, value); // with auto-boxing
+            else if (p.getType().getInstanceClass() != null && 
+                     p.getType().getInstanceClass().equals(Object.class))
+            {
+                assertTrue(value instanceof List);
+                assertEquals(0, ((List)value).size());
+            }
             else
                 assertNull(value);
         }
@@ -5731,4 +5743,17 @@ public class DataObjectTest extends BaseTest
         // IllegalArgumentException
     }
 
+    public void testSetNullList()
+    {
+        System.out.println("testSetNullList()");
+        DataObject dobj = createDataObject();
+        dobj.setList("object", null); // should this be allowed?
+        List value = dobj.getList("object");
+        assertNotNull(value);
+        //assertEquals(0, value.size()); // BUG?
+        // looks like the null value got interpreted as a value for
+        // "object" rather than the value of the List for "object"!
+        assertEquals(1, value.size());
+        assertNull(value.get(0));
+    }
 }
